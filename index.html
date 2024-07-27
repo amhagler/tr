@@ -42,6 +42,10 @@
             font-size: 1em;
         }
 
+        .team span[contenteditable="true"] {
+            outline: none;
+        }
+
         .board {
             display: grid;
             gap: 10px;
@@ -172,6 +176,56 @@
         .editable:hover {
             background-color: rgba(255, 255, 255, 0.2);
         }
+
+        .large-button {
+            font-size: 1.5em;
+            background-color: #DAA520;
+            color: #000080;
+            padding: 1em 2em;
+            border-radius: 50px;
+            margin: 1em;
+        }
+
+        .team-button {
+            margin: 0 1em;
+            background-color: #DAA520;
+            color: #000080;
+            padding: 1em;
+            border-radius: 50px;
+            font-size: 1.5em;
+        }
+
+        .team-button-large {
+            font-size: 2em;
+            padding: 1.5em;
+        }
+
+        .question-list-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1E90FF;
+            padding: 2em;
+            border-radius: 10px;
+            width: 80%;
+            height: 80%;
+            text-align: center;
+            border: 10px solid black;
+            overflow-y: auto;
+        }
+
+        .question-list-popup input[type="text"] {
+            width: 80%;
+            margin-bottom: 0.5em;
+        }
+
+        .question-list-popup input[type="number"] {
+            width: 80px;
+            margin-bottom: 0.5em;
+        }
+
     </style>
 </head>
 <body>
@@ -204,6 +258,12 @@
             <button id="startGame">Start Game</button>
             <button id="resetGame">Reset Game</button>
             <button id="togglePoints">Double</button>
+            <button id="undoPoints">Undo</button>
+            <button onclick="showQuestionList()">Show Questions</button>
+        </div>
+        <div>
+            <label for="timerDuration">Timer Duration (seconds): </label>
+            <input type="number" id="timerDuration" value="10" min="1" max="60">
         </div>
         <div class="board" id="board">
             <!-- Jeopardy board cells will be dynamically generated here -->
@@ -213,12 +273,21 @@
             <div class="timer" id="timer">10</div>
             <div class="answer" id="answer"></div>
             <div class="controls">
-                <button id="correctButton" onclick="markCorrect()">Correct</button>
+                <div>
+                    <button class="team-button team-button-large" id="team1Button" onclick="markCorrect(1)">Team 1</button>
+                    <button class="team-button team-button-large" id="team2Button" onclick="markCorrect(2)">Team 2</button>
+                    <button class="team-button team-button-large" id="team3Button" onclick="markCorrect(3)">Team 3</button>
+                </div>
+                <button onclick="noTeamCorrect()">No Team Correct</button>
+                <button onclick="showAnswer()">Show Answer</button>
                 <button onclick="closeQuestion()">Close</button>
+                <button id="pauseTimer" onclick="pauseTimer()">Pause Timer</button>
             </div>
         </div>
-        <div class="controls">
-            <button onclick="copyTemplate()">Format</button>
+        <div class="question-list-popup" id="question-list-popup">
+            <h2>Question List</h2>
+            <div id="questionsList"></div>
+            <button onclick="closeQuestionList()">Close</button>
         </div>
     </main>
     <div class="winner" id="winner"></div>
@@ -232,6 +301,8 @@
         let scores = { team1: 0, team2: 0, team3: 0 };
         let isDouble = false;
         let timerInterval;
+        let undoStack = [];
+        let isPaused = false;
 
         function startGame() {
             try {
@@ -277,18 +348,18 @@
         }
 
         function selectQuestion(category, index, cell) {
-            if (cell.style.backgroundColor === 'silver') return;
+            if (cell.style.backgroundColor === 'silver' || cell.style.backgroundColor === 'darkgray') return;
 
             currentQuestion = questions[category][index];
             currentCategory = category;
             currentIndex = index;
             currentCell = cell;
+
             const questionArea = document.getElementById('question-area');
             questionArea.style.display = 'block';
             document.getElementById('question').innerText = currentQuestion.question;
             document.getElementById('answer').innerText = '';
-            document.getElementById('correctButton').style.display = 'inline-block';
-            document.getElementById('timer').innerText = '10';
+            document.getElementById('timer').innerText = document.getElementById('timerDuration').value;
 
             questionArea.animate(
                 [
@@ -302,23 +373,29 @@
             );
 
             startTimer();
+            updateTeamButtons();
         }
 
         function startTimer() {
-            let timeLeft = 10;
+            let timeLeft = parseInt(document.getElementById('timerDuration').value, 10);
             document.getElementById('timer').innerText = timeLeft;
+            isPaused = false;
             timerInterval = setInterval(() => {
-                if (timeLeft > 0) {
+                if (timeLeft > 0 && !isPaused) {
                     timeLeft--;
                     document.getElementById('timer').innerText = timeLeft;
-                } else {
+                } else if (timeLeft === 0) {
                     clearInterval(timerInterval);
                     document.getElementById('question').innerText = 'Time Expired';
-                    setTimeout(() => {
-                        closeQuestion();
-                    }, 2000);
+                    currentCell.style.backgroundColor = 'darkgray';
+                    currentCell.onclick = null;
                 }
             }, 1000);
+        }
+
+        function pauseTimer() {
+            isPaused = !isPaused;
+            document.getElementById('pauseTimer').innerText = isPaused ? 'Resume Timer' : 'Pause Timer';
         }
 
         function showAnswer() {
@@ -328,10 +405,12 @@
         function closeQuestion() {
             clearInterval(timerInterval);
             document.getElementById('question-area').style.display = 'none';
-            if (document.getElementById('correctButton').style.display === 'none') {
+            if (document.getElementById('question').innerText === 'Time Expired') {
+                currentCell.style.backgroundColor = 'darkgray';
+            } else if (document.getElementById('answer').innerText !== '') {
                 currentCell.style.backgroundColor = 'silver';
-                currentCell.onclick = null;
             }
+            currentCell.onclick = null;
         }
 
         function updateScore(team, points) {
@@ -353,15 +432,29 @@
             document.getElementById(`selectTeam${currentTeam}`).innerText = currentTeamName;
         }
 
-        function markCorrect() {
+        function markCorrect(team) {
             clearInterval(timerInterval);
-            updateScore(currentTeam, currentQuestion.points * (isDouble ? 2 : 1));
+            const points = currentQuestion.points * (isDouble ? 2 : 1);
+            updateScore(team, points);
+            undoStack.push({ team, points, cell: currentCell, question: currentQuestion });
             showAnswer();
-            document.getElementById('correctButton').style.display = 'none';
+            currentCell.style.backgroundColor = 'silver';
+            currentCell.onclick = null;
+        }
+
+        function noTeamCorrect() {
+            clearInterval(timerInterval);
+            showAnswer();
+            currentCell.style.backgroundColor = 'silver';
+            currentCell.onclick = null;
+            setTimeout(() => {
+                closeQuestion();
+            }, 2000);
         }
 
         function resetGame() {
             scores = { team1: 0, team2: 0, team3: 0 };
+            undoStack = [];
             document.getElementById('jsonInput').style.display = 'block';
             document.getElementById('jsonInput').value = '';
             document.getElementById('currentTeam').innerText = '';
@@ -376,11 +469,19 @@
 
         function updateTeamName(teamNumber) {
             updateCurrentTeamDisplay();
+            updateTeamButtons();
         }
 
         function selectTeam(teamNumber) {
             currentTeam = teamNumber;
             updateCurrentTeamDisplay();
+            updateTeamButtons();
+        }
+
+        function updateTeamButtons() {
+            document.getElementById('team1Button').innerText = document.getElementById('teamName1').innerText;
+            document.getElementById('team2Button').innerText = document.getElementById('teamName2').innerText;
+            document.getElementById('team3Button').innerText = document.getElementById('teamName3').innerText;
         }
 
         function copyTemplate() {
@@ -429,15 +530,6 @@
         { "question": "Sample Question 5", "answer": "Sample Answer 5", "points": 500 },
         { "question": "Sample Question 6", "answer": "Sample Answer 6", "points": 600 },
         { "question": "Sample Question 7", "answer": "Sample Answer 7", "points": 700 }
-    ],
-    "Category 6": [
-        { "question": "Sample Question 1", "answer": "Sample Answer 1", "points": 100 },
-        { "question": "Sample Question 2", "answer": "Sample Answer 2", "points": 200 },
-        { "question": "Sample Question 3", "answer": "Sample Answer 3", "points": 300 },
-        { "question": "Sample Question 4", "answer": "Sample Answer 4", "points": 400 },
-        { "question": "Sample Question 5", "answer": "Sample Answer 5", "points": 500 },
-        { "question": "Sample Question 6", "answer": "Sample Answer 6", "points": 600 },
-        { "question": "Sample Question 7", "answer": "Sample Answer 7", "points": 700 }
     ]
 }`;
             const tempInput = document.createElement('textarea');
@@ -446,13 +538,62 @@
             tempInput.select();
             document.execCommand('copy');
             document.body.removeChild(tempInput);
-            alert('JSON template copied to clipboard');
+            alert('JSON template copied to clipboard!');
+        }
+
+        function showQuestionList() {
+            const questionListPopup = document.getElementById('question-list-popup');
+            const questionsList = document.getElementById('questionsList');
+            questionsList.innerHTML = '';
+
+            for (const category in questions) {
+                const categoryTitle = document.createElement('h3');
+                categoryTitle.innerText = category;
+                questionsList.appendChild(categoryTitle);
+
+                questions[category].forEach((q, index) => {
+                    const questionEntry = document.createElement('p');
+                    questionEntry.innerHTML = `Q${index + 1}: <span class="editable" contenteditable="true" data-category="${category}" data-index="${index}" oninput="updateQuestion(this)">${q.question}</span> - A: <span class="editable" contenteditable="true" data-category="${category}" data-index="${index}" oninput="updateAnswer(this)">${q.answer}</span> (${q.points} points)`;
+                    questionsList.appendChild(questionEntry);
+                });
+            }
+
+            questionListPopup.style.display = 'block';
+        }
+
+        function closeQuestionList() {
+            document.getElementById('question-list-popup').style.display = 'none';
+        }
+
+        function undoPoints() {
+            if (undoStack.length === 0) {
+                alert("No actions to undo");
+                return;
+            }
+
+            const lastAction = undoStack.pop();
+            scores[`team${lastAction.team}`] -= lastAction.points;
+            updateScores();
+            lastAction.cell.style.backgroundColor = '#1E90FF';
+            lastAction.cell.onclick = () => selectQuestion(lastAction.cell.className.split(' ')[1].split('-')[0], lastAction.cell.className.split(' ')[1].split('-')[1], lastAction.cell);
+        }
+
+        function updateQuestion(input) {
+            const category = input.getAttribute('data-category');
+            const index = input.getAttribute('data-index');
+            questions[category][index].question = input.innerText;
+        }
+
+        function updateAnswer(input) {
+            const category = input.getAttribute('data-category');
+            const index = input.getAttribute('data-index');
+            questions[category][index].answer = input.innerText;
         }
 
         document.getElementById('startGame').addEventListener('click', startGame);
         document.getElementById('resetGame').addEventListener('click', resetGame);
         document.getElementById('togglePoints').addEventListener('click', togglePoints);
+        document.getElementById('undoPoints').addEventListener('click', undoPoints);
     </script>
 </body>
 </html>
-
