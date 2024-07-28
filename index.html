@@ -36,7 +36,7 @@
             align-items: center;
             position: relative;
             cursor: pointer;
-            animation: none;
+            border: 5px solid black;
         }
 
         .team.breathing {
@@ -248,7 +248,7 @@
     <header>
         <h1>Trivia</h1>
         <div class="teams">
-            <div class="team" id="team1" onclick="selectTeam(1)">
+            <div class="team breathing" id="team1" onclick="selectTeam(1)">
                 <div class="editable" id="teamName1" contenteditable="true" oninput="updateTeamName(1)">Team 1</div>
                 <span id="score1" contenteditable="true" oninput="updateScores()">0</span>
             </div>
@@ -443,8 +443,10 @@
             const teamElements = document.querySelectorAll('.team');
             teamElements.forEach(team => {
                 team.classList.remove('breathing');
+                team.style.borderColor = 'black';
             });
             currentTeamElement.classList.add('breathing');
+            currentTeamElement.style.borderColor = 'silver';
         }
 
         function markCorrect(team) {
