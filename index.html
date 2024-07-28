@@ -35,6 +35,12 @@
             justify-content: center;
             align-items: center;
             position: relative;
+            cursor: pointer;
+            animation: none;
+        }
+
+        .team.breathing {
+            animation: breathe 1s infinite alternate;
         }
 
         .team span {
@@ -138,12 +144,6 @@
             font-family: Arial, sans-serif;
         }
 
-        #currentTeam {
-            font-size: 2em;
-            font-weight: bold;
-            margin-bottom: 1em;
-        }
-
         .category-label {
             font-size: 1.2em;
             padding: 0.5em;
@@ -226,30 +226,40 @@
             margin-bottom: 0.5em;
         }
 
+        .darker-gray {
+            background-color: #696969;
+        }
+
+        .category-title {
+            font-weight: bold;
+            text-align: left;
+            margin-top: 1em;
+            color: #DAA520;
+        }
+
+        .question-entry {
+            text-align: left;
+            margin-left: 1em;
+        }
+
     </style>
 </head>
 <body>
     <header>
         <h1>Trivia</h1>
         <div class="teams">
-            <div class="team" id="team1">
+            <div class="team" id="team1" onclick="selectTeam(1)">
                 <div class="editable" id="teamName1" contenteditable="true" oninput="updateTeamName(1)">Team 1</div>
                 <span id="score1" contenteditable="true" oninput="updateScores()">0</span>
             </div>
-            <div class="team" id="team2">
+            <div class="team" id="team2" onclick="selectTeam(2)">
                 <div class="editable" id="teamName2" contenteditable="true" oninput="updateTeamName(2)">Team 2</div>
                 <span id="score2" contenteditable="true" oninput="updateScores()">0</span>
             </div>
-            <div class="team" id="team3">
+            <div class="team" id="team3" onclick="selectTeam(3)">
                 <div class="editable" id="teamName3" contenteditable="true" oninput="updateTeamName(3)">Team 3</div>
                 <span id="score3" contenteditable="true" oninput="updateScores()">0</span>
             </div>
-        </div>
-        <div id="currentTeam"></div>
-        <div class="team-selectors">
-            <span class="team-selector" id="selectTeam1" onclick="selectTeam(1)">Team 1</span>
-            <span class="team-selector" id="selectTeam2" onclick="selectTeam(2)">Team 2</span>
-            <span class="team-selector" id="selectTeam3" onclick="selectTeam(3)">Team 3</span>
         </div>
     </header>
     <main>
@@ -260,6 +270,7 @@
             <button id="togglePoints">Double</button>
             <button id="undoPoints">Undo</button>
             <button onclick="showQuestionList()">Show Questions</button>
+            <button onclick="copyTemplate()">Format</button>
         </div>
         <div>
             <label for="timerDuration">Timer Duration (seconds): </label>
@@ -278,15 +289,18 @@
                     <button class="team-button team-button-large" id="team2Button" onclick="markCorrect(2)">Team 2</button>
                     <button class="team-button team-button-large" id="team3Button" onclick="markCorrect(3)">Team 3</button>
                 </div>
-                <button onclick="noTeamCorrect()">No Team Correct</button>
-                <button onclick="showAnswer()">Show Answer</button>
-                <button onclick="closeQuestion()">Close</button>
-                <button id="pauseTimer" onclick="pauseTimer()">Pause Timer</button>
+                <div style="margin-top: 1em;">
+                    <button class="team-button" onclick="noTeamCorrect()">No Team Correct</button>
+                    <button class="team-button" onclick="showAnswer()">Show Answer</button>
+                    <button class="team-button" onclick="pauseTimer()" id="pauseTimer">Pause Timer</button>
+                    <button class="team-button" onclick="closeQuestion()">Close</button>
+                </div>
             </div>
         </div>
         <div class="question-list-popup" id="question-list-popup">
-            <h2>Question List</h2>
+            <h2>Questions and Answers</h2>
             <div id="questionsList"></div>
+            <button onclick="copyQuestionList()">Copy</button>
             <button onclick="closeQuestionList()">Close</button>
         </div>
     </main>
@@ -387,7 +401,7 @@
                 } else if (timeLeft === 0) {
                     clearInterval(timerInterval);
                     document.getElementById('question').innerText = 'Time Expired';
-                    currentCell.style.backgroundColor = 'darkgray';
+                    currentCell.style.backgroundColor = '#696969';
                     currentCell.onclick = null;
                 }
             }, 1000);
@@ -406,7 +420,7 @@
             clearInterval(timerInterval);
             document.getElementById('question-area').style.display = 'none';
             if (document.getElementById('question').innerText === 'Time Expired') {
-                currentCell.style.backgroundColor = 'darkgray';
+                currentCell.style.backgroundColor = '#696969';
             } else if (document.getElementById('answer').innerText !== '') {
                 currentCell.style.backgroundColor = 'silver';
             }
@@ -425,11 +439,12 @@
         }
 
         function updateCurrentTeamDisplay() {
-            const currentTeamName = document.getElementById(`teamName${currentTeam}`).innerText;
-            document.getElementById('currentTeam').innerText = `Current Turn: ${currentTeamName}`;
-            document.querySelectorAll('.team-selector').forEach(selector => selector.classList.remove('selected'));
-            document.getElementById(`selectTeam${currentTeam}`).classList.add('selected');
-            document.getElementById(`selectTeam${currentTeam}`).innerText = currentTeamName;
+            const currentTeamElement = document.getElementById(`team${currentTeam}`);
+            const teamElements = document.querySelectorAll('.team');
+            teamElements.forEach(team => {
+                team.classList.remove('breathing');
+            });
+            currentTeamElement.classList.add('breathing');
         }
 
         function markCorrect(team) {
@@ -457,7 +472,7 @@
             undoStack = [];
             document.getElementById('jsonInput').style.display = 'block';
             document.getElementById('jsonInput').value = '';
-            document.getElementById('currentTeam').innerText = '';
+            document.querySelectorAll('.team').forEach(team => team.classList.remove('breathing'));
             startGame();
         }
 
@@ -548,11 +563,13 @@
 
             for (const category in questions) {
                 const categoryTitle = document.createElement('h3');
+                categoryTitle.className = 'category-title';
                 categoryTitle.innerText = category;
                 questionsList.appendChild(categoryTitle);
 
                 questions[category].forEach((q, index) => {
                     const questionEntry = document.createElement('p');
+                    questionEntry.className = 'question-entry';
                     questionEntry.innerHTML = `Q${index + 1}: <span class="editable" contenteditable="true" data-category="${category}" data-index="${index}" oninput="updateQuestion(this)">${q.question}</span> - A: <span class="editable" contenteditable="true" data-category="${category}" data-index="${index}" oninput="updateAnswer(this)">${q.answer}</span> (${q.points} points)`;
                     questionsList.appendChild(questionEntry);
                 });
@@ -563,6 +580,19 @@
 
         function closeQuestionList() {
             document.getElementById('question-list-popup').style.display = 'none';
+        }
+
+        function copyQuestionList() {
+            const questionsList = document.getElementById('questionsList').innerHTML;
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = questionsList;
+            const tempInput = document.createElement('textarea');
+            tempInput.value = tempDiv.innerText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            alert('Question list copied to clipboard!');
         }
 
         function undoPoints() {
