@@ -1,632 +1,1426 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Trivia</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #000080;
-            color: #FFFFFF;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Trivia Show</title>
+  <style>
+    :root{
+      /* Modern game-show + theatrical palette */
+      --bg0:#070B1A;          /* deep night */
+      --bg1:#0B1230;          /* panel navy */
+      --electric:#2D7DFF;     /* electric blue */
+      --electric2:#1E5BFF;    /* deeper electric */
 
-        header {
-            background-color: #1E90FF;
-            color: white;
-            padding: 1em;
-        }
+      /* Brighter "show" gold */
+      --gold:#FFD54A;         /* brighter show gold */
+      --gold2:#FFB700;        /* hotter gold for accents */
 
-        .teams {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 1em;
-        }
+      --ink:#EAF0FF;          /* near-white text */
+      --muted:#B7C2E6;        /* muted text */
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --shadow2: 0 10px 28px rgba(0,0,0,.35);
+      --radius: 18px;
+      --radius2: 26px;
+      --ring: 0 0 0 2px rgba(45,125,255,.35), 0 0 0 6px rgba(255,213,74,.12);
 
-        .team {
-            font-size: 2em;
-            background-color: #DAA520;
-            padding: 0.5em;
-            border-radius: 50%;
-            width: 200px;
-            height: 200px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            cursor: pointer;
-            animation: none;
-            border: 5px solid black;
-        }
+      --cell-min-h: 72px;
+    }
 
-        .team.breathing {
-            animation: breathe 1s infinite alternate;
-            border-width: 10px;
-        }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 700px at 20% -10%, rgba(45,125,255,.25), transparent 60%),
+        radial-gradient(900px 600px at 90% 10%, rgba(255,183,0,.18), transparent 55%),
+        radial-gradient(1200px 900px at 50% 120%, rgba(45,125,255,.18), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      text-align:center;
+      overflow-x:hidden;
+    }
 
-        .team span {
-            display: block;
-            font-size: 1em;
-        }
+    header{
+      padding: 20px 18px 10px;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(11,18,48,.92), rgba(11,18,48,.55));
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
 
-        .team span[contenteditable="true"] {
-            outline: none;
-        }
+    .title-wrap{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      align-items:center;
+      justify-content:center;
+      margin-bottom: 10px;
+    }
 
-        .board {
-            display: grid;
-            gap: 10px;
-            margin: 2em auto;
-            width: 90%;
-        }
+    h1{
+      margin:0;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      font-weight: 900;
+      font-size: clamp(22px, 3.2vw, 34px);
+      text-shadow: 0 10px 36px rgba(0,0,0,.55);
+    }
 
-        .board div {
-            background-color: #1E90FF;
-            padding: 1em;
-            border: 2px solid #DAA520;
-            cursor: pointer;
-            color: white;
-            border-radius: 5px;
-        }
+    .subline{
+      font-size: 12px;
+      letter-spacing:.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: .95;
+    }
 
-        .board .category {
-            background-color: #DAA520;
-            font-weight: bold;
-            cursor: default;
-        }
+    .teams{
+      display:flex;
+      justify-content:center;
+      gap: clamp(10px, 2vw, 18px);
+      flex-wrap: wrap;
+      margin: 14px auto 8px;
+      max-width: 1100px;
+    }
 
-        .question-area {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #1E90FF;
-            padding: 2em;
-            border-radius: 10px;
-            width: 60%;
-            height: 60%;
-            text-align: center;
-            border: 10px solid black;
-            animation: breathe 1s infinite alternate;
-        }
+    .team{
+      width: 220px;
+      height: 128px;
+      border-radius: 22px;
+      background:
+        radial-gradient(160px 100px at 30% 15%, rgba(255,213,74,.18), transparent 60%),
+        radial-gradient(220px 120px at 60% 80%, rgba(45,125,255,.16), transparent 55%),
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow2);
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      gap: 10px;
+      cursor:pointer;
+      position:relative;
+      transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+      user-select:none;
+    }
+    .team:hover{
+      transform: translateY(-1px);
+      border-color: rgba(45,125,255,.35);
+      box-shadow: 0 16px 40px rgba(0,0,0,.45);
+    }
 
-        @keyframes breathe {
-            from {
-                border-color: black;
-            }
-            to {
-                border-color: silver;
-            }
-        }
+    .team.active{
+      box-shadow: var(--shadow), 0 0 0 2px rgba(45,125,255,.35), 0 0 40px rgba(45,125,255,.22);
+      border-color: rgba(45,125,255,.50);
+      transform: translateY(-2px);
+    }
 
-        .question-area .question,
-        .question-area .answer {
-            font-size: 2em;
-            margin: 1em 0;
-        }
+    .team .name{
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing:.04em;
+      padding: 6px 10px;
+      border-radius: 12px;
+      max-width: 200px;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
 
-        .question-area .timer {
-            font-size: 3em;
-            position: absolute;
-            bottom: 10%;
-            left: 50%;
-            transform: translateX(-50%);
-        }
+    .team .score{
+      font-weight: 950;
+      font-size: 34px;
+      letter-spacing: .02em;
+      line-height: 1;
+      color: var(--gold);
+      text-shadow:
+        0 14px 40px rgba(0,0,0,.60),
+        0 0 22px rgba(255,183,0,.30),
+        0 0 44px rgba(255,213,74,.18);
+      padding: 4px 10px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.08);
+      min-width: 96px;
+    }
 
-        .controls {
-            margin: 1em 0;
-        }
+    .editable{
+      outline:none;
+      display:inline-block;
+      cursor:text;
+    }
+    .editable:hover{
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+    }
 
-        button {
-            background-color: #1E90FF;
-            color: white;
-            padding: 0.5em 1em;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+    main{
+      padding: 18px 16px 60px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
-        button:hover {
-            background-color: #104E8B;
-        }
+    .setup{
+      display:grid;
+      gap: 12px;
+      justify-items:center;
+      margin-top: 10px;
+    }
 
-        .winner {
-            display: none;
-            font-size: 2em;
-            color: #DAA520;
-            margin-top: 1em;
-        }
+    #jsonInput{
+      width:min(980px, 92vw);
+      height: 180px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      padding: 14px 14px;
+      background: rgba(255,255,255,.06);
+      color: var(--ink);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      box-shadow: var(--shadow2);
+      resize: vertical;
+    }
+    #jsonInput::placeholder{ color: rgba(234,240,255,.55); }
 
-        #jsonInput {
-            width: 80%;
-            height: 200px;
-            margin-bottom: 1em;
-            font-family: Arial, sans-serif;
-        }
+    .controls{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px;
+      justify-content:center;
+      align-items:center;
+      margin: 10px 0 8px;
+    }
 
-        .category-label {
-            font-size: 1.2em;
-            padding: 0.5em;
-            background-color: #DAA520;
-            border-radius: 5px;
-        }
+    button{
+      border:none;
+      cursor:pointer;
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: var(--ink);
+      font-weight: 900;
+      letter-spacing: .02em;
+      background:
+        radial-gradient(150px 90px at 20% 20%, rgba(45,125,255,.25), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 24px rgba(0,0,0,.35);
+      transition: transform .12s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
+      user-select:none;
+    }
+    button:hover{
+      transform: translateY(-1px);
+      border-color: rgba(45,125,255,.45);
+      box-shadow: 0 14px 30px rgba(0,0,0,.42);
+    }
+    button:active{ transform: translateY(0px) scale(.99); }
 
-        .team-selector {
-            display: inline-block;
-            margin: 0 10px;
-            cursor: pointer;
-            padding: 0.5em 1em;
-            background-color: #DAA520;
-            color: #000080;
-            border-radius: 5px;
-        }
+    .btn-gold{
+      background:
+        radial-gradient(160px 100px at 20% 20%, rgba(255,213,74,.55), transparent 60%),
+        linear-gradient(180deg, rgba(255,213,74,.40), rgba(255,255,255,.06));
+      border-color: rgba(255,213,74,.45);
+      color: #070B1A;
+      text-shadow: none;
+    }
+    .btn-danger{
+      background:
+        radial-gradient(160px 100px at 20% 20%, rgba(255,90,90,.25), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      border-color: rgba(255,90,90,.35);
+    }
 
-        .team-selector.selected {
-            background-color: #1E90FF;
-            color: #FFFFFF;
-        }
+    .inline{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content:center;
+      flex-wrap:wrap;
+      color: var(--muted);
+      font-weight: 800;
+      letter-spacing:.02em;
+      margin-top: 2px;
+    }
+    .inline input[type="number"]{
+      width: 90px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      padding: 8px 10px;
+      background: rgba(255,255,255,.06);
+      color: var(--ink);
+      font-weight: 900;
+      box-shadow: 0 10px 24px rgba(0,0,0,.30);
+      outline:none;
+    }
+    .inline input[type="number"]:focus{
+      box-shadow: var(--shadow2), var(--ring);
+      border-color: rgba(45,125,255,.45);
+    }
 
-        .editable {
-            display: inline-block;
-            padding: 0.1em;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+    .board{
+      display:grid;
+      gap: 14px;
+      margin: 20px auto 0;
+      width: min(1100px, 92vw);
+      align-items: stretch;
+    }
 
-        .editable:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
+    .cell{
+      background:
+        radial-gradient(160px 90px at 30% 15%, rgba(45,125,255,.35), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      box-shadow: 0 14px 30px rgba(0,0,0,.35);
+      padding: 14px 10px;
+      min-height: var(--cell-min-h);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease, filter .2s ease, opacity .2s ease;
+      user-select:none;
+      position:relative;
+      overflow:hidden;
+    }
+    .cell.clickable:hover{
+      transform: translateY(-2px);
+      border-color: rgba(45,125,255,.55);
+      box-shadow: 0 18px 40px rgba(0,0,0,.45), 0 0 30px rgba(45,125,255,.18);
+      cursor:pointer;
+    }
 
-        .large-button {
-            font-size: 1.5em;
-            background-color: #DAA520;
-            color: #000080;
-            padding: 1em 2em;
-            border-radius: 50px;
-            margin: 1em;
-        }
+    .cell .value{
+      font-weight: 950;
+      font-size: clamp(22px, 3vw, 34px);
+      letter-spacing: .04em;
+      text-shadow: 0 14px 40px rgba(0,0,0,.55);
+    }
 
-        .team-button {
-            margin: 0 1em;
-            background-color: #DAA520;
-            color: #000080;
-            padding: 1em;
-            border-radius: 50px;
-            font-size: 1.5em;
-        }
+    /* Brighter, less translucent category headers */
+    .cell.category{
+      background: linear-gradient(180deg, rgba(255,213,74,.92), rgba(255,183,0,.78));
+      border-color: rgba(255,213,74,.55);
+      box-shadow: 0 14px 30px rgba(0,0,0,.35);
+      cursor:default;
+      padding: 16px 10px;
+    }
+    .cell.category .cat{
+      font-weight: 950;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-size: 13px;
+      color: #070B1A;
+      text-shadow:none;
+      line-height: 1.2;
+      text-align:center;
+    }
 
-        .team-button-large {
-            font-size: 2em;
-            padding: 1.5em;
-        }
+    /* Cell states */
+    .cell.answered{
+      opacity: .45;
+      filter: saturate(.55);
+      background:
+        radial-gradient(220px 120px at 20% 20%, rgba(255,213,74,.22), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border-color: rgba(255,213,74,.25);
+      cursor:default;
+    }
+    .cell.missed{
+      opacity: .52;
+      filter: saturate(.35);
+      background:
+        radial-gradient(220px 120px at 20% 20%, rgba(255,255,255,.10), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border-color: rgba(255,255,255,.10);
+      cursor:default;
+    }
+    .cell.expired{
+      opacity: .48;
+      filter: saturate(.25);
+      background:
+        radial-gradient(220px 120px at 20% 20%, rgba(45,125,255,.12), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border-color: rgba(45,125,255,.15);
+      cursor:default;
+    }
 
-        .question-list-popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #1E90FF;
-            padding: 2em;
-            border-radius: 10px;
-            width: 80%;
-            height: 80%;
-            text-align: center;
-            border: 10px solid black;
-            overflow-y: auto;
-        }
+    /* Double mode badge */
+    .double-on .cell.clickable::after{
+      content: "×2";
+      position:absolute;
+      top:10px;
+      right:12px;
+      font-weight: 950;
+      font-size: 12px;
+      letter-spacing:.10em;
+      color: rgba(255,213,74,.98);
+      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,213,74,.35);
+      padding: 4px 8px;
+      border-radius: 999px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.35);
+    }
 
-        .question-list-popup input[type="text"] {
-            width: 80%;
-            margin-bottom: 0.5em;
-        }
+    /* Backdrop for modal drama */
+    .backdrop{
+      display:none;
+      position:fixed;
+      inset:0;
+      background: radial-gradient(1000px 700px at 50% 20%, rgba(45,125,255,.18), rgba(0,0,0,.70));
+      backdrop-filter: blur(6px);
+      z-index: 20;
+    }
+    .backdrop.show{ display:block; }
 
-        .question-list-popup input[type="number"] {
-            width: 80px;
-            margin-bottom: 0.5em;
-        }
+    /* Modal: now mostly opaque for readability */
+    .question-area{
+      display:none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(.96);
+      width: min(960px, 92vw);
+      height: min(72vh, 680px);
+      background: linear-gradient(180deg, rgba(10,16,40,.96), rgba(7,11,26,.96));
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 26px;
+      box-shadow: var(--shadow), 0 0 60px rgba(45,125,255,.14);
+      z-index: 25;
+      padding: 22px 20px 18px;
+      text-align: center;
+      overflow:hidden;
+    }
+    .question-area.show{
+      display:block;
+      animation: popIn .18s ease-out forwards;
+    }
+    @keyframes popIn{
+      from{ transform: translate(-50%, -50%) scale(.92); opacity:0; }
+      to{ transform: translate(-50%, -50%) scale(1); opacity:1; }
+    }
 
-        .darker-gray {
-            background-color: #696969;
-        }
+    .qa-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 10px;
+      padding: 4px 8px 10px;
+      color: var(--muted);
+      font-weight: 900;
+      letter-spacing:.08em;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
 
-        .category-title {
-            font-weight: bold;
-            text-align: left;
-            margin-top: 1em;
-            color: #DAA520;
-        }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 10px 24px rgba(0,0,0,.30);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .pill strong{ color: var(--ink); letter-spacing:.02em; }
 
-        .question-entry {
-            text-align: left;
-            margin-left: 1em;
-        }
+    /* Question panel: opaque enough to read cleanly */
+    .question{
+      font-size: clamp(24px, 3.3vw, 46px);
+      font-weight: 950;
+      letter-spacing: .01em;
+      line-height: 1.12;
+      margin: 14px auto 0;
+      max-width: 900px;
+      text-shadow: 0 18px 60px rgba(0,0,0,.70);
+      padding: 18px 18px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 18px 55px rgba(0,0,0,.45);
+    }
 
-    </style>
+    .answer{
+      font-size: clamp(18px, 2.3vw, 30px);
+      font-weight: 900;
+      letter-spacing: .01em;
+      margin: 18px auto 0;
+      max-width: 900px;
+      padding: 14px 14px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.45);
+      border: 1px solid rgba(255,183,0,.22);
+      color: rgba(234,240,255,.95);
+      text-shadow: 0 14px 40px rgba(0,0,0,.65);
+      min-height: 56px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .answer.revealed{
+      box-shadow:
+        0 0 50px rgba(255,183,0,.16),
+        0 18px 55px rgba(0,0,0,.45);
+      border-color: rgba(255,183,0,.40);
+    }
+
+    .timer{
+      position:absolute;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(34px, 5vw, 70px);
+      font-weight: 950;
+      letter-spacing:.06em;
+      color: var(--gold);
+      text-shadow:
+        0 18px 60px rgba(0,0,0,.65),
+        0 0 26px rgba(255,183,0,.35),
+        0 0 52px rgba(255,213,74,.22);
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 14px 36px rgba(0,0,0,.38);
+      min-width: 120px;
+    }
+    .timer.low{
+      animation: pulse 0.8s infinite ease-in-out;
+      box-shadow:
+        0 0 55px rgba(255,183,0,.20),
+        0 18px 60px rgba(0,0,0,.60);
+    }
+    @keyframes pulse{
+      0%{ transform: translateX(-50%) scale(1); }
+      50%{ transform: translateX(-50%) scale(1.04); }
+      100%{ transform: translateX(-50%) scale(1); }
+    }
+
+    .time-overlay{
+      position:absolute;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      font-size: clamp(40px, 7vw, 92px);
+      font-weight: 950;
+      letter-spacing:.18em;
+      text-transform: uppercase;
+      color: rgba(234,240,255,.92);
+      text-shadow: 0 20px 80px rgba(0,0,0,.75);
+      background: radial-gradient(700px 500px at 50% 40%, rgba(255,90,90,.22), rgba(0,0,0,.66));
+      backdrop-filter: blur(2px);
+    }
+    .time-overlay.show{ display:flex; }
+
+    .modal-controls{
+      position:absolute;
+      left: 0;
+      right: 0;
+      bottom: 104px;
+      padding: 0 18px;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      align-items:center;
+    }
+
+    .team-buttons{
+      display:flex;
+      gap: 10px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+
+    .team-button{
+      min-width: 220px;
+      font-size: 18px;
+      padding: 12px 16px;
+    }
+    .team-button.primary{
+      background:
+        radial-gradient(160px 100px at 20% 20%, rgba(255,213,74,.55), transparent 60%),
+        linear-gradient(180deg, rgba(255,213,74,.40), rgba(255,255,255,.06));
+      border-color: rgba(255,213,74,.45);
+      color: #070B1A;
+    }
+
+    .row-buttons{
+      display:flex;
+      gap: 10px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+    .row-buttons button{ min-width: 160px; }
+
+    .winner{
+      display:none;
+      margin: 18px auto 0;
+      width: min(1100px, 92vw);
+      padding: 16px 14px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.26);
+      border: 1px solid rgba(255,213,74,.22);
+      box-shadow: var(--shadow2);
+      font-size: 18px;
+      font-weight: 950;
+      letter-spacing:.02em;
+      color: var(--gold);
+      text-shadow:
+        0 14px 40px rgba(0,0,0,.60),
+        0 0 18px rgba(255,183,0,.22);
+    }
+
+    /* Questions list popup */
+    .question-list-popup{
+      display:none;
+      position:fixed;
+      inset: 5vh 4vw;
+      background: linear-gradient(180deg, rgba(10,16,40,.97), rgba(7,11,26,.97));
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      z-index: 30;
+      padding: 18px 16px 14px;
+      overflow:hidden;
+    }
+    .ql-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+    .ql-head h2{
+      margin:0;
+      font-size: 16px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      font-weight: 950;
+      color: var(--ink);
+    }
+    .ql-body{
+      height: calc(100% - 56px);
+      overflow:auto;
+      padding: 14px 6px 6px;
+      text-align:left;
+    }
+    .category-title{
+      margin: 18px 0 8px;
+      color: var(--gold);
+      font-weight: 950;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-size: 13px;
+    }
+    .question-entry{
+      margin: 6px 0;
+      padding: 10px 10px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.30);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+      line-height: 1.35;
+    }
+    .question-entry .tag{
+      display:inline-block;
+      font-weight: 950;
+      color: var(--muted);
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      font-size: 11px;
+      margin-right: 8px;
+    }
+    .question-entry .pts{
+      color: rgba(255,213,74,.98);
+      font-weight: 950;
+      margin-left: 8px;
+      white-space:nowrap;
+    }
+    .question-entry .editable{
+      padding: 2px 6px;
+      border-radius: 10px;
+    }
+
+    /* Tiny help text */
+    .hotkeys{
+      margin-top: 6px;
+      color: rgba(183,194,230,.92);
+      font-size: 12px;
+      letter-spacing:.03em;
+    }
+    .hotkeys kbd{
+      display:inline-block;
+      padding: 2px 7px;
+      border-radius: 8px;
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 10px 22px rgba(0,0,0,.18);
+      font-weight: 950;
+      color: var(--ink);
+      margin: 0 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+  </style>
 </head>
+
 <body>
-    <header>
-        <h1>Trivia</h1>
-        <div class="teams">
-            <div class="team" id="team1" onclick="selectTeam(1)">
-                <div class="editable" id="teamName1" contenteditable="true" oninput="updateTeamName(1)">Team 1</div>
-                <span id="score1" contenteditable="true" oninput="updateScores()">0</span>
-            </div>
-            <div class="team" id="team2" onclick="selectTeam(2)">
-                <div class="editable" id="teamName2" contenteditable="true" oninput="updateTeamName(2)">Team 2</div>
-                <span id="score2" contenteditable="true" oninput="updateScores()">0</span>
-            </div>
-            <div class="team" id="team3" onclick="selectTeam(3)">
-                <div class="editable" id="teamName3" contenteditable="true" oninput="updateTeamName(3)">Team 3</div>
-                <span id="score3" contenteditable="true" oninput="updateScores()">0</span>
-            </div>
-        </div>
-    </header>
-    <main>
-        <textarea id="jsonInput" placeholder="Paste your JSON data here..."></textarea>
-        <div class="controls">
-            <button id="startGame">Start Game</button>
-            <button id="resetGame">Reset Game</button>
-            <button id="togglePoints">Double</button>
-            <button id="undoPoints">Undo</button>
-            <button onclick="showQuestionList()">Show Questions</button>
-            <button onclick="copyTemplate()">Format</button>
-        </div>
-        <div>
-            <label for="timerDuration">Timer Duration (seconds): </label>
-            <input type="number" id="timerDuration" value="10" min="1" max="60">
-        </div>
-        <div class="board" id="board">
-            <!-- Jeopardy board cells will be dynamically generated here -->
-        </div>
-        <div class="question-area" id="question-area">
-            <div class="question" id="question"></div>
-            <div class="timer" id="timer">10</div>
-            <div class="answer" id="answer"></div>
-            <div class="controls">
-                <div>
-                    <button class="team-button team-button-large" id="team1Button" onclick="markCorrect(1)">Team 1</button>
-                    <button class="team-button team-button-large" id="team2Button" onclick="markCorrect(2)">Team 2</button>
-                    <button class="team-button team-button-large" id="team3Button" onclick="markCorrect(3)">Team 3</button>
-                </div>
-                <div style="margin-top: 1em;">
-                    <button class="team-button" onclick="noTeamCorrect()">No Team Correct</button>
-                    <button class="team-button" onclick="showAnswer()">Show Answer</button>
-                    <button class="team-button" onclick="pauseTimer()" id="pauseTimer">Pause Timer</button>
-                    <button class="team-button" onclick="closeQuestion()">Close</button>
-                </div>
-            </div>
-        </div>
-        <div class="question-list-popup" id="question-list-popup">
-            <h2>Questions and Answers</h2>
-            <div id="questionsList"></div>
-            <button onclick="copyQuestionList()">Copy</button>
-            <button onclick="closeQuestionList()">Close</button>
-        </div>
-    </main>
+  <header>
+    <div class="title-wrap">
+      <h1>TRIVIA SHOW</h1>
+      <div class="subline">Modern game show • Dramatic theatrical • Fast host controls</div>
+    </div>
+
+    <div class="teams">
+      <div class="team active" id="team1" data-team="1" title="Click to select Team 1">
+        <div class="name editable" id="teamName1" contenteditable="true">Team 1</div>
+        <div class="score editable" id="score1" contenteditable="true">0</div>
+      </div>
+
+      <div class="team" id="team2" data-team="2" title="Click to select Team 2">
+        <div class="name editable" id="teamName2" contenteditable="true">Team 2</div>
+        <div class="score editable" id="score2" contenteditable="true">0</div>
+      </div>
+
+      <div class="team" id="team3" data-team="3" title="Click to select Team 3">
+        <div class="name editable" id="teamName3" contenteditable="true">Team 3</div>
+        <div class="score editable" id="score3" contenteditable="true">0</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="setup" id="setup">
+      <textarea id="jsonInput" placeholder="Paste your JSON data here..."></textarea>
+
+      <div class="controls">
+        <button class="btn-gold" id="startGame">Start</button>
+        <button class="btn-danger" id="resetGame">Reset</button>
+        <button id="togglePoints">Double: OFF</button>
+        <button id="undoPoints">Undo</button>
+        <button id="showQuestionsBtn">Show Questions</button>
+        <button id="copyTemplateBtn">Format (Template)</button>
+        <button id="copyJsonBtn" title="Copies your current (edited) question set as JSON">Copy JSON</button>
+      </div>
+
+      <div class="inline">
+        <span>Timer (seconds)</span>
+        <input type="number" id="timerDuration" value="10" min="1" max="120" />
+        <span class="hotkeys">
+          Hotkeys:
+          <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> correct •
+          <kbd>A</kbd> answer •
+          <kbd>Space</kbd> pause •
+          <kbd>Esc</kbd> close •
+          <kbd>U</kbd> undo
+        </span>
+      </div>
+    </div>
+
+    <div class="board" id="board"></div>
     <div class="winner" id="winner"></div>
-    <script>
-        let questions = {};
-        let currentQuestion = null;
-        let currentCategory = null;
-        let currentIndex = null;
-        let currentCell = null;
-        let currentTeam = 1;
-        let scores = { team1: 0, team2: 0, team3: 0 };
-        let isDouble = false;
-        let timerInterval;
-        let undoStack = [];
-        let isPaused = false;
+  </main>
 
-        function startGame() {
-            try {
-                questions = JSON.parse(document.getElementById('jsonInput').value);
-            } catch (e) {
-                alert('Invalid JSON format. Please check your data and try again.');
-                return;
+  <div class="backdrop" id="backdrop"></div>
+
+  <div class="question-area" id="question-area" role="dialog" aria-modal="true" aria-label="Question">
+    <div class="qa-top">
+      <div class="pill" id="qaMetaLeft"><strong>—</strong></div>
+      <div class="pill" id="qaMetaRight"><strong>—</strong></div>
+    </div>
+
+    <div class="question" id="question"></div>
+
+    <div class="answer" id="answer" aria-live="polite"></div>
+
+    <div class="modal-controls">
+      <div class="team-buttons">
+        <button class="team-button primary" id="team1Button" onclick="markCorrect(1)"></button>
+        <button class="team-button primary" id="team2Button" onclick="markCorrect(2)"></button>
+        <button class="team-button primary" id="team3Button" onclick="markCorrect(3)"></button>
+      </div>
+
+      <div class="row-buttons">
+        <button class="btn-gold" onclick="noTeamCorrect()">No Team</button>
+        <button onclick="showAnswer()">Show Answer</button>
+        <button onclick="pauseTimer()" id="pauseTimer">Pause</button>
+        <button class="btn-danger" onclick="closeQuestion()">Close</button>
+      </div>
+    </div>
+
+    <div class="timer" id="timer">10</div>
+    <div class="time-overlay" id="timeOverlay">TIME</div>
+  </div>
+
+  <div class="question-list-popup" id="question-list-popup" role="dialog" aria-modal="true" aria-label="Questions list">
+    <div class="ql-head">
+      <h2>Questions & Answers</h2>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+        <button class="btn-gold" onclick="copyQuestionList()">Copy Text</button>
+        <button onclick="copyCurrentJson()">Copy JSON</button>
+        <button class="btn-danger" onclick="closeQuestionList()">Close</button>
+      </div>
+    </div>
+    <div class="ql-body" id="questionsList"></div>
+  </div>
+
+  <script>
+    // ----------------------------
+    // State
+    // ----------------------------
+    let questions = {};               // active question set
+    let hasLoadedQuestions = false;   // do we have a parsed set?
+    let currentQuestion = null;
+    let currentCategory = null;
+    let currentIndex = null;
+    let currentCell = null;
+
+    let currentTeam = 1;
+    let scores = { team1: 0, team2: 0, team3: 0 };
+
+    let isDouble = false;
+
+    let timerInterval = null;
+    let timeLeft = 0;
+    let isPaused = false;
+
+    // Undo entries: { team, pointsDelta, category, index, prevState }
+    let undoStack = [];
+
+    // ----------------------------
+    // Helpers
+    // ----------------------------
+    function clampInt(n, fallback=0){
+      const x = parseInt(String(n).replace(/[^\d-]/g,''), 10);
+      return Number.isFinite(x) ? x : fallback;
+    }
+
+    function sanitizeSingleLine(el){
+      el.innerText = el.innerText.replace(/\s+/g,' ').trim();
+    }
+
+    function setBoardDoubleClass(){
+      const board = document.getElementById('board');
+      if (isDouble) board.classList.add('double-on');
+      else board.classList.remove('double-on');
+    }
+
+    function getCategories(){
+      return Object.keys(questions || {});
+    }
+
+    function buildBoard(){
+      const board = document.getElementById('board');
+      board.innerHTML = '';
+
+      const categories = getCategories();
+      if (!categories.length){
+        board.innerHTML = '';
+        return;
+      }
+
+      const rows = Math.max(...categories.map(c => (questions[c] || []).length));
+      board.style.gridTemplateColumns = `repeat(${categories.length}, 1fr)`;
+      board.style.gridTemplateRows = `repeat(${rows + 1}, auto)`;
+
+      categories.forEach(category => {
+        const cell = document.createElement('div');
+        cell.className = 'cell category';
+        cell.innerHTML = `<div class="cat">${escapeHtml(category)}</div>`;
+        board.appendChild(cell);
+      });
+
+      for (let i = 0; i < rows; i++){
+        categories.forEach(category => {
+          const q = (questions[category] || [])[i];
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+
+          if (q){
+            cell.dataset.category = category;
+            cell.dataset.index = String(i);
+            cell.dataset.state = q._state || 'unplayed';
+
+            const value = q.points * (isDouble ? 2 : 1);
+            cell.innerHTML = `<div class="value">${value}</div>`;
+            applyCellStateClass(cell);
+
+            if (cell.dataset.state === 'unplayed'){
+              cell.classList.add('clickable');
+              cell.onclick = () => selectQuestion(category, i, cell);
+            } else {
+              cell.onclick = null;
             }
+          } else {
+            cell.style.opacity = '.15';
+            cell.style.filter = 'saturate(.2)';
+            cell.style.borderColor = 'rgba(255,255,255,.06)';
+          }
 
-            document.getElementById('jsonInput').style.display = 'none';
+          board.appendChild(cell);
+        });
+      }
 
-            const board = document.getElementById('board');
-            board.innerHTML = '';
+      setBoardDoubleClass();
+    }
 
-            const categories = Object.keys(questions);
-            const rows = Math.max(...categories.map(category => questions[category].length));
-            board.style.gridTemplateColumns = `repeat(${categories.length}, 1fr)`;
-            board.style.gridTemplateRows = `repeat(${rows + 1}, auto)`;
+    function applyCellStateClass(cell){
+      cell.classList.remove('answered','missed','expired','clickable');
+      const st = cell.dataset.state;
+      if (st === 'answered') cell.classList.add('answered');
+      if (st === 'missed') cell.classList.add('missed');
+      if (st === 'expired') cell.classList.add('expired');
+      if (st === 'unplayed') cell.classList.add('clickable');
+    }
 
-            categories.forEach(category => {
-                const categoryLabel = document.createElement('div');
-                categoryLabel.className = 'category';
-                categoryLabel.innerText = category;
-                board.appendChild(categoryLabel);
-            });
+    function setCellState(category, index, newState){
+      const q = questions?.[category]?.[index];
+      if (q) q._state = newState;
 
-            for (let i = 0; i < rows; i++) {
-                categories.forEach(category => {
-                    const cell = document.createElement('div');
-                    if (questions[category][i]) {
-                        cell.innerText = `${questions[category][i].points * (isDouble ? 2 : 1)}`;
-                        cell.className = `question-cell ${category}-${i}`;
-                        cell.onclick = () => selectQuestion(category, i, cell);
-                    }
-                    board.appendChild(cell);
-                });
-            }
-
-            document.getElementById('question-area').style.display = 'none';
-            document.getElementById('winner').style.display = 'none';
-            updateScores();
-            updateCurrentTeamDisplay();
+      const selector = `.cell[data-category="${cssEscape(category)}"][data-index="${index}"]`;
+      const cell = document.querySelector(selector);
+      if (cell){
+        cell.dataset.state = newState;
+        applyCellStateClass(cell);
+        if (newState === 'unplayed'){
+          cell.onclick = () => selectQuestion(category, index, cell);
+        } else {
+          cell.onclick = null;
         }
+        const valueNode = cell.querySelector('.value');
+        if (valueNode && q) valueNode.innerText = q.points * (isDouble ? 2 : 1);
+      }
+    }
 
-        function selectQuestion(category, index, cell) {
-            if (cell.style.backgroundColor === 'silver' || cell.style.backgroundColor === 'darkgray') return;
+    function updateDisplayedValues(){
+      getCategories().forEach(cat => {
+        (questions[cat] || []).forEach((q, i) => {
+          if (!q) return;
+          const selector = `.cell[data-category="${cssEscape(cat)}"][data-index="${i}"]`;
+          const cell = document.querySelector(selector);
+          if (!cell) return;
+          const valueNode = cell.querySelector('.value');
+          if (valueNode) valueNode.innerText = q.points * (isDouble ? 2 : 1);
+        });
+      });
+      setBoardDoubleClass();
+    }
 
-            currentQuestion = questions[category][index];
-            currentCategory = category;
-            currentIndex = index;
-            currentCell = cell;
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
+    }
 
-            const questionArea = document.getElementById('question-area');
-            questionArea.style.display = 'block';
-            document.getElementById('question').innerText = currentQuestion.question;
-            document.getElementById('answer').innerText = '';
-            document.getElementById('timer').innerText = document.getElementById('timerDuration').value;
+    function cssEscape(s){
+      if (window.CSS && CSS.escape) return CSS.escape(s);
+      return String(s).replace(/["\\]/g, '\\$&');
+    }
 
-            questionArea.animate(
-                [
-                    { transform: 'translate(-50%, -50%) scale(0)' },
-                    { transform: 'translate(-50%, -50%) scale(1)' }
-                ],
-                {
-                    duration: 300,
-                    fill: 'forwards'
-                }
-            );
+    function updateScoresUI(){
+      document.getElementById('score1').innerText = scores.team1;
+      document.getElementById('score2').innerText = scores.team2;
+      document.getElementById('score3').innerText = scores.team3;
+    }
 
-            startTimer();
-            updateTeamButtons();
+    function setActiveTeam(teamNumber){
+      currentTeam = teamNumber;
+      document.querySelectorAll('.team').forEach(t => t.classList.remove('active'));
+      const el = document.getElementById(`team${teamNumber}`);
+      if (el) el.classList.add('active');
+    }
+
+    function updateTeamButtons(){
+      document.getElementById('team1Button').innerText = document.getElementById('teamName1').innerText.trim() || 'Team 1';
+      document.getElementById('team2Button').innerText = document.getElementById('teamName2').innerText.trim() || 'Team 2';
+      document.getElementById('team3Button').innerText = document.getElementById('teamName3').innerText.trim() || 'Team 3';
+    }
+
+    function showModal(){
+      document.getElementById('backdrop').classList.add('show');
+      const modal = document.getElementById('question-area');
+      modal.classList.add('show');
+      modal.style.display = 'block';
+      document.getElementById('pauseTimer').focus({ preventScroll:true });
+    }
+
+    function hideModal(){
+      document.getElementById('backdrop').classList.remove('show');
+      const modal = document.getElementById('question-area');
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+    }
+
+    function clearTimer(){
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = null;
+      isPaused = false;
+      document.getElementById('pauseTimer').innerText = 'Pause';
+      document.getElementById('timer').classList.remove('low');
+      document.getElementById('timeOverlay').classList.remove('show');
+    }
+
+    function setWinnerIfAny(){
+      const max = Math.max(scores.team1, scores.team2, scores.team3);
+      const winners = [];
+      if (scores.team1 === max) winners.push(document.getElementById('teamName1').innerText.trim() || 'Team 1');
+      if (scores.team2 === max) winners.push(document.getElementById('teamName2').innerText.trim() || 'Team 2');
+      if (scores.team3 === max) winners.push(document.getElementById('teamName3').innerText.trim() || 'Team 3');
+
+      const winnerEl = document.getElementById('winner');
+      if (hasLoadedQuestions){
+        winnerEl.style.display = 'block';
+        winnerEl.innerText = winners.length === 1
+          ? `Leading: ${winners[0]} (${max})`
+          : `Tie: ${winners.join(' & ')} (${max})`;
+      } else {
+        winnerEl.style.display = 'none';
+      }
+    }
+
+    function copyToClipboard(text){
+      const temp = document.createElement('textarea');
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+    }
+
+    // ----------------------------
+    // Core actions
+    // ----------------------------
+    function parseJsonFromTextarea(){
+      const raw = document.getElementById('jsonInput').value;
+      const parsed = JSON.parse(raw);
+
+      const out = {};
+      for (const category of Object.keys(parsed)){
+        const arr = Array.isArray(parsed[category]) ? parsed[category] : [];
+        out[category] = arr.map(q => ({
+          question: String(q.question ?? ''),
+          answer: String(q.answer ?? ''),
+          points: clampInt(q.points, 0),
+          _state: 'unplayed'
+        }));
+      }
+      return out;
+    }
+
+    function startGame(){
+      const raw = document.getElementById('jsonInput').value.trim();
+
+      if (raw.length){
+        try{
+          questions = parseJsonFromTextarea();
+          hasLoadedQuestions = true;
+        }catch(e){
+          alert('Invalid JSON format. Please check your data and try again.');
+          return;
         }
-
-        function startTimer() {
-            let timeLeft = parseInt(document.getElementById('timerDuration').value, 10);
-            document.getElementById('timer').innerText = timeLeft;
-            isPaused = false;
-            timerInterval = setInterval(() => {
-                if (timeLeft > 0 && !isPaused) {
-                    timeLeft--;
-                    document.getElementById('timer').innerText = timeLeft;
-                } else if (timeLeft === 0) {
-                    clearInterval(timerInterval);
-                    document.getElementById('question').innerText = 'Time Expired';
-                    currentCell.style.backgroundColor = '#696969';
-                    currentCell.onclick = null;
-                }
-            }, 1000);
+      } else {
+        if (!hasLoadedQuestions){
+          alert('Paste JSON first (or click Template).');
+          return;
         }
+      }
 
-        function pauseTimer() {
-            isPaused = !isPaused;
-            document.getElementById('pauseTimer').innerText = isPaused ? 'Resume Timer' : 'Pause Timer';
+      document.getElementById('jsonInput').style.display = 'none';
+
+      getCategories().forEach(cat => {
+        (questions[cat] || []).forEach(q => {
+          if (!q._state) q._state = 'unplayed';
+        });
+      });
+
+      buildBoard();
+      updateScoresUI();
+      setActiveTeam(currentTeam);
+      updateTeamButtons();
+      setWinnerIfAny();
+    }
+
+    function resetGame(){
+      scores = { team1: 0, team2: 0, team3: 0 };
+      undoStack = [];
+      clearTimer();
+      hideModal();
+
+      if (hasLoadedQuestions){
+        getCategories().forEach(cat => {
+          (questions[cat] || []).forEach(q => q._state = 'unplayed');
+        });
+        document.getElementById('jsonInput').style.display = 'none';
+        buildBoard();
+      } else {
+        document.getElementById('jsonInput').style.display = 'block';
+        document.getElementById('jsonInput').value = '';
+        document.getElementById('board').innerHTML = '';
+      }
+
+      updateScoresUI();
+      setWinnerIfAny();
+      setActiveTeam(1);
+    }
+
+    function togglePoints(){
+      isDouble = !isDouble;
+      document.getElementById('togglePoints').innerText = `Double: ${isDouble ? 'ON' : 'OFF'}`;
+      if (hasLoadedQuestions){
+        updateDisplayedValues();
+      }
+    }
+
+    function selectQuestion(category, index, cell){
+      const q = questions?.[category]?.[index];
+      if (!q) return;
+
+      if ((q._state || 'unplayed') !== 'unplayed') return;
+
+      currentQuestion = q;
+      currentCategory = category;
+      currentIndex = index;
+      currentCell = cell;
+
+      document.getElementById('question').innerText = q.question;
+
+      const answerEl = document.getElementById('answer');
+      answerEl.innerText = '';
+      answerEl.classList.remove('revealed');
+
+      const points = q.points * (isDouble ? 2 : 1);
+      document.getElementById('qaMetaLeft').innerHTML = `<strong>${escapeHtml(category)}</strong>`;
+      document.getElementById('qaMetaRight').innerHTML = `<strong>${points} pts</strong>`;
+
+      timeLeft = clampInt(document.getElementById('timerDuration').value, 10);
+      document.getElementById('timer').innerText = timeLeft;
+      document.getElementById('timer').classList.toggle('low', timeLeft <= 5);
+
+      clearTimer();
+      showModal();
+      updateTeamButtons();
+      startTimer();
+    }
+
+    function startTimer(){
+      clearTimer();
+      isPaused = false;
+
+      timerInterval = setInterval(() => {
+        if (isPaused) return;
+
+        if (timeLeft > 0){
+          timeLeft--;
+          document.getElementById('timer').innerText = timeLeft;
+          document.getElementById('timer').classList.toggle('low', timeLeft <= 5);
+
+          if (timeLeft === 0){
+            document.getElementById('timeOverlay').classList.add('show');
+            setCellState(currentCategory, currentIndex, 'expired');
+            clearTimer();
+          }
         }
+      }, 1000);
+    }
 
-        function showAnswer() {
-            document.getElementById('answer').innerText = currentQuestion.answer;
-        }
+    function pauseTimer(){
+      if (!currentQuestion) return;
+      isPaused = !isPaused;
+      document.getElementById('pauseTimer').innerText = isPaused ? 'Resume' : 'Pause';
+    }
 
-        function closeQuestion() {
-            clearInterval(timerInterval);
-            document.getElementById('question-area').style.display = 'none';
-            if (document.getElementById('question').innerText === 'Time Expired') {
-                currentCell.style.backgroundColor = '#696969';
-            } else if (document.getElementById('answer').innerText !== '') {
-                currentCell.style.backgroundColor = 'silver';
-            }
-            currentCell.onclick = null;
-        }
+    function showAnswer(){
+      if (!currentQuestion) return;
+      const answerEl = document.getElementById('answer');
+      answerEl.innerText = currentQuestion.answer;
+      answerEl.classList.add('revealed');
+    }
 
-        function updateScore(team, points) {
-            scores[`team${team}`] += points;
-            updateScores();
-            selectTeam(team);
-        }
+    function markCorrect(team){
+      if (!currentQuestion) return;
 
-        function updateScores() {
-            document.getElementById('score1').innerText = scores.team1;
-            document.getElementById('score2').innerText = scores.team2;
-            document.getElementById('score3').innerText = scores.team3;
-        }
+      const points = currentQuestion.points * (isDouble ? 2 : 1);
+      const prevState = currentQuestion._state || 'unplayed';
 
-        function updateCurrentTeamDisplay() {
-            const currentTeamElement = document.getElementById(`team${currentTeam}`);
-            const teamElements = document.querySelectorAll('.team');
-            teamElements.forEach(team => {
-                team.classList.remove('breathing');
-            });
-            currentTeamElement.classList.add('breathing');
-        }
+      scores[`team${team}`] += points;
+      updateScoresUI();
+      setActiveTeam(team);
+      setWinnerIfAny();
 
-        function markCorrect(team) {
-            clearInterval(timerInterval);
-            const points = currentQuestion.points * (isDouble ? 2 : 1);
-            updateScore(team, points);
-            undoStack.push({ team, points, cell: currentCell, question: currentQuestion });
-            showAnswer();
-            currentCell.style.backgroundColor = 'silver';
-            currentCell.onclick = null;
-        }
+      undoStack.push({
+        team,
+        pointsDelta: points,
+        category: currentCategory,
+        index: currentIndex,
+        prevState
+      });
 
-        function noTeamCorrect() {
-            clearInterval(timerInterval);
-            showAnswer();
-            currentCell.style.backgroundColor = 'silver';
-            currentCell.onclick = null;
-            setTimeout(() => {
-                closeQuestion();
-            }, 2000);
-        }
+      showAnswer();
+      setCellState(currentCategory, currentIndex, 'answered');
+      clearTimer();
+    }
 
-        function resetGame() {
-            scores = { team1: 0, team2: 0, team3: 0 };
-            undoStack = [];
-            document.getElementById('jsonInput').style.display = 'block';
-            document.getElementById('jsonInput').value = '';
-            document.querySelectorAll('.team').forEach(team => team.classList.remove('breathing'));
-            startGame();
-        }
+    function noTeamCorrect(){
+      if (!currentQuestion) return;
 
-        function togglePoints() {
-            isDouble = !isDouble;
-            document.getElementById('togglePoints').innerText = isDouble ? 'Single' : 'Double';
-            startGame();
-        }
+      const prevState = currentQuestion._state || 'unplayed';
+      undoStack.push({
+        team: null,
+        pointsDelta: 0,
+        category: currentCategory,
+        index: currentIndex,
+        prevState
+      });
 
-        function updateTeamName(teamNumber) {
-            updateCurrentTeamDisplay();
-            updateTeamButtons();
-        }
+      showAnswer();
+      setCellState(currentCategory, currentIndex, 'missed');
+      clearTimer();
+    }
 
-        function selectTeam(teamNumber) {
-            currentTeam = teamNumber;
-            updateCurrentTeamDisplay();
-            updateTeamButtons();
-        }
+    function closeQuestion(){
+      clearTimer();
+      hideModal();
+      currentQuestion = null;
+      currentCategory = null;
+      currentIndex = null;
+      currentCell = null;
+    }
 
-        function updateTeamButtons() {
-            document.getElementById('team1Button').innerText = document.getElementById('teamName1').innerText;
-            document.getElementById('team2Button').innerText = document.getElementById('teamName2').innerText;
-            document.getElementById('team3Button').innerText = document.getElementById('teamName3').innerText;
-        }
+    function undoPoints(){
+      if (undoStack.length === 0){
+        alert('No actions to undo.');
+        return;
+      }
+      const last = undoStack.pop();
 
-        function copyTemplate() {
-            const template = `{
-    "Category 1": [
-        { "question": "Sample Question 1", "answer": "Sample Answer 1", "points": 100 },
-        { "question": "Sample Question 2", "answer": "Sample Answer 2", "points": 200 },
-        { "question": "Sample Question 3", "answer": "Sample Answer 3", "points": 300 },
-        { "question": "Sample Question 4", "answer": "Sample Answer 4", "points": 400 },
-        { "question": "Sample Question 5", "answer": "Sample Answer 5", "points": 500 },
-        { "question": "Sample Question 6", "answer": "Sample Answer 6", "points": 600 },
-        { "question": "Sample Question 7", "answer": "Sample Answer 7", "points": 700 }
-    ],
-    "Category 2": [
-        { "question": "Sample Question 1", "answer": "Sample Answer 1", "points": 100 },
-        { "question": "Sample Question 2", "answer": "Sample Answer 2", "points": 200 },
-        { "question": "Sample Question 3", "answer": "Sample Answer 3", "points": 300 },
-        { "question": "Sample Question 4", "answer": "Sample Answer 4", "points": 400 },
-        { "question": "Sample Question 5", "answer": "Sample Answer 5", "points": 500 },
-        { "question": "Sample Question 6", "answer": "Sample Answer 6", "points": 600 },
-        { "question": "Sample Question 7", "answer": "Sample Answer 7", "points": 700 }
-    ],
-    "Category 3": [
-        { "question": "Sample Question 1", "answer": "Sample Answer 1", "points": 100 },
-        { "question": "Sample Question 2", "answer": "Sample Answer 2", "points": 200 },
-        { "question": "Sample Question 3", "answer": "Sample Answer 3", "points": 300 },
-        { "question": "Sample Question 4", "answer": "Sample Answer 4", "points": 400 },
-        { "question": "Sample Question 5", "answer": "Sample Answer 5", "points": 500 },
-        { "question": "Sample Question 6", "answer": "Sample Answer 6", "points": 600 },
-        { "question": "Sample Question 7", "answer": "Sample Answer 7", "points": 700 }
-    ],
-    "Category 4": [
-        { "question": "Sample Question 1", "answer": "Sample Answer 1", "points": 100 },
-        { "question": "Sample Question 2", "answer": "Sample Answer 2", "points": 200 },
-        { "question": "Sample Question 3", "answer": "Sample Answer 3", "points": 300 },
-        { "question": "Sample Question 4", "answer": "Sample Answer 4", "points": 400 },
-        { "question": "Sample Question 5", "answer": "Sample Answer 5", "points": 500 },
-        { "question": "Sample Question 6", "answer": "Sample Answer 6", "points": 600 },
-        { "question": "Sample Question 7", "answer": "Sample Answer 7", "points": 700 }
-    ],
-    "Category 5": [
-        { "question": "Sample Question 1", "answer": "Sample Answer 1", "points": 100 },
-        { "question": "Sample Question 2", "answer": "Sample Answer 2", "points": 200 },
-        { "question": "Sample Question 3", "answer": "Sample Answer 3", "points": 300 },
-        { "question": "Sample Question 4", "answer": "Sample Answer 4", "points": 400 },
-        { "question": "Sample Question 5", "answer": "Sample Answer 5", "points": 500 },
-        { "question": "Sample Question 6", "answer": "Sample Answer 6", "points": 600 },
-        { "question": "Sample Question 7", "answer": "Sample Answer 7", "points": 700 }
-    ]
+      if (last.team != null){
+        scores[`team${last.team}`] -= last.pointsDelta;
+        updateScoresUI();
+        setActiveTeam(last.team);
+      }
+
+      setCellState(last.category, last.index, last.prevState || 'unplayed');
+      setWinnerIfAny();
+    }
+
+    // ----------------------------
+    // Template / Exports
+    // ----------------------------
+    function copyTemplate(){
+      const template = `{
+  "Category 1": [
+    { "question": "Sample Question 1", "answer": "Sample Answer 1", "points": 100 },
+    { "question": "Sample Question 2", "answer": "Sample Answer 2", "points": 200 },
+    { "question": "Sample Question 3", "answer": "Sample Answer 3", "points": 300 },
+    { "question": "Sample Question 4", "answer": "Sample Answer 4", "points": 400 },
+    { "question": "Sample Question 5", "answer": "Sample Answer 5", "points": 500 }
+  ]
 }`;
-            const tempInput = document.createElement('textarea');
-            tempInput.value = template;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
-            alert('JSON template copied to clipboard!');
+      copyToClipboard(template);
+      alert('Template copied to clipboard!');
+    }
+
+    function currentJsonObject(){
+      const out = {};
+      for (const cat of getCategories()){
+        out[cat] = (questions[cat] || []).map(q => ({
+          question: q.question,
+          answer: q.answer,
+          points: q.points
+        }));
+      }
+      return out;
+    }
+
+    function copyCurrentJson(){
+      if (!hasLoadedQuestions){
+        alert('No loaded questions yet.');
+        return;
+      }
+      const json = JSON.stringify(currentJsonObject(), null, 2);
+      copyToClipboard(json);
+      alert('Current JSON copied to clipboard!');
+    }
+
+    // ----------------------------
+    // Questions list editor
+    // ----------------------------
+    function showQuestionList(){
+      if (!hasLoadedQuestions){
+        const raw = document.getElementById('jsonInput').value.trim();
+        if (raw.length){
+          try{
+            questions = parseJsonFromTextarea();
+            hasLoadedQuestions = true;
+          }catch(e){
+            alert('Invalid JSON format. Please check your data and try again.');
+            return;
+          }
+        } else {
+          alert('Paste JSON first (or click Template).');
+          return;
         }
+      }
 
-        function showQuestionList() {
-            const questionListPopup = document.getElementById('question-list-popup');
-            const questionsList = document.getElementById('questionsList');
-            questionsList.innerHTML = '';
+      const list = document.getElementById('questionsList');
+      list.innerHTML = '';
 
-            for (const category in questions) {
-                const categoryTitle = document.createElement('h3');
-                categoryTitle.className = 'category-title';
-                categoryTitle.innerText = category;
-                questionsList.appendChild(categoryTitle);
+      for (const category of getCategories()){
+        const title = document.createElement('div');
+        title.className = 'category-title';
+        title.innerText = category;
+        list.appendChild(title);
 
-                questions[category].forEach((q, index) => {
-                    const questionEntry = document.createElement('p');
-                    questionEntry.className = 'question-entry';
-                    questionEntry.innerHTML = `Q${index + 1}: <span class="editable" contenteditable="true" data-category="${category}" data-index="${index}" oninput="updateQuestion(this)">${q.question}</span> - A: <span class="editable" contenteditable="true" data-category="${category}" data-index="${index}" oninput="updateAnswer(this)">${q.answer}</span> (${q.points} points)`;
-                    questionsList.appendChild(questionEntry);
-                });
-            }
+        (questions[category] || []).forEach((q, index) => {
+          const entry = document.createElement('div');
+          entry.className = 'question-entry';
+          entry.innerHTML = `
+            <span class="tag">Q${index + 1}</span>
+            <span class="editable" contenteditable="true"
+              data-type="question" data-category="${escapeHtml(category)}" data-index="${index}">${escapeHtml(q.question)}</span>
+            <div style="height:8px;"></div>
+            <span class="tag">A</span>
+            <span class="editable" contenteditable="true"
+              data-type="answer" data-category="${escapeHtml(category)}" data-index="${index}">${escapeHtml(q.answer)}</span>
+            <span class="pts">(${q.points} pts)</span>
+          `;
+          list.appendChild(entry);
+        });
+      }
 
-            questionListPopup.style.display = 'block';
+      document.getElementById('question-list-popup').style.display = 'block';
+    }
+
+    function closeQuestionList(){
+      document.getElementById('question-list-popup').style.display = 'none';
+      if (hasLoadedQuestions) updateDisplayedValues();
+    }
+
+    function copyQuestionList(){
+      const list = document.getElementById('questionsList');
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = list.innerHTML;
+      copyToClipboard(tempDiv.innerText);
+      alert('Question list copied!');
+    }
+
+    document.addEventListener('input', (e) => {
+      const el = e.target;
+      if (!el || !(el instanceof HTMLElement)) return;
+      if (!el.matches('[contenteditable="true"][data-type]')) return;
+
+      const type = el.getAttribute('data-type');
+      const category = el.getAttribute('data-category');
+      const index = clampInt(el.getAttribute('data-index'), -1);
+      if (!category || index < 0) return;
+
+      const q = questions?.[category]?.[index];
+      if (!q) return;
+
+      if (type === 'question') q.question = el.innerText;
+      if (type === 'answer') q.answer = el.innerText;
+    });
+
+    // ----------------------------
+    // Contenteditable safety
+    // ----------------------------
+    function preventEnterKey(e){
+      if (e.key === 'Enter'){
+        e.preventDefault();
+        document.execCommand('insertText', false, ' ');
+      }
+    }
+
+    function sanitizeScore(teamNumber){
+      const scoreEl = document.getElementById(`score${teamNumber}`);
+      const v = clampInt(scoreEl.innerText, 0);
+      scores[`team${teamNumber}`] = v;
+      scoreEl.innerText = v;
+      updateScoresUI();
+      setWinnerIfAny();
+    }
+
+    document.querySelectorAll('.team').forEach(teamEl => {
+      teamEl.addEventListener('click', () => {
+        const t = clampInt(teamEl.dataset.team, 1);
+        setActiveTeam(t);
+        updateTeamButtons();
+      });
+    });
+
+    [1,2,3].forEach(t => {
+      const nameEl = document.getElementById(`teamName${t}`);
+      nameEl.addEventListener('keydown', preventEnterKey);
+      nameEl.addEventListener('blur', () => {
+        sanitizeSingleLine(nameEl);
+        updateTeamButtons();
+        setWinnerIfAny();
+      });
+
+      const scoreEl = document.getElementById(`score${t}`);
+      scoreEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter'){
+          e.preventDefault();
+          scoreEl.blur();
+          return;
         }
+      });
+      scoreEl.addEventListener('blur', () => sanitizeScore(t));
+    });
 
-        function closeQuestionList() {
-            document.getElementById('question-list-popup').style.display = 'none';
-        }
+    // ----------------------------
+    // Keyboard shortcuts
+    // ----------------------------
+    document.addEventListener('keydown', (e) => {
+      const modalOpen = document.getElementById('question-area').classList.contains('show');
+      const isEditing = document.activeElement && (
+        document.activeElement.isContentEditable ||
+        ['TEXTAREA','INPUT'].includes(document.activeElement.tagName)
+      );
 
-        function copyQuestionList() {
-            const questionsList = document.getElementById('questionsList').innerHTML;
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = questionsList;
-            const tempInput = document.createElement('textarea');
-            tempInput.value = tempDiv.innerText;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
-            alert('Question list copied to clipboard!');
-        }
+      if (isEditing && e.key !== 'Escape') return;
 
-        function undoPoints() {
-            if (undoStack.length === 0) {
-                alert("No actions to undo");
-                return;
-            }
+      if (modalOpen){
+        if (e.key === 'Escape'){ e.preventDefault(); closeQuestion(); }
+        if (e.key === ' '){ e.preventDefault(); pauseTimer(); }
+        if (e.key.toLowerCase() === 'a'){ e.preventDefault(); showAnswer(); }
+        if (e.key === '1'){ e.preventDefault(); markCorrect(1); }
+        if (e.key === '2'){ e.preventDefault(); markCorrect(2); }
+        if (e.key === '3'){ e.preventDefault(); markCorrect(3); }
+      } else {
+        if (e.key.toLowerCase() === 'u'){ e.preventDefault(); undoPoints(); }
+      }
+    });
 
-            const lastAction = undoStack.pop();
-            scores[`team${lastAction.team}`] -= lastAction.points;
-            updateScores();
-            lastAction.cell.style.backgroundColor = '#1E90FF';
-            lastAction.cell.onclick = () => selectQuestion(lastAction.cell.className.split(' ')[1].split('-')[0], lastAction.cell.className.split(' ')[1].split('-')[1], lastAction.cell);
-        }
+    // ----------------------------
+    // Wire up buttons
+    // ----------------------------
+    document.getElementById('startGame').addEventListener('click', startGame);
+    document.getElementById('resetGame').addEventListener('click', () => {
+      const ok = confirm('Reset scores and restore all questions?');
+      if (ok) resetGame();
+    });
+    document.getElementById('togglePoints').addEventListener('click', togglePoints);
+    document.getElementById('undoPoints').addEventListener('click', undoPoints);
+    document.getElementById('showQuestionsBtn').addEventListener('click', showQuestionList);
+    document.getElementById('copyTemplateBtn').addEventListener('click', copyTemplate);
+    document.getElementById('copyJsonBtn').addEventListener('click', copyCurrentJson);
 
-        function updateQuestion(input) {
-            const category = input.getAttribute('data-category');
-            const index = input.getAttribute('data-index');
-            questions[category][index].question = input.innerText;
-        }
+    document.getElementById('backdrop').addEventListener('click', () => {
+      if (document.getElementById('question-area').classList.contains('show')) closeQuestion();
+      if (document.getElementById('question-list-popup').style.display === 'block') closeQuestionList();
+    });
 
-        function updateAnswer(input) {
-            const category = input.getAttribute('data-category');
-            const index = input.getAttribute('data-index');
-            questions[category][index].answer = input.innerText;
-        }
-
-        document.getElementById('startGame').addEventListener('click', startGame);
-        document.getElementById('resetGame').addEventListener('click', resetGame);
-        document.getElementById('togglePoints').addEventListener('click', togglePoints);
-        document.getElementById('undoPoints').addEventListener('click', undoPoints);
-    </script>
+    updateTeamButtons();
+    document.getElementById('togglePoints').innerText = `Double: ${isDouble ? 'ON' : 'OFF'}`;
+  </script>
 </body>
 </html>
