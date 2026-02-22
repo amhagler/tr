@@ -3,32 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Trivia Show</title>
+  <title>GEFFEN BOWL</title>
   <style>
     :root{
-      /* Modern game-show + theatrical palette */
-      --bg0:#070B1A;          /* deep night */
-      --bg1:#0B1230;          /* panel navy */
-      --electric:#2D7DFF;     /* electric blue */
-      --electric2:#1E5BFF;    /* deeper electric */
+      --bg0:#070B1A;
+      --bg1:#0B1230;
+      --panel:#0C1638;
 
-      /* Brighter "show" gold */
-      --gold:#FFD54A;         /* brighter show gold */
-      --gold2:#FFB700;        /* hotter gold for accents */
+      --electric:#2D7DFF;
+      --electric2:#1E5BFF;
 
-      --ink:#EAF0FF;          /* near-white text */
-      --muted:#B7C2E6;        /* muted text */
+      --gold:#FFE066;     /* brighter */
+      --gold2:#FFB700;    /* hotter */
+      --red:#FF5A5A;
+
+      --ink:#EAF0FF;
+      --muted:#B7C2E6;
+
       --shadow: 0 18px 60px rgba(0,0,0,.55);
       --shadow2: 0 10px 28px rgba(0,0,0,.35);
+
       --radius: 18px;
       --radius2: 26px;
-      --ring: 0 0 0 2px rgba(45,125,255,.35), 0 0 0 6px rgba(255,213,74,.12);
 
-      --cell-min-h: 72px;
+      --ring: 0 0 0 2px rgba(45,125,255,.35), 0 0 0 6px rgba(255,224,102,.14);
+
+      --cell-min-h: 76px;
+      --maxw: 1200px;
     }
 
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
+
     body{
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -38,61 +44,321 @@
         radial-gradient(900px 600px at 90% 10%, rgba(255,183,0,.18), transparent 55%),
         radial-gradient(1200px 900px at 50% 120%, rgba(45,125,255,.18), transparent 60%),
         linear-gradient(180deg, var(--bg0), var(--bg1));
-      text-align:center;
       overflow-x:hidden;
     }
 
-    header{
-      padding: 20px 18px 10px;
+    /* -------------------------
+       1993 Title Screen
+    -------------------------- */
+    #titleScreen{
+      position:relative;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    #starfield, #starfield2{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      display:block;
+    }
+
+    .crt{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        repeating-linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.03) 1px, transparent 1px, transparent 3px);
+      mix-blend-mode: overlay;
+      opacity:.30;
+      filter: blur(.2px);
+    }
+
+    .vignette{
+      position:absolute;
+      inset:-2px;
+      pointer-events:none;
+      background: radial-gradient(1200px 700px at 50% 35%, transparent 55%, rgba(0,0,0,.55));
+      opacity:.9;
+    }
+
+    .title-card{
+      position:relative;
+      width:min(980px, 92vw);
+      padding: 26px 22px 20px;
+      border-radius: 26px;
+      background:
+        radial-gradient(520px 240px at 20% 20%, rgba(255,224,102,.20), transparent 60%),
+        radial-gradient(540px 260px at 80% 35%, rgba(45,125,255,.22), transparent 62%),
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      text-align:center;
+    }
+
+    .logo{
+      font-weight: 1000;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      font-size: clamp(30px, 4.2vw, 54px);
+      margin: 4px 0 6px;
+      text-shadow:
+        0 18px 60px rgba(0,0,0,.65),
+        0 0 26px rgba(45,125,255,.25),
+        0 0 42px rgba(255,224,102,.16);
+    }
+
+    .tagline{
+      color: var(--muted);
+      letter-spacing:.10em;
+      text-transform: uppercase;
+      font-weight: 900;
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+
+    .glowbar{
+      width:min(720px, 86vw);
+      margin: 10px auto 18px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, transparent, rgba(45,125,255,.55), rgba(255,224,102,.70), rgba(45,125,255,.55), transparent);
+      filter: drop-shadow(0 0 14px rgba(255,224,102,.18));
+      opacity:.95;
+    }
+
+    .title-grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    @media (max-width: 860px){
+      .title-grid{ grid-template-columns: 1fr; }
+    }
+
+    .panel{
+      border-radius: 20px;
+      padding: 14px 14px;
+      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow2);
+      text-align:left;
+    }
+
+    .panel h3{
+      margin: 0 0 10px;
+      font-size: 12px;
+      letter-spacing:.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 950;
+    }
+
+    .row{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+      justify-content:flex-start;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width: 180px;
+      flex: 1;
+    }
+
+    label{
+      font-size: 11px;
+      letter-spacing:.08em;
+      text-transform: uppercase;
+      color: rgba(183,194,230,.95);
+      font-weight: 900;
+    }
+
+    select, input[type="number"], input[type="text"], textarea{
+      width:100%;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--ink);
+      padding: 10px 10px;
+      outline:none;
+      font-weight: 800;
+      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+    }
+    select:focus, input:focus, textarea:focus{ box-shadow: var(--shadow2), var(--ring); border-color: rgba(45,125,255,.55); }
+
+    .toggles{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      margin-top: 8px;
+    }
+
+    .toggle{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      cursor:pointer;
+      user-select:none;
+    }
+    .toggle:hover{ border-color: rgba(45,125,255,.45); }
+
+    .toggle input{ width:18px; height:18px; }
+
+    .title-actions{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      justify-content:center;
+      margin-top: 14px;
+    }
+
+    button{
+      border:none;
+      cursor:pointer;
+      padding: 11px 16px;
+      border-radius: 999px;
+      color: var(--ink);
+      font-weight: 950;
+      letter-spacing: .02em;
+      background:
+        radial-gradient(150px 90px at 20% 20%, rgba(45,125,255,.25), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 24px rgba(0,0,0,.35);
+      transition: transform .12s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease, filter .2s ease;
+      user-select:none;
+    }
+    button:hover{
+      transform: translateY(-1px);
+      border-color: rgba(45,125,255,.55);
+      box-shadow: 0 14px 30px rgba(0,0,0,.42);
+    }
+    button:active{ transform: translateY(0px) scale(.99); }
+
+    .btn-gold{
+      background:
+        radial-gradient(160px 100px at 20% 20%, rgba(255,224,102,.65), transparent 60%),
+        linear-gradient(180deg, rgba(255,224,102,.42), rgba(255,255,255,.06));
+      border-color: rgba(255,224,102,.55);
+      color: #070B1A;
+      text-shadow:none;
+    }
+    .btn-danger{
+      background:
+        radial-gradient(160px 100px at 20% 20%, rgba(255,90,90,.25), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      border-color: rgba(255,90,90,.40);
+    }
+
+    .tiny{
+      font-size: 12px;
+      color: rgba(183,194,230,.92);
+      line-height: 1.35;
+    }
+    .tiny kbd{
+      display:inline-block;
+      padding: 2px 7px;
+      border-radius: 8px;
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 10px 22px rgba(0,0,0,.18);
+      font-weight: 950;
+      color: var(--ink);
+      margin: 0 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* -------------------------
+       Game Screen
+    -------------------------- */
+    #gameScreen{
+      display:none;
+      min-height:100vh;
+    }
+
+    header.game{
       position: sticky;
       top: 0;
       z-index: 5;
-      backdrop-filter: blur(10px);
+      padding: 16px 16px 10px;
       background: linear-gradient(180deg, rgba(11,18,48,.92), rgba(11,18,48,.55));
+      backdrop-filter: blur(10px);
       border-bottom: 1px solid rgba(255,255,255,.08);
     }
 
-    .title-wrap{
+    .topbar{
+      max-width: var(--maxw);
+      margin: 0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap:wrap;
+    }
+
+    .brand{
       display:flex;
       flex-direction:column;
-      gap:8px;
-      align-items:center;
-      justify-content:center;
-      margin-bottom: 10px;
+      gap: 4px;
+      text-align:left;
     }
 
-    h1{
-      margin:0;
+    .brand .h{
+      font-weight: 1000;
       letter-spacing: .18em;
       text-transform: uppercase;
-      font-weight: 900;
-      font-size: clamp(22px, 3.2vw, 34px);
-      text-shadow: 0 10px 36px rgba(0,0,0,.55);
+      margin:0;
+      font-size: 18px;
+      text-shadow: 0 12px 40px rgba(0,0,0,.55);
     }
 
-    .subline{
-      font-size: 12px;
+    .brand .s{
+      font-size: 11px;
       letter-spacing:.08em;
       text-transform: uppercase;
       color: var(--muted);
-      opacity: .95;
+      font-weight: 900;
+    }
+
+    .header-controls{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
     }
 
     .teams{
+      max-width: var(--maxw);
+      margin: 12px auto 0;
       display:flex;
       justify-content:center;
-      gap: clamp(10px, 2vw, 18px);
-      flex-wrap: wrap;
-      margin: 14px auto 8px;
-      max-width: 1100px;
+      gap: clamp(10px, 2vw, 14px);
+      flex-wrap:wrap;
     }
 
     .team{
-      width: 220px;
-      height: 128px;
+      width: 210px;
+      height: 116px;
       border-radius: 22px;
       background:
-        radial-gradient(160px 100px at 30% 15%, rgba(255,213,74,.18), transparent 60%),
+        radial-gradient(160px 100px at 30% 15%, rgba(255,224,102,.16), transparent 60%),
         radial-gradient(220px 120px at 60% 80%, rgba(45,125,255,.16), transparent 55%),
         linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
       border: 1px solid rgba(255,255,255,.10);
@@ -101,177 +367,123 @@
       flex-direction:column;
       justify-content:center;
       align-items:center;
-      gap: 10px;
+      gap: 8px;
       cursor:pointer;
-      position:relative;
       transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
       user-select:none;
+      position:relative;
     }
     .team:hover{
       transform: translateY(-1px);
       border-color: rgba(45,125,255,.35);
       box-shadow: 0 16px 40px rgba(0,0,0,.45);
     }
-
     .team.active{
       box-shadow: var(--shadow), 0 0 0 2px rgba(45,125,255,.35), 0 0 40px rgba(45,125,255,.22);
-      border-color: rgba(45,125,255,.50);
+      border-color: rgba(45,125,255,.55);
       transform: translateY(-2px);
-    }
-
-    .team .name{
-      font-weight: 900;
-      font-size: 18px;
-      letter-spacing:.04em;
-      padding: 6px 10px;
-      border-radius: 12px;
-      max-width: 200px;
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-    }
-
-    .team .score{
-      font-weight: 950;
-      font-size: 34px;
-      letter-spacing: .02em;
-      line-height: 1;
-      color: var(--gold);
-      text-shadow:
-        0 14px 40px rgba(0,0,0,.60),
-        0 0 22px rgba(255,183,0,.30),
-        0 0 44px rgba(255,213,74,.18);
-      padding: 4px 10px;
-      border-radius: 14px;
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.08);
-      min-width: 96px;
     }
 
     .editable{
       outline:none;
       display:inline-block;
       cursor:text;
+      padding: 2px 6px;
+      border-radius: 10px;
     }
     .editable:hover{
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
       background: rgba(255,255,255,.06);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+    }
+
+    .team .name{
+      font-weight: 950;
+      letter-spacing:.04em;
+      font-size: 16px;
+      max-width: 188px;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    .team .score{
+      font-weight: 1000;
+      font-size: 32px;
+      line-height: 1;
+      color: var(--gold);
+      text-shadow:
+        0 14px 40px rgba(0,0,0,.60),
+        0 0 22px rgba(255,183,0,.30),
+        0 0 44px rgba(255,224,102,.18);
+      padding: 4px 10px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.08);
+      min-width: 92px;
+      text-align:center;
     }
 
     main{
-      padding: 18px 16px 60px;
-      max-width: 1200px;
+      padding: 16px 16px 64px;
+      max-width: var(--maxw);
       margin: 0 auto;
     }
 
-    .setup{
-      display:grid;
-      gap: 12px;
-      justify-items:center;
-      margin-top: 10px;
+    .boardWrap{
+      margin-top: 14px;
     }
 
-    #jsonInput{
-      width:min(980px, 92vw);
-      height: 180px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.12);
-      padding: 14px 14px;
-      background: rgba(255,255,255,.06);
-      color: var(--ink);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      box-shadow: var(--shadow2);
-      resize: vertical;
-    }
-    #jsonInput::placeholder{ color: rgba(234,240,255,.55); }
-
-    .controls{
+    .roundBanner{
       display:flex;
-      flex-wrap:wrap;
-      gap: 10px;
-      justify-content:center;
       align-items:center;
-      margin: 10px 0 8px;
+      justify-content:space-between;
+      gap: 10px;
+      flex-wrap:wrap;
+      margin: 10px 0 10px;
     }
 
-    button{
-      border:none;
-      cursor:pointer;
-      padding: 10px 14px;
+    .roundPill{
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 12px;
       border-radius: 999px;
-      color: var(--ink);
-      font-weight: 900;
-      letter-spacing: .02em;
-      background:
-        radial-gradient(150px 90px at 20% 20%, rgba(45,125,255,.25), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: 0 10px 24px rgba(0,0,0,.35);
-      transition: transform .12s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
-      user-select:none;
-    }
-    button:hover{
-      transform: translateY(-1px);
-      border-color: rgba(45,125,255,.45);
-      box-shadow: 0 14px 30px rgba(0,0,0,.42);
-    }
-    button:active{ transform: translateY(0px) scale(.99); }
-
-    .btn-gold{
-      background:
-        radial-gradient(160px 100px at 20% 20%, rgba(255,213,74,.55), transparent 60%),
-        linear-gradient(180deg, rgba(255,213,74,.40), rgba(255,255,255,.06));
-      border-color: rgba(255,213,74,.45);
-      color: #070B1A;
-      text-shadow: none;
-    }
-    .btn-danger{
-      background:
-        radial-gradient(160px 100px at 20% 20%, rgba(255,90,90,.25), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
-      border-color: rgba(255,90,90,.35);
-    }
-
-    .inline{
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      justify-content:center;
-      flex-wrap:wrap;
-      color: var(--muted);
-      font-weight: 800;
-      letter-spacing:.02em;
-      margin-top: 2px;
-    }
-    .inline input[type="number"]{
-      width: 90px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.12);
-      padding: 8px 10px;
-      background: rgba(255,255,255,.06);
-      color: var(--ink);
-      font-weight: 900;
+      background: rgba(0,0,0,.30);
+      border: 1px solid rgba(255,255,255,.10);
       box-shadow: 0 10px 24px rgba(0,0,0,.30);
-      outline:none;
+      color: var(--muted);
+      font-weight: 950;
+      letter-spacing:.08em;
+      text-transform: uppercase;
+      font-size: 12px;
+      white-space:nowrap;
     }
-    .inline input[type="number"]:focus{
-      box-shadow: var(--shadow2), var(--ring);
-      border-color: rgba(45,125,255,.45);
+    .roundPill strong{ color: var(--ink); letter-spacing:.02em; }
+
+    .winner{
+      display:none;
+      padding: 14px 14px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.26);
+      border: 1px solid rgba(255,224,102,.22);
+      box-shadow: var(--shadow2);
+      font-size: 16px;
+      font-weight: 1000;
+      letter-spacing:.02em;
+      color: var(--gold);
+      text-shadow: 0 14px 40px rgba(0,0,0,.60);
     }
 
     .board{
       display:grid;
       gap: 14px;
-      margin: 20px auto 0;
-      width: min(1100px, 92vw);
+      width: 100%;
       align-items: stretch;
     }
 
     .cell{
-      background:
-        radial-gradient(160px 90px at 30% 15%, rgba(45,125,255,.35), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
-      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.12);
       border-radius: 16px;
       box-shadow: 0 14px 30px rgba(0,0,0,.35);
       padding: 14px 10px;
@@ -286,28 +498,27 @@
     }
     .cell.clickable:hover{
       transform: translateY(-2px);
-      border-color: rgba(45,125,255,.55);
-      box-shadow: 0 18px 40px rgba(0,0,0,.45), 0 0 30px rgba(45,125,255,.18);
+      border-color: rgba(45,125,255,.65);
+      box-shadow: 0 18px 40px rgba(0,0,0,.45), 0 0 34px rgba(45,125,255,.20);
       cursor:pointer;
     }
 
     .cell .value{
-      font-weight: 950;
-      font-size: clamp(22px, 3vw, 34px);
+      font-weight: 1000;
+      font-size: clamp(22px, 2.6vw, 34px);
       letter-spacing: .04em;
       text-shadow: 0 14px 40px rgba(0,0,0,.55);
+      color: var(--ink);
     }
 
-    /* Brighter, less translucent category headers */
+    /* Category headers */
     .cell.category{
-      background: linear-gradient(180deg, rgba(255,213,74,.92), rgba(255,183,0,.78));
-      border-color: rgba(255,213,74,.55);
-      box-shadow: 0 14px 30px rgba(0,0,0,.35);
+      background: linear-gradient(180deg, rgba(255,224,102,.98), rgba(255,183,0,.88));
+      border-color: rgba(255,224,102,.65);
       cursor:default;
-      padding: 16px 10px;
     }
     .cell.category .cat{
-      font-weight: 950;
+      font-weight: 1000;
       letter-spacing: .12em;
       text-transform: uppercase;
       font-size: 13px;
@@ -317,82 +528,98 @@
       text-align:center;
     }
 
-    /* Cell states */
+    /* States: MORE obvious */
     .cell.answered{
-      opacity: .45;
-      filter: saturate(.55);
-      background:
-        radial-gradient(220px 120px at 20% 20%, rgba(255,213,74,.22), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      border-color: rgba(255,213,74,.25);
+      opacity: .30;
+      filter: grayscale(.2) saturate(.25);
+      background: linear-gradient(180deg, rgba(255,224,102,.20), rgba(255,255,255,.04));
+      border-color: rgba(255,224,102,.22);
       cursor:default;
     }
     .cell.missed{
-      opacity: .52;
-      filter: saturate(.35);
-      background:
-        radial-gradient(220px 120px at 20% 20%, rgba(255,255,255,.10), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border-color: rgba(255,255,255,.10);
+      opacity: .28;
+      filter: grayscale(.35) saturate(.20);
+      background: linear-gradient(180deg, rgba(255,90,90,.18), rgba(255,255,255,.03));
+      border-color: rgba(255,90,90,.22);
       cursor:default;
     }
     .cell.expired{
-      opacity: .48;
-      filter: saturate(.25);
-      background:
-        radial-gradient(220px 120px at 20% 20%, rgba(45,125,255,.12), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      border-color: rgba(45,125,255,.15);
+      opacity: .26;
+      filter: grayscale(.45) saturate(.18);
+      background: linear-gradient(180deg, rgba(45,125,255,.12), rgba(255,255,255,.02));
+      border-color: rgba(45,125,255,.18);
       cursor:default;
     }
 
+    /* Stamps */
+    .cell.answered::after,
+    .cell.missed::after,
+    .cell.expired::after{
+      position:absolute;
+      inset:auto 10px 10px auto;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 1000;
+      letter-spacing:.12em;
+      text-transform: uppercase;
+      font-size: 11px;
+      color: rgba(234,240,255,.92);
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 10px 24px rgba(0,0,0,.30);
+    }
+    .cell.answered::after{ content:"DONE"; border-color: rgba(255,224,102,.28); color: rgba(255,224,102,.95); }
+    .cell.missed::after{ content:"MISSED"; border-color: rgba(255,90,90,.26); color: rgba(255,90,90,.95); }
+    .cell.expired::after{ content:"TIME"; border-color: rgba(45,125,255,.24); color: rgba(45,125,255,.95); }
+
     /* Double mode badge */
-    .double-on .cell.clickable::after{
-      content: "×2";
+    .double-on .cell.clickable::before{
+      content:"×2";
       position:absolute;
       top:10px;
       right:12px;
-      font-weight: 950;
+      font-weight: 1000;
       font-size: 12px;
       letter-spacing:.10em;
-      color: rgba(255,213,74,.98);
+      color: rgba(255,224,102,.98);
       background: rgba(0,0,0,.28);
-      border: 1px solid rgba(255,213,74,.35);
+      border: 1px solid rgba(255,224,102,.35);
       padding: 4px 8px;
       border-radius: 999px;
       box-shadow: 0 10px 25px rgba(0,0,0,.35);
     }
 
-    /* Backdrop for modal drama */
+    /* -------------------------
+       Backdrop + Modal
+    -------------------------- */
     .backdrop{
       display:none;
       position:fixed;
       inset:0;
-      background: radial-gradient(1000px 700px at 50% 20%, rgba(45,125,255,.18), rgba(0,0,0,.70));
+      background: radial-gradient(1000px 700px at 50% 20%, rgba(45,125,255,.18), rgba(0,0,0,.72));
       backdrop-filter: blur(6px);
       z-index: 20;
     }
     .backdrop.show{ display:block; }
 
-    /* Modal: now mostly opaque for readability */
-    .question-area{
+    .modal{
       display:none;
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(.96);
-      width: min(960px, 92vw);
-      height: min(72vh, 680px);
-      background: linear-gradient(180deg, rgba(10,16,40,.96), rgba(7,11,26,.96));
+      width: min(980px, 94vw);
+      height: min(74vh, 720px);
+      background: linear-gradient(180deg, rgba(10,16,40,.98), rgba(7,11,26,.98));
       border: 1px solid rgba(255,255,255,.14);
       border-radius: 26px;
       box-shadow: var(--shadow), 0 0 60px rgba(45,125,255,.14);
       z-index: 25;
-      padding: 22px 20px 18px;
-      text-align: center;
+      padding: 18px 18px 16px;
       overflow:hidden;
+      text-align:center;
     }
-    .question-area.show{
+    .modal.show{
       display:block;
       animation: popIn .18s ease-out forwards;
     }
@@ -406,12 +633,13 @@
       justify-content:space-between;
       align-items:center;
       gap: 10px;
-      padding: 4px 8px 10px;
+      padding: 2px 4px 10px;
       color: var(--muted);
-      font-weight: 900;
+      font-weight: 1000;
       letter-spacing:.08em;
       text-transform: uppercase;
       font-size: 12px;
+      flex-wrap:wrap;
     }
 
     .pill{
@@ -428,32 +656,44 @@
     }
     .pill strong{ color: var(--ink); letter-spacing:.02em; }
 
-    /* Question panel: opaque enough to read cleanly */
+    .vis{
+      display:flex;
+      gap: 8px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    .vis .pill{
+      padding: 7px 10px;
+      font-size: 11px;
+    }
+    .vis .ok{ border-color: rgba(255,224,102,.22); color: rgba(255,224,102,.95); }
+    .vis .no{ border-color: rgba(255,90,90,.18); color: rgba(183,194,230,.95); opacity:.9; }
+
     .question{
-      font-size: clamp(24px, 3.3vw, 46px);
-      font-weight: 950;
+      font-size: clamp(24px, 3.2vw, 46px);
+      font-weight: 1000;
       letter-spacing: .01em;
       line-height: 1.12;
-      margin: 14px auto 0;
-      max-width: 900px;
+      margin: 10px auto 0;
+      max-width: 920px;
       text-shadow: 0 18px 60px rgba(0,0,0,.70);
       padding: 18px 18px;
       border-radius: 18px;
-      background: rgba(0,0,0,.35);
-      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.40);
+      border: 1px solid rgba(255,255,255,.12);
       box-shadow: 0 18px 55px rgba(0,0,0,.45);
     }
 
     .answer{
-      font-size: clamp(18px, 2.3vw, 30px);
-      font-weight: 900;
+      font-size: clamp(18px, 2.2vw, 30px);
+      font-weight: 950;
       letter-spacing: .01em;
-      margin: 18px auto 0;
-      max-width: 900px;
+      margin: 16px auto 0;
+      max-width: 920px;
       padding: 14px 14px;
       border-radius: 18px;
-      background: rgba(0,0,0,.45);
-      border: 1px solid rgba(255,183,0,.22);
+      background: rgba(0,0,0,.48);
+      border: 1px solid rgba(255,183,0,.24);
       color: rgba(234,240,255,.95);
       text-shadow: 0 14px 40px rgba(0,0,0,.65);
       min-height: 56px;
@@ -462,60 +702,9 @@
       justify-content:center;
     }
     .answer.revealed{
-      box-shadow:
-        0 0 50px rgba(255,183,0,.16),
-        0 18px 55px rgba(0,0,0,.45);
-      border-color: rgba(255,183,0,.40);
+      box-shadow: 0 0 50px rgba(255,183,0,.18), 0 18px 55px rgba(0,0,0,.45);
+      border-color: rgba(255,183,0,.44);
     }
-
-    .timer{
-      position:absolute;
-      bottom: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: clamp(34px, 5vw, 70px);
-      font-weight: 950;
-      letter-spacing:.06em;
-      color: var(--gold);
-      text-shadow:
-        0 18px 60px rgba(0,0,0,.65),
-        0 0 26px rgba(255,183,0,.35),
-        0 0 52px rgba(255,213,74,.22);
-      padding: 8px 18px;
-      border-radius: 999px;
-      background: rgba(0,0,0,.35);
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow: 0 14px 36px rgba(0,0,0,.38);
-      min-width: 120px;
-    }
-    .timer.low{
-      animation: pulse 0.8s infinite ease-in-out;
-      box-shadow:
-        0 0 55px rgba(255,183,0,.20),
-        0 18px 60px rgba(0,0,0,.60);
-    }
-    @keyframes pulse{
-      0%{ transform: translateX(-50%) scale(1); }
-      50%{ transform: translateX(-50%) scale(1.04); }
-      100%{ transform: translateX(-50%) scale(1); }
-    }
-
-    .time-overlay{
-      position:absolute;
-      inset:0;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      font-size: clamp(40px, 7vw, 92px);
-      font-weight: 950;
-      letter-spacing:.18em;
-      text-transform: uppercase;
-      color: rgba(234,240,255,.92);
-      text-shadow: 0 20px 80px rgba(0,0,0,.75);
-      background: radial-gradient(700px 500px at 50% 40%, rgba(255,90,90,.22), rgba(0,0,0,.66));
-      backdrop-filter: blur(2px);
-    }
-    .time-overlay.show{ display:flex; }
 
     .modal-controls{
       position:absolute;
@@ -534,18 +723,19 @@
       gap: 10px;
       justify-content:center;
       flex-wrap:wrap;
+      width: 100%;
     }
 
     .team-button{
       min-width: 220px;
-      font-size: 18px;
+      font-size: 16px;
       padding: 12px 16px;
     }
     .team-button.primary{
       background:
-        radial-gradient(160px 100px at 20% 20%, rgba(255,213,74,.55), transparent 60%),
-        linear-gradient(180deg, rgba(255,213,74,.40), rgba(255,255,255,.06));
-      border-color: rgba(255,213,74,.45);
+        radial-gradient(160px 100px at 20% 20%, rgba(255,224,102,.65), transparent 60%),
+        linear-gradient(180deg, rgba(255,224,102,.42), rgba(255,255,255,.06));
+      border-color: rgba(255,224,102,.55);
       color: #070B1A;
     }
 
@@ -557,358 +747,468 @@
     }
     .row-buttons button{ min-width: 160px; }
 
-    .winner{
-      display:none;
-      margin: 18px auto 0;
-      width: min(1100px, 92vw);
-      padding: 16px 14px;
-      border-radius: 18px;
-      background: rgba(0,0,0,.26);
-      border: 1px solid rgba(255,213,74,.22);
-      box-shadow: var(--shadow2);
-      font-size: 18px;
-      font-weight: 950;
-      letter-spacing:.02em;
+    .timer{
+      position:absolute;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(34px, 5vw, 70px);
+      font-weight: 1000;
+      letter-spacing:.06em;
       color: var(--gold);
       text-shadow:
-        0 14px 40px rgba(0,0,0,.60),
-        0 0 18px rgba(255,183,0,.22);
+        0 18px 60px rgba(0,0,0,.65),
+        0 0 26px rgba(255,183,0,.35),
+        0 0 52px rgba(255,224,102,.22);
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 14px 36px rgba(0,0,0,.38);
+      min-width: 120px;
+    }
+    .timer.low{
+      animation: pulse 0.8s infinite ease-in-out;
+      box-shadow: 0 0 60px rgba(255,183,0,.24), 0 18px 60px rgba(0,0,0,.60);
+    }
+    @keyframes pulse{
+      0%{ transform: translateX(-50%) scale(1); }
+      50%{ transform: translateX(-50%) scale(1.05); }
+      100%{ transform: translateX(-50%) scale(1); }
     }
 
-    /* Questions list popup */
-    .question-list-popup{
+    .time-overlay{
+      position:absolute;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      font-size: clamp(40px, 7vw, 92px);
+      font-weight: 1000;
+      letter-spacing:.18em;
+      text-transform: uppercase;
+      color: rgba(234,240,255,.92);
+      text-shadow: 0 20px 80px rgba(0,0,0,.75);
+      background: radial-gradient(700px 500px at 50% 40%, rgba(255,90,90,.22), rgba(0,0,0,.70));
+      backdrop-filter: blur(2px);
+    }
+    .time-overlay.show{ display:flex; }
+
+    /* Round splash */
+    .splash{
+      display:none;
+      position:fixed;
+      inset:0;
+      z-index: 40;
+      background:
+        radial-gradient(900px 540px at 50% 25%, rgba(255,224,102,.18), transparent 60%),
+        radial-gradient(900px 540px at 50% 30%, rgba(45,125,255,.20), transparent 62%),
+        rgba(0,0,0,.66);
+      backdrop-filter: blur(8px);
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding: 18px;
+    }
+    .splash.show{ display:flex; }
+    .splash .box{
+      width: min(920px, 92vw);
+      padding: 22px 18px;
+      border-radius: 26px;
+      background: rgba(0,0,0,.40);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: var(--shadow);
+    }
+    .splash .big{
+      font-size: clamp(30px, 6vw, 78px);
+      font-weight: 1000;
+      letter-spacing: .20em;
+      text-transform: uppercase;
+      margin: 6px 0 10px;
+      text-shadow: 0 18px 60px rgba(0,0,0,.70);
+    }
+    .splash .small{
+      color: var(--muted);
+      letter-spacing:.10em;
+      text-transform:uppercase;
+      font-weight: 950;
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+
+    /* -------------------------
+       Builder (Phase 2B style)
+    -------------------------- */
+    .builder{
       display:none;
       position:fixed;
       inset: 5vh 4vw;
-      background: linear-gradient(180deg, rgba(10,16,40,.97), rgba(7,11,26,.97));
+      z-index: 60;
+      background: linear-gradient(180deg, rgba(10,16,40,.98), rgba(7,11,26,.98));
       border: 1px solid rgba(255,255,255,.14);
       border-radius: 26px;
       box-shadow: var(--shadow);
-      z-index: 30;
-      padding: 18px 16px 14px;
       overflow:hidden;
     }
-    .ql-head{
+    .builder.show{ display:block; }
+
+    .builderHead{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap: 10px;
-      padding-bottom: 12px;
+      padding: 14px 14px;
       border-bottom: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      flex-wrap:wrap;
     }
-    .ql-head h2{
+    .builderHead h2{
       margin:0;
-      font-size: 16px;
+      font-size: 14px;
       letter-spacing:.14em;
       text-transform:uppercase;
-      font-weight: 950;
+      font-weight: 1000;
       color: var(--ink);
-    }
-    .ql-body{
-      height: calc(100% - 56px);
-      overflow:auto;
-      padding: 14px 6px 6px;
-      text-align:left;
-    }
-    .category-title{
-      margin: 18px 0 8px;
-      color: var(--gold);
-      font-weight: 950;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      font-size: 13px;
-    }
-    .question-entry{
-      margin: 6px 0;
-      padding: 10px 10px;
-      border-radius: 14px;
-      background: rgba(0,0,0,.30);
-      border: 1px solid rgba(255,255,255,.08);
-      box-shadow: 0 10px 24px rgba(0,0,0,.25);
-      line-height: 1.35;
-    }
-    .question-entry .tag{
-      display:inline-block;
-      font-weight: 950;
-      color: var(--muted);
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      font-size: 11px;
-      margin-right: 8px;
-    }
-    .question-entry .pts{
-      color: rgba(255,213,74,.98);
-      font-weight: 950;
-      margin-left: 8px;
-      white-space:nowrap;
-    }
-    .question-entry .editable{
-      padding: 2px 6px;
-      border-radius: 10px;
     }
 
-    /* Tiny help text */
-    .hotkeys{
-      margin-top: 6px;
-      color: rgba(183,194,230,.92);
-      font-size: 12px;
-      letter-spacing:.03em;
+    .builderBody{
+      height: calc(100% - 64px);
+      overflow:auto;
+      padding: 14px 14px 18px;
     }
-    .hotkeys kbd{
-      display:inline-block;
-      padding: 2px 7px;
-      border-radius: 8px;
-      background: rgba(0,0,0,.35);
+
+    .catBlock{
+      padding: 14px 14px;
+      border-radius: 20px;
+      background: rgba(0,0,0,.30);
       border: 1px solid rgba(255,255,255,.10);
-      box-shadow: 0 10px 22px rgba(0,0,0,.18);
+      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+      margin-bottom: 14px;
+    }
+
+    .catTop{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      margin-bottom: 10px;
+    }
+
+    .catName{
+      font-weight: 1000;
+      letter-spacing:.08em;
+      text-transform: uppercase;
+      font-size: 12px;
+      color: var(--gold);
+    }
+
+    .qRow{
+      display:grid;
+      grid-template-columns: 1.3fr 1fr 100px 120px;
+      gap: 10px;
+      align-items:center;
+      margin: 10px 0;
+    }
+    @media (max-width: 980px){
+      .qRow{ grid-template-columns: 1fr; }
+    }
+    .qRow .mini{
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing:.10em;
+      color: rgba(183,194,230,.92);
       font-weight: 950;
-      color: var(--ink);
-      margin: 0 4px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      margin-bottom: 4px;
+    }
+
+    .qBox{
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+    }
+
+    .qRow input[type="text"]{ width:100%; }
+    .qRow input[type="number"]{ width: 100%; }
+
+    .hr{
+      height:1px;
+      background: rgba(255,255,255,.08);
+      margin: 10px 0;
+    }
+
+    /* Projector mode hint */
+    .projHint{
+      display:none;
+      margin-left: 8px;
+      padding: 8px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,224,102,.22);
+      background: rgba(0,0,0,.20);
+      color: rgba(255,224,102,.95);
+      font-weight: 1000;
+      font-size: 11px;
+      letter-spacing:.10em;
+      text-transform: uppercase;
+      white-space:nowrap;
+    }
+
+    /* Projector-only UI adjustments */
+    body.projector header.game .header-controls,
+    body.projector header.game .teams,
+    body.projector .winner,
+    body.projector .header-controls,
+    body.projector .team{ cursor:default; }
+    body.projector .editable{ cursor:default; }
+    body.projector .header-controls button{ display:none; }
+
+    .projectorTop{
+      display:none;
+      max-width: var(--maxw);
+      margin: 0 auto 10px;
+      padding: 10px 0 0;
+      text-align:right;
+    }
+    body.projector .projectorTop{ display:block; }
+
+    .statusDot{
+      display:inline-block;
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background: rgba(255,90,90,.9);
+      box-shadow: 0 0 18px rgba(255,90,90,.25);
+      margin-right:8px;
+      vertical-align:middle;
+    }
+    .statusDot.ok{
+      background: rgba(45,125,255,.9);
+      box-shadow: 0 0 18px rgba(45,125,255,.25);
     }
   </style>
 </head>
 
 <body>
-  <header>
-    <div class="title-wrap">
-      <h1>TRIVIA SHOW</h1>
-      <div class="subline">Modern game show • Dramatic theatrical • Fast host controls</div>
+  <!-- TITLE SCREEN -->
+  <section id="titleScreen" aria-label="Title screen">
+    <canvas id="starfield"></canvas>
+    <canvas id="starfield2"></canvas>
+    <div class="crt"></div>
+    <div class="vignette"></div>
+
+    <div class="title-card">
+      <div class="logo">GEFFEN BOWL</div>
+      <div class="tagline">1993 arcade splash • modern host controls • classroom-safe projector mode</div>
+      <div class="glowbar"></div>
+
+      <div class="title-grid">
+        <div class="panel">
+          <h3>Game Setup</h3>
+
+          <div class="row">
+            <div class="field">
+              <label for="teamCount">Teams (2–6)</label>
+              <select id="teamCount">
+                <option value="2">2 Teams</option>
+                <option value="3" selected>3 Teams</option>
+                <option value="4">4 Teams</option>
+                <option value="5">5 Teams</option>
+                <option value="6">6 Teams</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="gameMode">Mode</label>
+              <select id="gameMode">
+                <option value="classic" selected>Classic (1 round)</option>
+                <option value="tworound">Two-Round (Round 1 + Round 2)</option>
+                <option value="lightning">Lightning (shorter timer defaults)</option>
+                <option value="tournament">Tournament (locks edits midgame)</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="timerDefault">Timer (seconds)</label>
+              <input id="timerDefault" type="number" min="1" max="240" value="10" />
+            </div>
+          </div>
+
+          <div class="toggles">
+            <label class="toggle" title="Autosave game state so refresh doesn't wipe everything">
+              <input type="checkbox" id="autosaveToggle" checked />
+              <span>Autosave</span>
+            </label>
+
+            <label class="toggle" title="Adds a separate read-only projector window">
+              <input type="checkbox" id="projectorToggle" checked />
+              <span>Projector Mode</span>
+            </label>
+
+            <label class="toggle" title="Prevents accidental answer reveals on the projector">
+              <input type="checkbox" id="safeModeToggle" checked />
+              <span>SAFE MODE (Projector)</span>
+            </label>
+
+            <label class="toggle" title="Default behavior for the Show Answer button">
+              <input type="checkbox" id="defaultRevealBothToggle" />
+              <span>Default reveal BOTH</span>
+            </label>
+          </div>
+
+          <div style="margin-top:10px;" class="tiny">
+            Host hotkeys (in question): <kbd>1</kbd>–<kbd>6</kbd> award • <kbd>A</kbd> host answer • <kbd>Shift</kbd>+<kbd>A</kbd> projector answer • <kbd>Space</kbd> pause • <kbd>Esc</kbd> close • <kbd>U</kbd> undo
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Questions</h3>
+          <div class="tiny" style="margin-bottom:10px;">
+            You can paste JSON <em>or</em> build questions inside the editor. Old JSON still works (loads as Round 1).
+          </div>
+
+          <div class="row">
+            <button class="btn-gold" id="openBuilderFromTitle">Open Question Builder</button>
+            <button id="pasteJsonFromTitle">Paste JSON</button>
+          </div>
+
+          <div style="margin-top:10px;">
+            <textarea id="jsonInputTitle" placeholder="Paste JSON here (optional)"></textarea>
+          </div>
+
+          <div class="title-actions">
+            <button class="btn-gold" id="startFromTitle">Start GEFFEN BOWL</button>
+            <button class="btn-danger" id="clearSaveBtn">Clear Saved Game</button>
+          </div>
+
+          <div class="tiny" style="margin-top:8px;">
+            Tip: if popups are blocked, allow popups for this page so the projector window can open.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAME SCREEN -->
+  <section id="gameScreen" aria-label="Game screen">
+    <header class="game">
+      <div class="topbar">
+        <div class="brand">
+          <div class="h">GEFFEN BOWL</div>
+          <div class="s" id="subtitle">Modern game show • Dramatic theatrical • Host controls</div>
+        </div>
+
+        <div class="header-controls">
+          <button id="openBuilderBtn">Question Builder</button>
+          <button id="copyJsonBtn" title="Copy current questions (all rounds) as JSON">Copy JSON</button>
+          <button id="toggleDoubleBtn">Double: OFF</button>
+          <button id="openProjectorBtn">Open Projector</button>
+          <button class="btn-danger" id="returnToTitleBtn">Title Screen</button>
+        </div>
+      </div>
+
+      <div class="projectorTop" id="projectorTop">
+        <span class="statusDot" id="projStatusDot"></span>
+        <span class="projHint" id="projHint">PROJECTOR CONNECTED</span>
+        <button class="btn-gold" id="projectorFullscreenBtn">Fullscreen</button>
+      </div>
+
+      <div class="teams" id="teamsRow"></div>
+    </header>
+
+    <main>
+      <div class="roundBanner">
+        <div class="roundPill" id="roundPill"><strong>Round 1</strong></div>
+        <div class="roundPill" id="modePill"><strong>Classic</strong></div>
+        <div class="roundPill" id="timerPill"><strong>Timer:</strong> <span id="timerDefaultReadout">10</span>s</div>
+        <div class="roundPill" id="safePill"><strong>SAFE:</strong> <span id="safeModeReadout">ON</span></div>
+      </div>
+
+      <div class="winner" id="winner"></div>
+
+      <div class="boardWrap">
+        <div class="board" id="board"></div>
+      </div>
+    </main>
+
+    <div class="backdrop" id="backdrop"></div>
+
+    <!-- Question Modal -->
+    <div class="modal" id="questionModal" role="dialog" aria-modal="true" aria-label="Question">
+      <div class="qa-top">
+        <div class="pill" id="qaMetaLeft"><strong>—</strong></div>
+        <div class="pill" id="qaMetaRight"><strong>—</strong></div>
+        <div class="vis">
+          <div class="pill" id="hostVisPill">HOST: <strong id="hostVisText">HIDDEN</strong></div>
+          <div class="pill" id="projVisPill">PROJECTOR: <strong id="projVisText">HIDDEN</strong></div>
+        </div>
+      </div>
+
+      <div class="question" id="questionText"></div>
+      <div class="answer" id="answerText" aria-live="polite"></div>
+
+      <div class="modal-controls">
+        <div class="team-buttons" id="awardButtonsRow"></div>
+
+        <div class="row-buttons">
+          <button class="btn-gold" id="noTeamBtn">No Team</button>
+          <button id="hostAnswerBtn">Show Answer (Host)</button>
+          <button id="projAnswerBtn" title="SAFE MODE may require hold/confirm">Reveal Answer (Projector)</button>
+          <button id="bothAnswerBtn">Reveal Both</button>
+          <button id="pauseBtn">Pause</button>
+          <button class="btn-danger" id="closeQuestionBtn">Close</button>
+        </div>
+      </div>
+
+      <div class="timer" id="timer">10</div>
+      <div class="time-overlay" id="timeOverlay">TIME</div>
     </div>
 
-    <div class="teams">
-      <div class="team active" id="team1" data-team="1" title="Click to select Team 1">
-        <div class="name editable" id="teamName1" contenteditable="true">Team 1</div>
-        <div class="score editable" id="score1" contenteditable="true">0</div>
-      </div>
-
-      <div class="team" id="team2" data-team="2" title="Click to select Team 2">
-        <div class="name editable" id="teamName2" contenteditable="true">Team 2</div>
-        <div class="score editable" id="score2" contenteditable="true">0</div>
-      </div>
-
-      <div class="team" id="team3" data-team="3" title="Click to select Team 3">
-        <div class="name editable" id="teamName3" contenteditable="true">Team 3</div>
-        <div class="score editable" id="score3" contenteditable="true">0</div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    <div class="setup" id="setup">
-      <textarea id="jsonInput" placeholder="Paste your JSON data here..."></textarea>
-
-      <div class="controls">
-        <button class="btn-gold" id="startGame">Start</button>
-        <button class="btn-danger" id="resetGame">Reset</button>
-        <button id="togglePoints">Double: OFF</button>
-        <button id="undoPoints">Undo</button>
-        <button id="showQuestionsBtn">Show Questions</button>
-        <button id="copyTemplateBtn">Format (Template)</button>
-        <button id="copyJsonBtn" title="Copies your current (edited) question set as JSON">Copy JSON</button>
-      </div>
-
-      <div class="inline">
-        <span>Timer (seconds)</span>
-        <input type="number" id="timerDuration" value="10" min="1" max="120" />
-        <span class="hotkeys">
-          Hotkeys:
-          <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> correct •
-          <kbd>A</kbd> answer •
-          <kbd>Space</kbd> pause •
-          <kbd>Esc</kbd> close •
-          <kbd>U</kbd> undo
-        </span>
+    <!-- Round splash -->
+    <div class="splash" id="roundSplash" aria-label="Round splash">
+      <div class="box">
+        <div class="big" id="splashTitle">ROUND 1</div>
+        <div class="small" id="splashSubtitle">Get ready.</div>
+        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+          <button class="btn-gold" id="startRoundBtn">Start Round</button>
+        </div>
       </div>
     </div>
 
-    <div class="board" id="board"></div>
-    <div class="winner" id="winner"></div>
-  </main>
-
-  <div class="backdrop" id="backdrop"></div>
-
-  <div class="question-area" id="question-area" role="dialog" aria-modal="true" aria-label="Question">
-    <div class="qa-top">
-      <div class="pill" id="qaMetaLeft"><strong>—</strong></div>
-      <div class="pill" id="qaMetaRight"><strong>—</strong></div>
-    </div>
-
-    <div class="question" id="question"></div>
-
-    <div class="answer" id="answer" aria-live="polite"></div>
-
-    <div class="modal-controls">
-      <div class="team-buttons">
-        <button class="team-button primary" id="team1Button" onclick="markCorrect(1)"></button>
-        <button class="team-button primary" id="team2Button" onclick="markCorrect(2)"></button>
-        <button class="team-button primary" id="team3Button" onclick="markCorrect(3)"></button>
+    <!-- Builder -->
+    <div class="builder" id="builder">
+      <div class="builderHead">
+        <h2>Question Builder</h2>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+          <button class="btn-gold" id="builderAddRoundBtn">Add Round</button>
+          <button id="builderAddCategoryBtn">Add Category</button>
+          <button id="builderCopyJsonBtn">Copy JSON</button>
+          <button class="btn-danger" id="builderCloseBtn">Close</button>
+        </div>
       </div>
-
-      <div class="row-buttons">
-        <button class="btn-gold" onclick="noTeamCorrect()">No Team</button>
-        <button onclick="showAnswer()">Show Answer</button>
-        <button onclick="pauseTimer()" id="pauseTimer">Pause</button>
-        <button class="btn-danger" onclick="closeQuestion()">Close</button>
-      </div>
+      <div class="builderBody" id="builderBody"></div>
     </div>
-
-    <div class="timer" id="timer">10</div>
-    <div class="time-overlay" id="timeOverlay">TIME</div>
-  </div>
-
-  <div class="question-list-popup" id="question-list-popup" role="dialog" aria-modal="true" aria-label="Questions list">
-    <div class="ql-head">
-      <h2>Questions & Answers</h2>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
-        <button class="btn-gold" onclick="copyQuestionList()">Copy Text</button>
-        <button onclick="copyCurrentJson()">Copy JSON</button>
-        <button class="btn-danger" onclick="closeQuestionList()">Close</button>
-      </div>
-    </div>
-    <div class="ql-body" id="questionsList"></div>
-  </div>
+  </section>
 
   <script>
-    // ----------------------------
-    // State
-    // ----------------------------
-    let questions = {};               // active question set
-    let hasLoadedQuestions = false;   // do we have a parsed set?
-    let currentQuestion = null;
-    let currentCategory = null;
-    let currentIndex = null;
-    let currentCell = null;
-
-    let currentTeam = 1;
-    let scores = { team1: 0, team2: 0, team3: 0 };
-
-    let isDouble = false;
-
-    let timerInterval = null;
-    let timeLeft = 0;
-    let isPaused = false;
-
-    // Undo entries: { team, pointsDelta, category, index, prevState }
-    let undoStack = [];
+    /* =========================================================
+       GEFFEN BOWL — Phase 4 Implementation
+       - 2–6 teams (dynamic)
+       - modes
+       - rounds
+       - projector window w/ safe reveal + dual reveal states
+       - builder
+       - autosave
+    ========================================================== */
 
     // ----------------------------
-    // Helpers
+    // Utilities
     // ----------------------------
+    const qs = (sel) => document.querySelector(sel);
+    const qsa = (sel) => Array.from(document.querySelectorAll(sel));
+
     function clampInt(n, fallback=0){
       const x = parseInt(String(n).replace(/[^\d-]/g,''), 10);
       return Number.isFinite(x) ? x : fallback;
-    }
-
-    function sanitizeSingleLine(el){
-      el.innerText = el.innerText.replace(/\s+/g,' ').trim();
-    }
-
-    function setBoardDoubleClass(){
-      const board = document.getElementById('board');
-      if (isDouble) board.classList.add('double-on');
-      else board.classList.remove('double-on');
-    }
-
-    function getCategories(){
-      return Object.keys(questions || {});
-    }
-
-    function buildBoard(){
-      const board = document.getElementById('board');
-      board.innerHTML = '';
-
-      const categories = getCategories();
-      if (!categories.length){
-        board.innerHTML = '';
-        return;
-      }
-
-      const rows = Math.max(...categories.map(c => (questions[c] || []).length));
-      board.style.gridTemplateColumns = `repeat(${categories.length}, 1fr)`;
-      board.style.gridTemplateRows = `repeat(${rows + 1}, auto)`;
-
-      categories.forEach(category => {
-        const cell = document.createElement('div');
-        cell.className = 'cell category';
-        cell.innerHTML = `<div class="cat">${escapeHtml(category)}</div>`;
-        board.appendChild(cell);
-      });
-
-      for (let i = 0; i < rows; i++){
-        categories.forEach(category => {
-          const q = (questions[category] || [])[i];
-          const cell = document.createElement('div');
-          cell.className = 'cell';
-
-          if (q){
-            cell.dataset.category = category;
-            cell.dataset.index = String(i);
-            cell.dataset.state = q._state || 'unplayed';
-
-            const value = q.points * (isDouble ? 2 : 1);
-            cell.innerHTML = `<div class="value">${value}</div>`;
-            applyCellStateClass(cell);
-
-            if (cell.dataset.state === 'unplayed'){
-              cell.classList.add('clickable');
-              cell.onclick = () => selectQuestion(category, i, cell);
-            } else {
-              cell.onclick = null;
-            }
-          } else {
-            cell.style.opacity = '.15';
-            cell.style.filter = 'saturate(.2)';
-            cell.style.borderColor = 'rgba(255,255,255,.06)';
-          }
-
-          board.appendChild(cell);
-        });
-      }
-
-      setBoardDoubleClass();
-    }
-
-    function applyCellStateClass(cell){
-      cell.classList.remove('answered','missed','expired','clickable');
-      const st = cell.dataset.state;
-      if (st === 'answered') cell.classList.add('answered');
-      if (st === 'missed') cell.classList.add('missed');
-      if (st === 'expired') cell.classList.add('expired');
-      if (st === 'unplayed') cell.classList.add('clickable');
-    }
-
-    function setCellState(category, index, newState){
-      const q = questions?.[category]?.[index];
-      if (q) q._state = newState;
-
-      const selector = `.cell[data-category="${cssEscape(category)}"][data-index="${index}"]`;
-      const cell = document.querySelector(selector);
-      if (cell){
-        cell.dataset.state = newState;
-        applyCellStateClass(cell);
-        if (newState === 'unplayed'){
-          cell.onclick = () => selectQuestion(category, index, cell);
-        } else {
-          cell.onclick = null;
-        }
-        const valueNode = cell.querySelector('.value');
-        if (valueNode && q) valueNode.innerText = q.points * (isDouble ? 2 : 1);
-      }
-    }
-
-    function updateDisplayedValues(){
-      getCategories().forEach(cat => {
-        (questions[cat] || []).forEach((q, i) => {
-          if (!q) return;
-          const selector = `.cell[data-category="${cssEscape(cat)}"][data-index="${i}"]`;
-          const cell = document.querySelector(selector);
-          if (!cell) return;
-          const valueNode = cell.querySelector('.value');
-          if (valueNode) valueNode.innerText = q.points * (isDouble ? 2 : 1);
-        });
-      });
-      setBoardDoubleClass();
     }
 
     function escapeHtml(str){
@@ -925,65 +1225,1388 @@
       return String(s).replace(/["\\]/g, '\\$&');
     }
 
-    function updateScoresUI(){
-      document.getElementById('score1').innerText = scores.team1;
-      document.getElementById('score2').innerText = scores.team2;
-      document.getElementById('score3').innerText = scores.team3;
+    function nowId(){
+      return Math.random().toString(36).slice(2,10);
     }
 
-    function setActiveTeam(teamNumber){
-      currentTeam = teamNumber;
-      document.querySelectorAll('.team').forEach(t => t.classList.remove('active'));
-      const el = document.getElementById(`team${teamNumber}`);
-      if (el) el.classList.add('active');
+    function deepClone(o){
+      return JSON.parse(JSON.stringify(o));
     }
 
-    function updateTeamButtons(){
-      document.getElementById('team1Button').innerText = document.getElementById('teamName1').innerText.trim() || 'Team 1';
-      document.getElementById('team2Button').innerText = document.getElementById('teamName2').innerText.trim() || 'Team 2';
-      document.getElementById('team3Button').innerText = document.getElementById('teamName3').innerText.trim() || 'Team 3';
+    // ----------------------------
+    // Projector detection + channel
+    // ----------------------------
+    const params = new URLSearchParams(location.search);
+    const isProjectorView = params.get('view') === 'projector';
+    if (isProjectorView) document.body.classList.add('projector');
+
+    const CHANNEL_NAME = 'geffenbowl_channel_v1';
+    let bc = null;
+    try { bc = new BroadcastChannel(CHANNEL_NAME); } catch(e){ bc = null; }
+
+    function sendToProjector(payload){
+      if (!payload) return;
+      if (bc) bc.postMessage(payload);
+      // postMessage fallback handled by host when opening projector
+      if (projectorWin && !projectorWin.closed){
+        try { projectorWin.postMessage(payload, '*'); } catch(e){}
+      }
     }
+
+    function onProjectorMessage(handler){
+      if (bc) bc.onmessage = (e) => handler(e.data);
+      window.addEventListener('message', (e) => handler(e.data));
+    }
+
+    // ----------------------------
+    // Global state
+    // ----------------------------
+    const SAVE_KEY = 'geffen_bowl_save_v4';
+
+    const defaultState = () => ({
+      meta: { version: 4 },
+      settings: {
+        mode: 'classic',
+        teamCount: 3,
+        timerDefault: 10,
+        autosave: true,
+        projectorEnabled: true,
+        safeMode: true,
+        defaultRevealBoth: false
+      },
+      teams: [
+        { id: 't1', name: 'Team 1', score: 0 },
+        { id: 't2', name: 'Team 2', score: 0 },
+        { id: 't3', name: 'Team 3', score: 0 }
+      ],
+      rounds: [
+        { id: 'r1', title: 'Round 1', categories: {} }
+      ],
+      currentRoundIndex: 0,
+      isDouble: false,
+      activeTeamIndex: 0,
+      // current question selection (null when none)
+      currentPick: null, // { roundIndex, category, index }
+      // timer
+      timer: { running: false, paused: false, timeLeft: 10 },
+      // projector connection hint
+      projector: { connected: false }
+    });
+
+    let state = defaultState();
+
+    // Host-only window handle
+    let projectorWin = null;
+
+    // Undo stack entries:
+    // { type:'award'|'noTeam'|'expired', roundIndex, category, index, prevState, teamIndex, pointsDelta, prevScores }
+    let undoStack = [];
+
+    // ----------------------------
+    // JSON format support
+    // - Old format: { "Category":[{question,answer,points}, ...], ... } => Round 1
+    // - New format:
+    //   {
+    //     "teams":[{"name":"A","score":0}, ...] (optional),
+    //     "rounds":[{"title":"Round 1","categories":{...}}, ...]
+    //   }
+    // ----------------------------
+    function normalizeQuestion(q){
+      return {
+        question: String(q?.question ?? ''),
+        answer: String(q?.answer ?? ''),
+        points: clampInt(q?.points ?? 0, 0),
+        _state: q?._state || 'unplayed', // unplayed|answered|missed|expired
+        _hostShown: !!q?._hostShown,
+        _projShown: !!q?._projShown
+      };
+    }
+
+    function parseAnyJson(raw){
+      const parsed = JSON.parse(raw);
+      // New format?
+      if (parsed && typeof parsed === 'object' && Array.isArray(parsed.rounds)){
+        const rounds = parsed.rounds.map((r, i) => ({
+          id: r.id || `r${i+1}_${nowId()}`,
+          title: String(r.title ?? `Round ${i+1}`),
+          categories: normalizeCategories(r.categories || {})
+        }));
+        const teams = Array.isArray(parsed.teams)
+          ? parsed.teams.slice(0,6).map((t, i) => ({
+              id: t.id || `t${i+1}_${nowId()}`,
+              name: String(t.name ?? `Team ${i+1}`),
+              score: clampInt(t.score ?? 0, 0)
+            }))
+          : null;
+
+        return { rounds, teams };
+      }
+
+      // Old format: categories at top-level
+      if (parsed && typeof parsed === 'object'){
+        const categories = normalizeCategories(parsed);
+        return {
+          rounds: [{ id: 'r1_'+nowId(), title: 'Round 1', categories }],
+          teams: null
+        };
+      }
+
+      throw new Error('Unsupported JSON shape.');
+    }
+
+    function normalizeCategories(obj){
+      const out = {};
+      for (const cat of Object.keys(obj || {})){
+        const arr = Array.isArray(obj[cat]) ? obj[cat] : [];
+        out[String(cat)] = arr.map(normalizeQuestion);
+      }
+      return out;
+    }
+
+    function exportJson(){
+      return JSON.stringify({
+        teams: state.teams.map(t => ({ name: t.name, score: t.score })),
+        rounds: state.rounds.map(r => ({
+          title: r.title,
+          categories: Object.fromEntries(Object.entries(r.categories).map(([cat, arr]) => [
+            cat,
+            (arr || []).map(q => ({ question: q.question, answer: q.answer, points: q.points }))
+          ]))
+        }))
+      }, null, 2);
+    }
+
+    // ----------------------------
+    // Persistence
+    // ----------------------------
+    function saveState(){
+      if (!state.settings.autosave) return;
+      try{
+        const payload = {
+          state,
+          undoStack
+        };
+        localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+      }catch(e){}
+    }
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(SAVE_KEY);
+        if (!raw) return false;
+        const payload = JSON.parse(raw);
+        if (!payload?.state) return false;
+        state = payload.state;
+        undoStack = payload.undoStack || [];
+        return true;
+      }catch(e){
+        return false;
+      }
+    }
+
+    function clearSaved(){
+      try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+    }
+
+    // ----------------------------
+    // Mode presets
+    // ----------------------------
+    function applyModePreset(mode){
+      state.settings.mode = mode;
+
+      if (mode === 'classic'){
+        state.settings.timerDefault = clampInt(state.settings.timerDefault, 10) || 10;
+        // 1 round
+        state.rounds = [state.rounds[0] || { id:'r1_'+nowId(), title:'Round 1', categories:{} }];
+        state.rounds[0].title = 'Round 1';
+        state.currentRoundIndex = 0;
+      }
+      if (mode === 'tworound'){
+        state.settings.timerDefault = clampInt(state.settings.timerDefault, 10) || 10;
+        // 2 rounds
+        const r1 = state.rounds[0] || { id:'r1_'+nowId(), title:'Round 1', categories:{} };
+        const r2 = state.rounds[1] || { id:'r2_'+nowId(), title:'Round 2', categories:{} };
+        r1.title = 'Round 1';
+        r2.title = 'Round 2';
+        state.rounds = [r1, r2];
+        state.currentRoundIndex = 0;
+      }
+      if (mode === 'lightning'){
+        state.settings.timerDefault = 7;
+        const r1 = state.rounds[0] || { id:'r1_'+nowId(), title:'Round 1', categories:{} };
+        r1.title = 'Round 1';
+        state.rounds = [r1];
+        state.currentRoundIndex = 0;
+      }
+      if (mode === 'tournament'){
+        state.settings.timerDefault = clampInt(state.settings.timerDefault, 10) || 10;
+        const r1 = state.rounds[0] || { id:'r1_'+nowId(), title:'Round 1', categories:{} };
+        const r2 = state.rounds[1] || { id:'r2_'+nowId(), title:'Round 2', categories:{} };
+        r1.title = 'Round 1';
+        r2.title = 'Round 2';
+        state.rounds = [r1, r2];
+        state.currentRoundIndex = 0;
+      }
+
+      state.timer.timeLeft = state.settings.timerDefault;
+      state.timer.running = false;
+      state.timer.paused = false;
+      state.isDouble = false;
+    }
+
+    // ----------------------------
+    // Teams
+    // ----------------------------
+    function setTeamCount(n){
+      const count = Math.max(2, Math.min(6, clampInt(n, 3)));
+      state.settings.teamCount = count;
+
+      const next = [];
+      for (let i=0; i<count; i++){
+        const existing = state.teams[i];
+        next.push(existing || { id:`t${i+1}_${nowId()}`, name:`Team ${i+1}`, score:0 });
+      }
+      state.teams = next;
+      state.activeTeamIndex = Math.min(state.activeTeamIndex, state.teams.length - 1);
+    }
+
+    // ----------------------------
+    // Rendering
+    // ----------------------------
+    function showTitle(){
+      qs('#titleScreen').style.display = 'flex';
+      qs('#gameScreen').style.display = 'none';
+      if (isProjectorView){
+        // projector view should never be on title in practice
+      }
+    }
+
+    function showGame(){
+      qs('#titleScreen').style.display = 'none';
+      qs('#gameScreen').style.display = 'block';
+    }
+
+    function renderHeaderPills(){
+      qs('#modePill strong').innerText = ({
+        classic:'Classic',
+        tworound:'Two-Round',
+        lightning:'Lightning',
+        tournament:'Tournament'
+      })[state.settings.mode] || 'Mode';
+
+      qs('#timerDefaultReadout').innerText = String(state.settings.timerDefault);
+      qs('#safeModeReadout').innerText = state.settings.safeMode ? 'ON' : 'OFF';
+
+      const round = state.rounds[state.currentRoundIndex];
+      qs('#roundPill strong').innerText = round?.title || `Round ${state.currentRoundIndex+1}`;
+
+      qs('#toggleDoubleBtn').innerText = `Double: ${state.isDouble ? 'ON' : 'OFF'}`;
+      const board = qs('#board');
+      if (state.isDouble) board.classList.add('double-on');
+      else board.classList.remove('double-on');
+
+      qs('#safePill').style.borderColor = state.settings.safeMode ? 'rgba(255,224,102,.30)' : 'rgba(255,255,255,.10)';
+    }
+
+    function renderTeams(){
+      const row = qs('#teamsRow');
+      row.innerHTML = '';
+
+      state.teams.forEach((t, idx) => {
+        const el = document.createElement('div');
+        el.className = 'team' + (idx === state.activeTeamIndex ? ' active' : '');
+        el.dataset.teamIndex = String(idx);
+
+        el.innerHTML = `
+          <div class="name editable" contenteditable="${isProjectorView ? 'false':'true'}" data-type="teamName">${escapeHtml(t.name)}</div>
+          <div class="score editable" contenteditable="${isProjectorView ? 'false':'true'}" data-type="teamScore">${escapeHtml(String(t.score))}</div>
+        `;
+
+        if (!isProjectorView){
+          el.addEventListener('click', () => {
+            state.activeTeamIndex = idx;
+            renderTeams();
+            saveState();
+            broadcastState();
+          });
+
+          // contenteditable safety + update
+          const nameEl = el.querySelector('[data-type="teamName"]');
+          const scoreEl = el.querySelector('[data-type="teamScore"]');
+
+          nameEl.addEventListener('keydown', preventEnterKey);
+          nameEl.addEventListener('blur', () => {
+            t.name = nameEl.innerText.replace(/\s+/g,' ').trim() || `Team ${idx+1}`;
+            renderTeams();
+            setWinnerBanner();
+            saveState();
+            broadcastState();
+          });
+
+          scoreEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter'){ e.preventDefault(); scoreEl.blur(); }
+          });
+          scoreEl.addEventListener('blur', () => {
+            t.score = clampInt(scoreEl.innerText, 0);
+            renderTeams();
+            setWinnerBanner();
+            saveState();
+            broadcastState();
+          });
+        }
+
+        row.appendChild(el);
+      });
+    }
+
+    function getCurrentRound(){
+      return state.rounds[state.currentRoundIndex] || state.rounds[0];
+    }
+
+    function getCategories(){
+      const r = getCurrentRound();
+      return Object.keys(r?.categories || {});
+    }
+
+    function maxRows(){
+      const r = getCurrentRound();
+      const cats = getCategories();
+      if (!cats.length) return 0;
+      return Math.max(...cats.map(c => (r.categories[c] || []).length), 0);
+    }
+
+    function applyCellStateClass(cell, st){
+      cell.classList.remove('answered','missed','expired','clickable');
+      if (st === 'answered') cell.classList.add('answered');
+      if (st === 'missed') cell.classList.add('missed');
+      if (st === 'expired') cell.classList.add('expired');
+      if (st === 'unplayed') cell.classList.add('clickable');
+    }
+
+    function renderBoard(){
+      const board = qs('#board');
+      board.innerHTML = '';
+
+      const r = getCurrentRound();
+      const cats = getCategories();
+      if (!cats.length){
+        board.innerHTML = `
+          <div class="panel" style="max-width:760px; margin: 0 auto; text-align:center;">
+            <h3 style="margin:0 0 10px; letter-spacing:.14em; text-transform:uppercase; color: var(--gold);">No questions loaded</h3>
+            <div class="tiny">Open the Question Builder, or paste JSON on the title screen.</div>
+          </div>
+        `;
+        return;
+      }
+
+      const rows = maxRows();
+      board.style.gridTemplateColumns = `repeat(${cats.length}, 1fr)`;
+      board.style.gridTemplateRows = `repeat(${rows + 1}, auto)`;
+
+      // headers
+      for (const cat of cats){
+        const cell = document.createElement('div');
+        cell.className = 'cell category';
+        cell.innerHTML = `<div class="cat">${escapeHtml(cat)}</div>`;
+        board.appendChild(cell);
+      }
+
+      // cells
+      for (let i=0; i<rows; i++){
+        for (const cat of cats){
+          const q = (r.categories[cat] || [])[i];
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+
+          if (q){
+            const st = q._state || 'unplayed';
+            const value = q.points * (state.isDouble ? 2 : 1);
+
+            cell.dataset.category = cat;
+            cell.dataset.index = String(i);
+            cell.dataset.state = st;
+
+            cell.innerHTML = `<div class="value">${escapeHtml(String(value))}</div>`;
+            applyCellStateClass(cell, st);
+
+            if (!isProjectorView && st === 'unplayed'){
+              cell.onclick = () => selectQuestion(state.currentRoundIndex, cat, i);
+            }
+          } else {
+            cell.style.opacity = '.12';
+            cell.style.borderColor = 'rgba(255,255,255,.06)';
+            cell.style.filter = 'saturate(.2)';
+          }
+
+          board.appendChild(cell);
+        }
+      }
+
+      renderHeaderPills();
+    }
+
+    function setWinnerBanner(){
+      const winnerEl = qs('#winner');
+      const max = Math.max(...state.teams.map(t => t.score), 0);
+      const winners = state.teams.filter(t => t.score === max).map(t => t.name || 'Team');
+
+      if (!getCategories().length){
+        winnerEl.style.display = 'none';
+        return;
+      }
+
+      winnerEl.style.display = 'block';
+      winnerEl.innerText = (winners.length === 1)
+        ? `Leading: ${winners[0]} (${max})`
+        : `Tie: ${winners.join(' & ')} (${max})`;
+    }
+
+    // ----------------------------
+    // Modal + timer
+    // ----------------------------
+    let timerInterval = null;
+
+    function showBackdrop(){ qs('#backdrop').classList.add('show'); }
+    function hideBackdrop(){ qs('#backdrop').classList.remove('show'); }
 
     function showModal(){
-      document.getElementById('backdrop').classList.add('show');
-      const modal = document.getElementById('question-area');
-      modal.classList.add('show');
-      modal.style.display = 'block';
-      document.getElementById('pauseTimer').focus({ preventScroll:true });
+      showBackdrop();
+      qs('#questionModal').classList.add('show');
+      qs('#questionModal').style.display = 'block';
     }
-
     function hideModal(){
-      document.getElementById('backdrop').classList.remove('show');
-      const modal = document.getElementById('question-area');
-      modal.classList.remove('show');
-      modal.style.display = 'none';
+      qs('#questionModal').classList.remove('show');
+      qs('#questionModal').style.display = 'none';
+      hideBackdrop();
     }
 
     function clearTimer(){
       if (timerInterval) clearInterval(timerInterval);
       timerInterval = null;
-      isPaused = false;
-      document.getElementById('pauseTimer').innerText = 'Pause';
-      document.getElementById('timer').classList.remove('low');
-      document.getElementById('timeOverlay').classList.remove('show');
+      state.timer.running = false;
+      state.timer.paused = false;
+      qs('#pauseBtn').innerText = 'Pause';
+      qs('#timer').classList.remove('low');
+      qs('#timeOverlay').classList.remove('show');
     }
 
-    function setWinnerIfAny(){
-      const max = Math.max(scores.team1, scores.team2, scores.team3);
-      const winners = [];
-      if (scores.team1 === max) winners.push(document.getElementById('teamName1').innerText.trim() || 'Team 1');
-      if (scores.team2 === max) winners.push(document.getElementById('teamName2').innerText.trim() || 'Team 2');
-      if (scores.team3 === max) winners.push(document.getElementById('teamName3').innerText.trim() || 'Team 3');
+    function startTimer(){
+      clearTimer();
+      state.timer.running = true;
+      state.timer.paused = false;
+      timerInterval = setInterval(() => {
+        if (state.timer.paused) return;
 
-      const winnerEl = document.getElementById('winner');
-      if (hasLoadedQuestions){
-        winnerEl.style.display = 'block';
-        winnerEl.innerText = winners.length === 1
-          ? `Leading: ${winners[0]} (${max})`
-          : `Tie: ${winners.join(' & ')} (${max})`;
-      } else {
-        winnerEl.style.display = 'none';
+        if (state.timer.timeLeft > 0){
+          state.timer.timeLeft--;
+          renderTimerUI();
+          broadcastState({ timerTick: true });
+          saveState();
+
+          if (state.timer.timeLeft === 0){
+            qs('#timeOverlay').classList.add('show');
+            markExpiredIfStillUnplayed();
+            clearTimer();
+            broadcastState();
+            saveState();
+          }
+        }
+      }, 1000);
+    }
+
+    function renderTimerUI(){
+      qs('#timer').innerText = String(state.timer.timeLeft);
+      qs('#timer').classList.toggle('low', state.timer.timeLeft <= 5);
+    }
+
+    function preventEnterKey(e){
+      if (e.key === 'Enter'){
+        e.preventDefault();
+        document.execCommand('insertText', false, ' ');
       }
+    }
+
+    function currentQuestionObj(){
+      if (!state.currentPick) return null;
+      const { roundIndex, category, index } = state.currentPick;
+      const r = state.rounds[roundIndex];
+      const q = r?.categories?.[category]?.[index];
+      return q || null;
+    }
+
+    function updateVisibilityPills(){
+      const q = currentQuestionObj();
+      const hostShown = !!q?._hostShown;
+      const projShown = !!q?._projShown;
+
+      qs('#hostVisText').innerText = hostShown ? 'SHOWN' : 'HIDDEN';
+      qs('#projVisText').innerText = projShown ? 'SHOWN' : 'HIDDEN';
+
+      const hostPill = qs('#hostVisPill');
+      const projPill = qs('#projVisPill');
+
+      hostPill.classList.toggle('ok', hostShown);
+      hostPill.classList.toggle('no', !hostShown);
+
+      projPill.classList.toggle('ok', projShown);
+      projPill.classList.toggle('no', !projShown);
+    }
+
+    function renderAwardButtons(){
+      const row = qs('#awardButtonsRow');
+      row.innerHTML = '';
+
+      state.teams.forEach((t, idx) => {
+        const b = document.createElement('button');
+        b.className = 'team-button primary';
+        b.innerText = t.name || `Team ${idx+1}`;
+        b.addEventListener('click', () => awardToTeam(idx));
+        row.appendChild(b);
+      });
+    }
+
+    function selectQuestion(roundIndex, category, index){
+      const r = state.rounds[roundIndex];
+      const q = r?.categories?.[category]?.[index];
+      if (!q) return;
+      if ((q._state || 'unplayed') !== 'unplayed') return;
+
+      state.currentPick = { roundIndex, category, index };
+
+      qs('#qaMetaLeft').innerHTML = `<strong>${escapeHtml(category)}</strong>`;
+      const pts = q.points * (state.isDouble ? 2 : 1);
+      qs('#qaMetaRight').innerHTML = `<strong>${pts} pts</strong>`;
+
+      qs('#questionText').innerText = q.question;
+      qs('#answerText').innerText = '';
+      qs('#answerText').classList.remove('revealed');
+
+      // timer setup
+      state.timer.timeLeft = clampInt(state.settings.timerDefault, 10);
+      renderTimerUI();
+      qs('#timeOverlay').classList.remove('show');
+
+      // reset per-question reveal (do NOT auto-clear; but generally you'd want hidden)
+      // We'll keep existing flags as-is; host/proj buttons govern visibility.
+      updateVisibilityPills();
+      renderAwardButtons();
+
+      showModal();
+      startTimer();
+
+      broadcastState();
+      saveState();
+    }
+
+    function pauseTimer(){
+      if (!state.currentPick) return;
+      state.timer.paused = !state.timer.paused;
+      qs('#pauseBtn').innerText = state.timer.paused ? 'Resume' : 'Pause';
+      broadcastState();
+      saveState();
+    }
+
+    function showAnswerHost(toggle=true){
+      const q = currentQuestionObj();
+      if (!q) return;
+
+      q._hostShown = toggle ? !q._hostShown : true;
+
+      if (q._hostShown){
+        qs('#answerText').innerText = q.answer;
+        qs('#answerText').classList.add('revealed');
+      } else {
+        qs('#answerText').innerText = '';
+        qs('#answerText').classList.remove('revealed');
+      }
+
+      updateVisibilityPills();
+      broadcastState();
+      saveState();
+    }
+
+    function showAnswerProjector(forceOn=null){
+      const q = currentQuestionObj();
+      if (!q) return;
+
+      const target = (forceOn === null) ? !q._projShown : !!forceOn;
+      q._projShown = target;
+
+      updateVisibilityPills();
+      broadcastState();
+      saveState();
+    }
+
+    function showAnswerBoth(){
+      const q = currentQuestionObj();
+      if (!q) return;
+
+      // host
+      q._hostShown = true;
+      qs('#answerText').innerText = q.answer;
+      qs('#answerText').classList.add('revealed');
+
+      // projector
+      q._projShown = true;
+
+      updateVisibilityPills();
+      broadcastState();
+      saveState();
+    }
+
+    function markExpiredIfStillUnplayed(){
+      const q = currentQuestionObj();
+      if (!q) return;
+      if ((q._state || 'unplayed') !== 'unplayed') return;
+
+      const { roundIndex, category, index } = state.currentPick;
+      const prevState = q._state || 'unplayed';
+
+      q._state = 'expired';
+
+      undoStack.push({
+        type:'expired',
+        roundIndex, category, index,
+        prevState
+      });
+
+      renderBoard();
+      saveState();
+    }
+
+    function closeQuestion(){
+      clearTimer();
+      hideModal();
+      state.currentPick = null;
+      broadcastState();
+      saveState();
+    }
+
+    function pointsForCurrent(){
+      const q = currentQuestionObj();
+      if (!q) return 0;
+      return q.points * (state.isDouble ? 2 : 1);
+    }
+
+    function awardToTeam(teamIndex){
+      const q = currentQuestionObj();
+      if (!q) return;
+
+      const { roundIndex, category, index } = state.currentPick;
+      const prevState = q._state || 'unplayed';
+      if (prevState !== 'unplayed') return;
+
+      const pts = pointsForCurrent();
+      const prevScores = state.teams.map(t => t.score);
+
+      state.teams[teamIndex].score += pts;
+      state.activeTeamIndex = teamIndex;
+
+      q._state = 'answered';
+      // auto-reveal host (convenient)
+      q._hostShown = true;
+      qs('#answerText').innerText = q.answer;
+      qs('#answerText').classList.add('revealed');
+
+      undoStack.push({
+        type:'award',
+        roundIndex, category, index,
+        prevState,
+        teamIndex,
+        pointsDelta: pts,
+        prevScores
+      });
+
+      renderTeams();
+      setWinnerBanner();
+      renderBoard();
+      updateVisibilityPills();
+      clearTimer();
+
+      broadcastState();
+      saveState();
+    }
+
+    function noTeamCorrect(){
+      const q = currentQuestionObj();
+      if (!q) return;
+
+      const { roundIndex, category, index } = state.currentPick;
+      const prevState = q._state || 'unplayed';
+      if (prevState !== 'unplayed') return;
+
+      undoStack.push({
+        type:'noTeam',
+        roundIndex, category, index,
+        prevState
+      });
+
+      q._state = 'missed';
+      // auto-reveal host (convenient)
+      q._hostShown = true;
+      qs('#answerText').innerText = q.answer;
+      qs('#answerText').classList.add('revealed');
+
+      renderBoard();
+      updateVisibilityPills();
+      clearTimer();
+
+      broadcastState();
+      saveState();
+    }
+
+    function undoLast(){
+      if (!undoStack.length){
+        alert('No actions to undo.');
+        return;
+      }
+
+      const last = undoStack.pop();
+      const r = state.rounds[last.roundIndex];
+      const q = r?.categories?.[last.category]?.[last.index];
+      if (!q) return;
+
+      q._state = last.prevState || 'unplayed';
+
+      if (last.type === 'award' && Array.isArray(last.prevScores)){
+        state.teams.forEach((t, i) => t.score = last.prevScores[i] ?? t.score);
+      }
+
+      renderTeams();
+      setWinnerBanner();
+      renderBoard();
+
+      broadcastState();
+      saveState();
+    }
+
+    function toggleDouble(){
+      state.isDouble = !state.isDouble;
+      renderHeaderPills();
+      renderBoard();
+      broadcastState();
+      saveState();
+    }
+
+    // ----------------------------
+    // Rounds
+    // ----------------------------
+    function showRoundSplash(){
+      const r = getCurrentRound();
+      qs('#splashTitle').innerText = (r?.title || `Round ${state.currentRoundIndex+1}`).toUpperCase();
+      qs('#splashSubtitle').innerText = 'Get ready.';
+      qs('#roundSplash').classList.add('show');
+      broadcastState({ splash: true });
+    }
+
+    function hideRoundSplash(){
+      qs('#roundSplash').classList.remove('show');
+      broadcastState({ splash: false });
+    }
+
+    function startRound(){
+      hideRoundSplash();
+      renderBoard();
+      broadcastState();
+      saveState();
+    }
+
+    function nextRoundIfAvailable(){
+      if (state.currentRoundIndex < state.rounds.length - 1){
+        state.currentRoundIndex++;
+        state.isDouble = (state.settings.mode === 'tworound' || state.settings.mode === 'tournament'); // common expectation
+        renderHeaderPills();
+        renderBoard();
+        showRoundSplash();
+        saveState();
+        broadcastState();
+      } else {
+        // no next round
+        alert('No more rounds configured.');
+      }
+    }
+
+    // ----------------------------
+    // Builder (in-place editing of state.rounds)
+    // ----------------------------
+    function ensureSomeQuestionsExist(){
+      const r = getCurrentRound();
+      if (!Object.keys(r.categories).length){
+        r.categories['Category 1'] = [
+          normalizeQuestion({question:'Sample Q1', answer:'Sample A1', points:100}),
+          normalizeQuestion({question:'Sample Q2', answer:'Sample A2', points:200}),
+          normalizeQuestion({question:'Sample Q3', answer:'Sample A3', points:300})
+        ];
+      }
+    }
+
+    function openBuilder(){
+      if (isProjectorView) return;
+
+      ensureSomeQuestionsExist();
+      renderBuilder();
+      qs('#builder').classList.add('show');
+      qs('#backdrop').classList.add('show');
+    }
+
+    function closeBuilder(){
+      qs('#builder').classList.remove('show');
+      qs('#backdrop').classList.remove('show');
+      renderBoard();
+      saveState();
+      broadcastState();
+    }
+
+    function addRound(){
+      const n = state.rounds.length + 1;
+      state.rounds.push({ id: `r${n}_${nowId()}`, title:`Round ${n}`, categories:{} });
+      renderBuilder();
+      saveState();
+      broadcastState();
+    }
+
+    function addCategory(){
+      const r = getCurrentRound();
+      const base = 'New Category';
+      let name = base;
+      let i = 2;
+      while (r.categories[name]){ name = `${base} ${i++}`; }
+      r.categories[name] = [
+        normalizeQuestion({question:'New question', answer:'New answer', points:100})
+      ];
+      renderBuilder();
+      saveState();
+      broadcastState();
+    }
+
+    function addQuestion(cat){
+      const r = getCurrentRound();
+      r.categories[cat] = r.categories[cat] || [];
+      r.categories[cat].push(normalizeQuestion({question:'New question', answer:'New answer', points:100}));
+      renderBuilder();
+      saveState();
+      broadcastState();
+    }
+
+    function removeCategory(cat){
+      const r = getCurrentRound();
+      if (!confirm(`Delete category "${cat}"?`)) return;
+      delete r.categories[cat];
+      renderBuilder();
+      saveState();
+      broadcastState();
+    }
+
+    function removeQuestion(cat, idx){
+      const r = getCurrentRound();
+      if (!confirm('Delete this question?')) return;
+      r.categories[cat].splice(idx, 1);
+      renderBuilder();
+      saveState();
+      broadcastState();
+    }
+
+    function renameCategory(oldName, newName){
+      const r = getCurrentRound();
+      const nn = String(newName || '').trim();
+      if (!nn || nn === oldName) return;
+      if (r.categories[nn]){
+        alert('That category name already exists.');
+        return;
+      }
+      r.categories[nn] = r.categories[oldName];
+      delete r.categories[oldName];
+      renderBuilder();
+      saveState();
+      broadcastState();
+    }
+
+    function renderBuilder(){
+      const body = qs('#builderBody');
+      body.innerHTML = '';
+
+      // round selector
+      const roundPanel = document.createElement('div');
+      roundPanel.className = 'catBlock';
+      roundPanel.innerHTML = `
+        <div class="catTop">
+          <div class="catName">Editing Round</div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <select id="builderRoundSelect" style="min-width:220px;">
+              ${state.rounds.map((r,i) => `<option value="${i}" ${i===state.currentRoundIndex?'selected':''}>${escapeHtml(r.title)}</option>`).join('')}
+            </select>
+            <button id="builderNextRoundBtn">Next Round</button>
+          </div>
+        </div>
+        <div class="tiny">Tip: keep category names short for cleaner projector layout.</div>
+      `;
+      body.appendChild(roundPanel);
+
+      const roundSelect = roundPanel.querySelector('#builderRoundSelect');
+      roundSelect.addEventListener('change', () => {
+        state.currentRoundIndex = clampInt(roundSelect.value, 0);
+        renderBuilder();
+        renderHeaderPills();
+        saveState();
+        broadcastState();
+      });
+
+      roundPanel.querySelector('#builderNextRoundBtn').addEventListener('click', () => nextRoundIfAvailable());
+
+      const r = getCurrentRound();
+      const cats = Object.keys(r.categories || {});
+      if (!cats.length){
+        const empty = document.createElement('div');
+        empty.className = 'catBlock';
+        empty.innerHTML = `<div class="tiny">No categories yet. Click <strong>Add Category</strong>.</div>`;
+        body.appendChild(empty);
+        return;
+      }
+
+      for (const cat of cats){
+        const block = document.createElement('div');
+        block.className = 'catBlock';
+
+        block.innerHTML = `
+          <div class="catTop">
+            <div>
+              <div class="catName">Category</div>
+              <input type="text" value="${escapeHtml(cat)}" data-cat-rename="${escapeHtml(cat)}" />
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn-gold" data-add-q="${escapeHtml(cat)}">Add Question</button>
+              <button class="btn-danger" data-del-cat="${escapeHtml(cat)}">Delete Category</button>
+            </div>
+          </div>
+          <div class="hr"></div>
+          <div class="tiny" style="margin-bottom:10px;">Questions</div>
+          <div data-qwrap="${escapeHtml(cat)}"></div>
+        `;
+
+        body.appendChild(block);
+
+        // rename category
+        const renameInput = block.querySelector('input[type="text"]');
+        renameInput.addEventListener('blur', () => {
+          renameCategory(cat, renameInput.value);
+        });
+
+        // add question
+        block.querySelector(`[data-add-q="${cssEscape(cat)}"]`)?.addEventListener('click', () => addQuestion(cat));
+        // delete category
+        block.querySelector(`[data-del-cat="${cssEscape(cat)}"]`)?.addEventListener('click', () => removeCategory(cat));
+
+        // questions
+        const wrap = block.querySelector(`[data-qwrap="${cssEscape(cat)}"]`);
+        (r.categories[cat] || []).forEach((q, idx) => {
+          const row = document.createElement('div');
+          row.className = 'qRow';
+
+          row.innerHTML = `
+            <div class="qBox">
+              <div class="mini">Question</div>
+              <input type="text" value="${escapeHtml(q.question)}" data-q="${escapeHtml(cat)}" data-i="${idx}" data-field="question" />
+            </div>
+            <div class="qBox">
+              <div class="mini">Answer</div>
+              <input type="text" value="${escapeHtml(q.answer)}" data-q="${escapeHtml(cat)}" data-i="${idx}" data-field="answer" />
+            </div>
+            <div class="qBox">
+              <div class="mini">Points</div>
+              <input type="number" min="0" step="50" value="${escapeHtml(String(q.points))}" data-q="${escapeHtml(cat)}" data-i="${idx}" data-field="points" />
+            </div>
+            <div class="qBox">
+              <div class="mini">Actions</div>
+              <button class="btn-danger" data-del-q="${escapeHtml(cat)}" data-di="${idx}">Delete</button>
+            </div>
+          `;
+
+          wrap.appendChild(row);
+
+          // bind fields
+          row.querySelectorAll('input').forEach(inp => {
+            inp.addEventListener('input', () => {
+              const c = inp.getAttribute('data-q');
+              const i = clampInt(inp.getAttribute('data-i'), -1);
+              const f = inp.getAttribute('data-field');
+              const qq = r.categories[c]?.[i];
+              if (!qq) return;
+              if (f === 'question') qq.question = inp.value;
+              if (f === 'answer') qq.answer = inp.value;
+              if (f === 'points') qq.points = clampInt(inp.value, 0);
+              saveState();
+              broadcastState();
+              renderBoard(); // so points update live
+            });
+          });
+
+          // delete question
+          row.querySelector(`[data-del-q="${cssEscape(cat)}"][data-di="${idx}"]`)?.addEventListener('click', () => removeQuestion(cat, idx));
+        });
+      }
+    }
+
+    // ----------------------------
+    // Projector window rendering
+    // ----------------------------
+    function renderProjectorStatus(){
+      if (!isProjectorView) return;
+
+      const dot = qs('#projStatusDot');
+      const hint = qs('#projHint');
+
+      if (!dot || !hint) return;
+
+      dot.classList.toggle('ok', state.projector.connected);
+      hint.style.display = 'inline-block';
+      hint.textContent = state.projector.connected ? 'PROJECTOR CONNECTED' : 'WAITING FOR HOST';
+    }
+
+    // The projector should NEVER show host-only UI. It can show the same board + same modal,
+    // but answer visibility is governed by q._projShown only.
+    function projectorRenderModalFromState(){
+      if (!isProjectorView) return;
+
+      const pick = state.currentPick;
+      if (!pick){
+        hideModal();
+        return;
+      }
+
+      const q = currentQuestionObj();
+      if (!q){
+        hideModal();
+        return;
+      }
+
+      // show modal on projector
+      qs('#qaMetaLeft').innerHTML = `<strong>${escapeHtml(pick.category)}</strong>`;
+      const pts = q.points * (state.isDouble ? 2 : 1);
+      qs('#qaMetaRight').innerHTML = `<strong>${pts} pts</strong>`;
+
+      qs('#questionText').innerText = q.question;
+
+      // projector answer
+      if (q._projShown){
+        qs('#answerText').innerText = q.answer;
+        qs('#answerText').classList.add('revealed');
+      } else {
+        qs('#answerText').innerText = '';
+        qs('#answerText').classList.remove('revealed');
+      }
+
+      // timer
+      renderTimerUI();
+      qs('#timeOverlay').classList.toggle('show', state.timer.timeLeft === 0);
+
+      showModal();
+    }
+
+    // ----------------------------
+    // Broadcast / sync
+    // ----------------------------
+    function broadcastState(extra={}){
+      if (isProjectorView) return;
+      if (!state.settings.projectorEnabled) return;
+
+      sendToProjector({
+        type:'STATE',
+        state: deepClone(state),
+        extra
+      });
+    }
+
+    function handleIncoming(payload){
+      if (!payload || typeof payload !== 'object') return;
+
+      if (payload.type === 'PING' && !isProjectorView){
+        // host receives ping from projector; reply with state
+        state.projector.connected = true;
+        saveState();
+        renderProjectorConnectedUI(true);
+        broadcastState({ pingReply:true });
+        return;
+      }
+
+      if (payload.type === 'STATE' && isProjectorView){
+        // projector receives state
+        state = payload.state;
+        state.projector.connected = true;
+        renderProjectorStatus();
+        renderHeaderPills();
+        renderTeams();
+        renderBoard();
+        setWinnerBanner();
+        projectorRenderModalFromState();
+        // splash state
+        if (payload.extra && 'splash' in payload.extra){
+          qs('#roundSplash').classList.toggle('show', !!payload.extra.splash);
+          qs('#splashTitle').innerText = (getCurrentRound()?.title || '').toUpperCase();
+        }
+        return;
+      }
+    }
+
+    function renderProjectorConnectedUI(connected){
+      if (isProjectorView) return;
+      const hint = qs('#projHint');
+      if (!hint) return;
+      hint.style.display = connected ? 'inline-block' : 'none';
+      hint.textContent = connected ? 'PROJECTOR CONNECTED' : '';
+    }
+
+    // ----------------------------
+    // Title -> Start game
+    // ----------------------------
+    function titleToGame(){
+      showGame();
+      renderHeaderPills();
+      renderTeams();
+      renderBoard();
+      setWinnerBanner();
+      showRoundSplash();
+      saveState();
+      broadcastState();
+    }
+
+    function loadQuestionsFromTitleTextarea(){
+      const raw = qs('#jsonInputTitle').value.trim();
+      if (!raw) return false;
+
+      try{
+        const parsed = parseAnyJson(raw);
+        state.rounds = parsed.rounds;
+        // normalize states to unplayed
+        state.rounds.forEach(r => {
+          for (const cat of Object.keys(r.categories || {})){
+            r.categories[cat] = (r.categories[cat] || []).map(qq => ({
+              ...normalizeQuestion(qq),
+              _state: 'unplayed',
+              _hostShown: false,
+              _projShown: false
+            }));
+          }
+        });
+
+        if (parsed.teams){
+          state.teams = parsed.teams;
+          state.settings.teamCount = Math.min(6, Math.max(2, state.teams.length));
+        }
+        state.currentRoundIndex = 0;
+        undoStack = [];
+        return true;
+      }catch(e){
+        alert('Invalid JSON. Please check your data and try again.');
+        return false;
+      }
+    }
+
+    // ----------------------------
+    // Safe Mode (Projector reveal)
+    // ----------------------------
+    let projHoldTimer = null;
+    function setupSafeProjectorRevealButton(){
+      const btn = qs('#projAnswerBtn');
+
+      // Always clear any old handlers
+      btn.onmousedown = null;
+      btn.onmouseup = null;
+      btn.onmouseleave = null;
+      btn.ontouchstart = null;
+      btn.ontouchend = null;
+
+      function clearHold(){
+        if (projHoldTimer) clearTimeout(projHoldTimer);
+        projHoldTimer = null;
+        btn.style.filter = '';
+      }
+
+      function startHold(){
+        if (!state.settings.safeMode){
+          showAnswerProjector();
+          return;
+        }
+
+        // SAFE MODE: hold to reveal
+        btn.style.filter = 'brightness(1.15)';
+        projHoldTimer = setTimeout(() => {
+          showAnswerProjector(true);
+          clearHold();
+        }, 700);
+      }
+
+      btn.onmousedown = startHold;
+      btn.onmouseup = clearHold;
+      btn.onmouseleave = clearHold;
+
+      // touch
+      btn.ontouchstart = (e) => { e.preventDefault(); startHold(); };
+      btn.ontouchend = (e) => { e.preventDefault(); clearHold(); };
+    }
+
+    // ----------------------------
+    // Wire up UI
+    // ----------------------------
+    function wireTitleUI(){
+      qs('#clearSaveBtn').addEventListener('click', () => {
+        const ok = confirm('Clear saved GEFFEN BOWL game state?');
+        if (!ok) return;
+        clearSaved();
+        alert('Saved game cleared.');
+      });
+
+      qs('#pasteJsonFromTitle').addEventListener('click', () => {
+        qs('#jsonInputTitle').focus();
+      });
+
+      qs('#openBuilderFromTitle').addEventListener('click', () => {
+        // ensure at least Round 1 exists
+        if (!state.rounds?.length) state.rounds = [{ id:'r1_'+nowId(), title:'Round 1', categories:{} }];
+        openBuilder();
+      });
+
+      qs('#startFromTitle').addEventListener('click', () => {
+        // apply settings from title UI
+        const teamCount = clampInt(qs('#teamCount').value, 3);
+        const mode = qs('#gameMode').value;
+        const timerDefault = clampInt(qs('#timerDefault').value, 10);
+
+        state.settings.autosave = !!qs('#autosaveToggle').checked;
+        state.settings.projectorEnabled = !!qs('#projectorToggle').checked;
+        state.settings.safeMode = !!qs('#safeModeToggle').checked;
+        state.settings.defaultRevealBoth = !!qs('#defaultRevealBothToggle').checked;
+
+        setTeamCount(teamCount);
+        state.settings.timerDefault = timerDefault;
+        applyModePreset(mode);
+
+        // try to load JSON if present
+        loadQuestionsFromTitleTextarea();
+
+        // update pills
+        qs('#timerDefaultReadout').innerText = String(state.settings.timerDefault);
+        qs('#safeModeReadout').innerText = state.settings.safeMode ? 'ON' : 'OFF';
+
+        setupSafeProjectorRevealButton();
+        titleToGame();
+
+        // ping projector if already open
+        if (state.settings.projectorEnabled){
+          broadcastState();
+        }
+      });
+    }
+
+    function wireGameUI(){
+      qs('#returnToTitleBtn').addEventListener('click', () => {
+        const ok = confirm('Return to title screen? (Game state remains saved if Autosave is on.)');
+        if (!ok) return;
+        closeQuestion();
+        closeBuilder();
+        showTitle();
+        saveState();
+      });
+
+      qs('#toggleDoubleBtn').addEventListener('click', toggleDouble);
+
+      qs('#copyJsonBtn').addEventListener('click', () => {
+        const json = exportJson();
+        copyToClipboard(json);
+        alert('Current JSON copied.');
+      });
+
+      qs('#openBuilderBtn').addEventListener('click', () => openBuilder());
+
+      qs('#openProjectorBtn').addEventListener('click', () => openProjectorWindow());
+
+      qs('#projectorFullscreenBtn').addEventListener('click', () => {
+        try{ document.documentElement.requestFullscreen(); }catch(e){}
+      });
+
+      // Modal buttons
+      qs('#noTeamBtn').addEventListener('click', noTeamCorrect);
+
+      qs('#hostAnswerBtn').addEventListener('click', () => {
+        if (state.settings.defaultRevealBoth) showAnswerBoth();
+        else showAnswerHost(true); // toggle
+      });
+
+      qs('#bothAnswerBtn').addEventListener('click', showAnswerBoth);
+
+      qs('#pauseBtn').addEventListener('click', pauseTimer);
+
+      qs('#closeQuestionBtn').addEventListener('click', closeQuestion);
+
+      setupSafeProjectorRevealButton();
+
+      qs('#startRoundBtn').addEventListener('click', startRound);
+
+      // Backdrop click closes overlays (host only)
+      qs('#backdrop').addEventListener('click', () => {
+        if (qs('#builder').classList.contains('show')) closeBuilder();
+        if (qs('#questionModal').classList.contains('show')) closeQuestion();
+      });
+
+      // Builder controls
+      qs('#builderCloseBtn').addEventListener('click', closeBuilder);
+      qs('#builderAddCategoryBtn').addEventListener('click', addCategory);
+      qs('#builderAddRoundBtn').addEventListener('click', addRound);
+      qs('#builderCopyJsonBtn').addEventListener('click', () => {
+        copyToClipboard(exportJson());
+        alert('JSON copied.');
+      });
+
+      // Keyboard shortcuts
+      document.addEventListener('keydown', (e) => {
+        if (isProjectorView) return;
+
+        const modalOpen = qs('#questionModal').classList.contains('show');
+        const builderOpen = qs('#builder').classList.contains('show');
+        const isEditing = document.activeElement && (
+          document.activeElement.isContentEditable ||
+          ['TEXTAREA','INPUT','SELECT'].includes(document.activeElement.tagName)
+        );
+
+        if (isEditing && e.key !== 'Escape') return;
+
+        if (builderOpen){
+          if (e.key === 'Escape'){ e.preventDefault(); closeBuilder(); }
+          return;
+        }
+
+        if (modalOpen){
+          if (e.key === 'Escape'){ e.preventDefault(); closeQuestion(); return; }
+          if (e.key === ' '){ e.preventDefault(); pauseTimer(); return; }
+
+          if (e.key.toLowerCase() === 'a'){
+            if (e.shiftKey){
+              // projector reveal key
+              e.preventDefault();
+              if (state.settings.safeMode){
+                const ok = confirm('SAFE MODE: Reveal answer on projector?');
+                if (ok) showAnswerProjector(true);
+              } else {
+                showAnswerProjector();
+              }
+            } else {
+              e.preventDefault();
+              if (state.settings.defaultRevealBoth) showAnswerBoth();
+              else showAnswerHost(true);
+            }
+            return;
+          }
+
+          // award 1-6
+          const n = clampInt(e.key, -1);
+          if (n >= 1 && n <= 6){
+            e.preventDefault();
+            if (n <= state.teams.length) awardToTeam(n - 1);
+            return;
+          }
+        } else {
+          if (e.key.toLowerCase() === 'u'){ e.preventDefault(); undoLast(); return; }
+        }
+      });
     }
 
     function copyToClipboard(text){
@@ -996,431 +2619,174 @@
     }
 
     // ----------------------------
-    // Core actions
+    // Projector window open + handshake
     // ----------------------------
-    function parseJsonFromTextarea(){
-      const raw = document.getElementById('jsonInput').value;
-      const parsed = JSON.parse(raw);
-
-      const out = {};
-      for (const category of Object.keys(parsed)){
-        const arr = Array.isArray(parsed[category]) ? parsed[category] : [];
-        out[category] = arr.map(q => ({
-          question: String(q.question ?? ''),
-          answer: String(q.answer ?? ''),
-          points: clampInt(q.points, 0),
-          _state: 'unplayed'
-        }));
-      }
-      return out;
-    }
-
-    function startGame(){
-      const raw = document.getElementById('jsonInput').value.trim();
-
-      if (raw.length){
-        try{
-          questions = parseJsonFromTextarea();
-          hasLoadedQuestions = true;
-        }catch(e){
-          alert('Invalid JSON format. Please check your data and try again.');
-          return;
-        }
-      } else {
-        if (!hasLoadedQuestions){
-          alert('Paste JSON first (or click Template).');
-          return;
-        }
-      }
-
-      document.getElementById('jsonInput').style.display = 'none';
-
-      getCategories().forEach(cat => {
-        (questions[cat] || []).forEach(q => {
-          if (!q._state) q._state = 'unplayed';
-        });
-      });
-
-      buildBoard();
-      updateScoresUI();
-      setActiveTeam(currentTeam);
-      updateTeamButtons();
-      setWinnerIfAny();
-    }
-
-    function resetGame(){
-      scores = { team1: 0, team2: 0, team3: 0 };
-      undoStack = [];
-      clearTimer();
-      hideModal();
-
-      if (hasLoadedQuestions){
-        getCategories().forEach(cat => {
-          (questions[cat] || []).forEach(q => q._state = 'unplayed');
-        });
-        document.getElementById('jsonInput').style.display = 'none';
-        buildBoard();
-      } else {
-        document.getElementById('jsonInput').style.display = 'block';
-        document.getElementById('jsonInput').value = '';
-        document.getElementById('board').innerHTML = '';
-      }
-
-      updateScoresUI();
-      setWinnerIfAny();
-      setActiveTeam(1);
-    }
-
-    function togglePoints(){
-      isDouble = !isDouble;
-      document.getElementById('togglePoints').innerText = `Double: ${isDouble ? 'ON' : 'OFF'}`;
-      if (hasLoadedQuestions){
-        updateDisplayedValues();
-      }
-    }
-
-    function selectQuestion(category, index, cell){
-      const q = questions?.[category]?.[index];
-      if (!q) return;
-
-      if ((q._state || 'unplayed') !== 'unplayed') return;
-
-      currentQuestion = q;
-      currentCategory = category;
-      currentIndex = index;
-      currentCell = cell;
-
-      document.getElementById('question').innerText = q.question;
-
-      const answerEl = document.getElementById('answer');
-      answerEl.innerText = '';
-      answerEl.classList.remove('revealed');
-
-      const points = q.points * (isDouble ? 2 : 1);
-      document.getElementById('qaMetaLeft').innerHTML = `<strong>${escapeHtml(category)}</strong>`;
-      document.getElementById('qaMetaRight').innerHTML = `<strong>${points} pts</strong>`;
-
-      timeLeft = clampInt(document.getElementById('timerDuration').value, 10);
-      document.getElementById('timer').innerText = timeLeft;
-      document.getElementById('timer').classList.toggle('low', timeLeft <= 5);
-
-      clearTimer();
-      showModal();
-      updateTeamButtons();
-      startTimer();
-    }
-
-    function startTimer(){
-      clearTimer();
-      isPaused = false;
-
-      timerInterval = setInterval(() => {
-        if (isPaused) return;
-
-        if (timeLeft > 0){
-          timeLeft--;
-          document.getElementById('timer').innerText = timeLeft;
-          document.getElementById('timer').classList.toggle('low', timeLeft <= 5);
-
-          if (timeLeft === 0){
-            document.getElementById('timeOverlay').classList.add('show');
-            setCellState(currentCategory, currentIndex, 'expired');
-            clearTimer();
-          }
-        }
-      }, 1000);
-    }
-
-    function pauseTimer(){
-      if (!currentQuestion) return;
-      isPaused = !isPaused;
-      document.getElementById('pauseTimer').innerText = isPaused ? 'Resume' : 'Pause';
-    }
-
-    function showAnswer(){
-      if (!currentQuestion) return;
-      const answerEl = document.getElementById('answer');
-      answerEl.innerText = currentQuestion.answer;
-      answerEl.classList.add('revealed');
-    }
-
-    function markCorrect(team){
-      if (!currentQuestion) return;
-
-      const points = currentQuestion.points * (isDouble ? 2 : 1);
-      const prevState = currentQuestion._state || 'unplayed';
-
-      scores[`team${team}`] += points;
-      updateScoresUI();
-      setActiveTeam(team);
-      setWinnerIfAny();
-
-      undoStack.push({
-        team,
-        pointsDelta: points,
-        category: currentCategory,
-        index: currentIndex,
-        prevState
-      });
-
-      showAnswer();
-      setCellState(currentCategory, currentIndex, 'answered');
-      clearTimer();
-    }
-
-    function noTeamCorrect(){
-      if (!currentQuestion) return;
-
-      const prevState = currentQuestion._state || 'unplayed';
-      undoStack.push({
-        team: null,
-        pointsDelta: 0,
-        category: currentCategory,
-        index: currentIndex,
-        prevState
-      });
-
-      showAnswer();
-      setCellState(currentCategory, currentIndex, 'missed');
-      clearTimer();
-    }
-
-    function closeQuestion(){
-      clearTimer();
-      hideModal();
-      currentQuestion = null;
-      currentCategory = null;
-      currentIndex = null;
-      currentCell = null;
-    }
-
-    function undoPoints(){
-      if (undoStack.length === 0){
-        alert('No actions to undo.');
+    function openProjectorWindow(){
+      if (isProjectorView) return;
+      if (!state.settings.projectorEnabled){
+        alert('Projector Mode is disabled on the title screen settings.');
         return;
       }
-      const last = undoStack.pop();
 
-      if (last.team != null){
-        scores[`team${last.team}`] -= last.pointsDelta;
-        updateScoresUI();
-        setActiveTeam(last.team);
-      }
+      // Open same page in projector mode
+      const url = new URL(location.href);
+      url.searchParams.set('view', 'projector');
 
-      setCellState(last.category, last.index, last.prevState || 'unplayed');
-      setWinnerIfAny();
-    }
-
-    // ----------------------------
-    // Template / Exports
-    // ----------------------------
-    function copyTemplate(){
-      const template = `{
-  "Category 1": [
-    { "question": "Sample Question 1", "answer": "Sample Answer 1", "points": 100 },
-    { "question": "Sample Question 2", "answer": "Sample Answer 2", "points": 200 },
-    { "question": "Sample Question 3", "answer": "Sample Answer 3", "points": 300 },
-    { "question": "Sample Question 4", "answer": "Sample Answer 4", "points": 400 },
-    { "question": "Sample Question 5", "answer": "Sample Answer 5", "points": 500 }
-  ]
-}`;
-      copyToClipboard(template);
-      alert('Template copied to clipboard!');
-    }
-
-    function currentJsonObject(){
-      const out = {};
-      for (const cat of getCategories()){
-        out[cat] = (questions[cat] || []).map(q => ({
-          question: q.question,
-          answer: q.answer,
-          points: q.points
-        }));
-      }
-      return out;
-    }
-
-    function copyCurrentJson(){
-      if (!hasLoadedQuestions){
-        alert('No loaded questions yet.');
+      projectorWin = window.open(url.toString(), 'GEFFEN_BOWL_PROJECTOR', 'popup,width=1200,height=800');
+      if (!projectorWin){
+        alert('Popup blocked. Allow popups for this page, then try again.');
         return;
       }
-      const json = JSON.stringify(currentJsonObject(), null, 2);
-      copyToClipboard(json);
-      alert('Current JSON copied to clipboard!');
+
+      // Host marks "not yet confirmed"
+      state.projector.connected = false;
+      renderProjectorConnectedUI(false);
+
+      // After a short delay, ping
+      setTimeout(() => {
+        sendToProjector({ type:'PING' });
+        broadcastState();
+      }, 300);
     }
 
     // ----------------------------
-    // Questions list editor
+    // Starfield (1993 vibe)
     // ----------------------------
-    function showQuestionList(){
-      if (!hasLoadedQuestions){
-        const raw = document.getElementById('jsonInput').value.trim();
-        if (raw.length){
-          try{
-            questions = parseJsonFromTextarea();
-            hasLoadedQuestions = true;
-          }catch(e){
-            alert('Invalid JSON format. Please check your data and try again.');
-            return;
-          }
-        } else {
-          alert('Paste JSON first (or click Template).');
-          return;
+    function initStarfield(){
+      const c1 = qs('#starfield');
+      const c2 = qs('#starfield2');
+      if (!c1 || !c2) return;
+
+      const ctx1 = c1.getContext('2d');
+      const ctx2 = c2.getContext('2d');
+
+      let w=0,h=0, dpr=1;
+
+      function resize(){
+        dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        w = Math.floor(window.innerWidth * dpr);
+        h = Math.floor(window.innerHeight * dpr);
+        c1.width = w; c1.height = h;
+        c2.width = w; c2.height = h;
+        c1.style.width = '100%'; c1.style.height='100%';
+        c2.style.width = '100%'; c2.style.height='100%';
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      const starsA = Array.from({length: 220}, () => ({
+        x: Math.random()*w,
+        y: Math.random()*h,
+        z: Math.random()*1,
+        s: 0.6 + Math.random()*1.4,
+        v: 0.25 + Math.random()*0.8
+      }));
+
+      const starsB = Array.from({length: 90}, () => ({
+        x: Math.random()*w,
+        y: Math.random()*h,
+        s: 1.2 + Math.random()*2.2,
+        v: 0.55 + Math.random()*1.2
+      }));
+
+      let t=0;
+
+      function step(){
+        t += 0.016;
+
+        // layer A
+        ctx1.clearRect(0,0,w,h);
+        ctx1.fillStyle = 'rgba(255,255,255,.9)';
+        for (const s of starsA){
+          s.y += s.v * dpr * 1.2;
+          s.x += Math.sin(t*0.7 + s.z*10) * 0.12 * dpr;
+          if (s.y > h) { s.y = -10; s.x = Math.random()*w; }
+          ctx1.globalAlpha = 0.55 + s.z*0.35;
+          ctx1.fillRect(s.x, s.y, s.s*dpr*0.8, s.s*dpr*0.8);
         }
-      }
 
-      const list = document.getElementById('questionsList');
-      list.innerHTML = '';
+        // layer B (brighter streaks)
+        ctx2.clearRect(0,0,w,h);
+        for (const s of starsB){
+          s.y += s.v * dpr * 2.4;
+          if (s.y > h){ s.y = -30; s.x = Math.random()*w; }
+          const glow = 0.35 + Math.sin(t*2 + s.x*0.002)*0.15;
+          ctx2.globalAlpha = glow;
+          ctx2.fillStyle = 'rgba(45,125,255,.8)';
+          ctx2.fillRect(s.x, s.y, s.s*dpr*0.5, s.s*dpr*2.5);
 
-      for (const category of getCategories()){
-        const title = document.createElement('div');
-        title.className = 'category-title';
-        title.innerText = category;
-        list.appendChild(title);
-
-        (questions[category] || []).forEach((q, index) => {
-          const entry = document.createElement('div');
-          entry.className = 'question-entry';
-          entry.innerHTML = `
-            <span class="tag">Q${index + 1}</span>
-            <span class="editable" contenteditable="true"
-              data-type="question" data-category="${escapeHtml(category)}" data-index="${index}">${escapeHtml(q.question)}</span>
-            <div style="height:8px;"></div>
-            <span class="tag">A</span>
-            <span class="editable" contenteditable="true"
-              data-type="answer" data-category="${escapeHtml(category)}" data-index="${index}">${escapeHtml(q.answer)}</span>
-            <span class="pts">(${q.points} pts)</span>
-          `;
-          list.appendChild(entry);
-        });
-      }
-
-      document.getElementById('question-list-popup').style.display = 'block';
-    }
-
-    function closeQuestionList(){
-      document.getElementById('question-list-popup').style.display = 'none';
-      if (hasLoadedQuestions) updateDisplayedValues();
-    }
-
-    function copyQuestionList(){
-      const list = document.getElementById('questionsList');
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = list.innerHTML;
-      copyToClipboard(tempDiv.innerText);
-      alert('Question list copied!');
-    }
-
-    document.addEventListener('input', (e) => {
-      const el = e.target;
-      if (!el || !(el instanceof HTMLElement)) return;
-      if (!el.matches('[contenteditable="true"][data-type]')) return;
-
-      const type = el.getAttribute('data-type');
-      const category = el.getAttribute('data-category');
-      const index = clampInt(el.getAttribute('data-index'), -1);
-      if (!category || index < 0) return;
-
-      const q = questions?.[category]?.[index];
-      if (!q) return;
-
-      if (type === 'question') q.question = el.innerText;
-      if (type === 'answer') q.answer = el.innerText;
-    });
-
-    // ----------------------------
-    // Contenteditable safety
-    // ----------------------------
-    function preventEnterKey(e){
-      if (e.key === 'Enter'){
-        e.preventDefault();
-        document.execCommand('insertText', false, ' ');
-      }
-    }
-
-    function sanitizeScore(teamNumber){
-      const scoreEl = document.getElementById(`score${teamNumber}`);
-      const v = clampInt(scoreEl.innerText, 0);
-      scores[`team${teamNumber}`] = v;
-      scoreEl.innerText = v;
-      updateScoresUI();
-      setWinnerIfAny();
-    }
-
-    document.querySelectorAll('.team').forEach(teamEl => {
-      teamEl.addEventListener('click', () => {
-        const t = clampInt(teamEl.dataset.team, 1);
-        setActiveTeam(t);
-        updateTeamButtons();
-      });
-    });
-
-    [1,2,3].forEach(t => {
-      const nameEl = document.getElementById(`teamName${t}`);
-      nameEl.addEventListener('keydown', preventEnterKey);
-      nameEl.addEventListener('blur', () => {
-        sanitizeSingleLine(nameEl);
-        updateTeamButtons();
-        setWinnerIfAny();
-      });
-
-      const scoreEl = document.getElementById(`score${t}`);
-      scoreEl.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter'){
-          e.preventDefault();
-          scoreEl.blur();
-          return;
+          ctx2.globalAlpha = glow*0.8;
+          ctx2.fillStyle = 'rgba(255,224,102,.85)';
+          ctx2.fillRect(s.x + 2*dpr, s.y + 4*dpr, s.s*dpr*0.35, s.s*dpr*1.7);
         }
-      });
-      scoreEl.addEventListener('blur', () => sanitizeScore(t));
-    });
 
-    // ----------------------------
-    // Keyboard shortcuts
-    // ----------------------------
-    document.addEventListener('keydown', (e) => {
-      const modalOpen = document.getElementById('question-area').classList.contains('show');
-      const isEditing = document.activeElement && (
-        document.activeElement.isContentEditable ||
-        ['TEXTAREA','INPUT'].includes(document.activeElement.tagName)
-      );
-
-      if (isEditing && e.key !== 'Escape') return;
-
-      if (modalOpen){
-        if (e.key === 'Escape'){ e.preventDefault(); closeQuestion(); }
-        if (e.key === ' '){ e.preventDefault(); pauseTimer(); }
-        if (e.key.toLowerCase() === 'a'){ e.preventDefault(); showAnswer(); }
-        if (e.key === '1'){ e.preventDefault(); markCorrect(1); }
-        if (e.key === '2'){ e.preventDefault(); markCorrect(2); }
-        if (e.key === '3'){ e.preventDefault(); markCorrect(3); }
-      } else {
-        if (e.key.toLowerCase() === 'u'){ e.preventDefault(); undoPoints(); }
+        requestAnimationFrame(step);
       }
-    });
+      step();
+    }
 
     // ----------------------------
-    // Wire up buttons
+    // Boot
     // ----------------------------
-    document.getElementById('startGame').addEventListener('click', startGame);
-    document.getElementById('resetGame').addEventListener('click', () => {
-      const ok = confirm('Reset scores and restore all questions?');
-      if (ok) resetGame();
-    });
-    document.getElementById('togglePoints').addEventListener('click', togglePoints);
-    document.getElementById('undoPoints').addEventListener('click', undoPoints);
-    document.getElementById('showQuestionsBtn').addEventListener('click', showQuestionList);
-    document.getElementById('copyTemplateBtn').addEventListener('click', copyTemplate);
-    document.getElementById('copyJsonBtn').addEventListener('click', copyCurrentJson);
+    function boot(){
+      initStarfield();
 
-    document.getElementById('backdrop').addEventListener('click', () => {
-      if (document.getElementById('question-area').classList.contains('show')) closeQuestion();
-      if (document.getElementById('question-list-popup').style.display === 'block') closeQuestionList();
-    });
+      // If projector view, hide title; go straight to "waiting" game shell
+      if (isProjectorView){
+        showGame();
+        qs('#subtitle').innerText = 'PROJECTOR VIEW • read-only';
+        qs('#openProjectorBtn')?.remove();
+        qs('#returnToTitleBtn')?.remove();
+        qs('#openBuilderBtn')?.remove();
+        qs('#copyJsonBtn')?.remove();
+        qs('#toggleDoubleBtn')?.remove();
 
-    updateTeamButtons();
-    document.getElementById('togglePoints').innerText = `Double: ${isDouble ? 'ON' : 'OFF'}`;
+        // show projector connection UI
+        qs('#projHint').style.display = 'inline-block';
+        renderProjectorStatus();
+
+        onProjectorMessage(handleIncoming);
+
+        // ping host (if opened by host, this will get answered)
+        setTimeout(() => {
+          sendToProjector({ type:'PING' });
+        }, 250);
+
+        // Prevent interactions
+        renderTeams();
+        renderBoard();
+        return;
+      }
+
+      // Host: attempt load save
+      const loaded = loadState();
+
+      // Initialize title UI from state
+      qs('#teamCount').value = String(state.settings.teamCount || 3);
+      qs('#gameMode').value = state.settings.mode || 'classic';
+      qs('#timerDefault').value = String(state.settings.timerDefault || 10);
+
+      qs('#autosaveToggle').checked = !!state.settings.autosave;
+      qs('#projectorToggle').checked = !!state.settings.projectorEnabled;
+      qs('#safeModeToggle').checked = !!state.settings.safeMode;
+      qs('#defaultRevealBothToggle').checked = !!state.settings.defaultRevealBoth;
+
+      // Wire
+      wireTitleUI();
+      wireGameUI();
+
+      // Projector messages
+      onProjectorMessage(handleIncoming);
+
+      // If a saved game exists, stay on title but make it easy to resume
+      if (loaded){
+        qs('#jsonInputTitle').placeholder = 'Saved game detected. Click Start to resume, or paste JSON to overwrite.';
+      }
+
+      showTitle();
+    }
+
+    boot();
   </script>
 </body>
 </html>
