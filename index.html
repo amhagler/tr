@@ -985,6 +985,18 @@
       background: rgba(45,125,255,.9);
       box-shadow: 0 0 18px rgba(45,125,255,.25);
     }
+
+    /* -------------------------
+       NEW: Slot manager modal
+    -------------------------- */
+    .slotModalBody{
+      max-width: 920px;
+      margin: 10px auto 0;
+      text-align:left;
+      overflow:auto;
+      height: calc(100% - 56px);
+      padding-right: 6px;
+    }
   </style>
 </head>
 
@@ -998,7 +1010,7 @@
 
     <div class="title-card">
       <div class="logo">GEFFEN BOWL</div>
-      <div class="tagline">1993 arcade splash • modern host controls • classroom-safe projector mode</div>
+      <div class="tagline">Powerful Communication • Adaptable Learning • Restorative Trivia • Like Regular Trivia but more *Geffen* </div>
       <div class="glowbar"></div>
 
       <div class="title-grid">
@@ -1062,13 +1074,28 @@
 
         <div class="panel">
           <h3>Questions</h3>
+
+          <!-- NEW: JSON template + copy button -->
           <div class="tiny" style="margin-bottom:10px;">
-            You can paste JSON <em>or</em> build questions inside the editor. Old JSON still works (loads as Round 1).
+            You can paste JSON <em>or</em> build questions inside the editor.
+            Old JSON still works (loads as Round 1).
           </div>
 
-          <div class="row">
+          <div class="row" style="margin-bottom:10px;">
             <button class="btn-gold" id="openBuilderFromTitle">Open Question Builder</button>
             <button id="pasteJsonFromTitle">Paste JSON</button>
+            <button id="copyJsonTemplateBtn" title="Copy a starter JSON template">Copy JSON Template</button>
+          </div>
+
+          <div class="field" style="margin-bottom:10px;">
+            <label for="saveSlotSelect">Save Slot</label>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <select id="saveSlotSelect" style="flex:1; min-width:240px;"></select>
+              <button id="manageSlotsBtn" title="Create, rename, or delete save slots">Manage</button>
+            </div>
+            <div class="tiny" style="margin-top:6px;">
+              Each slot is its own saved game (perfect for C block vs D block). Switch slots to resume that class.
+            </div>
           </div>
 
           <div style="margin-top:10px;">
@@ -1077,8 +1104,12 @@
 
           <div class="title-actions">
             <button class="btn-gold" id="startFromTitle">Start GEFFEN BOWL</button>
+            <button id="exportSaveBtn" title="Download the current slot's saved game as a file">Export Save</button>
+            <button id="importSaveBtn" title="Import a previously exported save file">Import Save</button>
             <button class="btn-danger" id="clearSaveBtn">Clear Saved Game</button>
           </div>
+
+          <input id="importFileInput" type="file" accept="application/json" style="display:none;" />
 
           <div class="tiny" style="margin-top:8px;">
             Tip: if popups are blocked, allow popups for this page so the projector window can open.
@@ -1094,7 +1125,7 @@
       <div class="topbar">
         <div class="brand">
           <div class="h">GEFFEN BOWL</div>
-          <div class="s" id="subtitle">Modern game show • Dramatic theatrical • Host controls</div>
+          <div class="s" id="subtitle">History is not trivia • Trivia is not history • Facts and truths are not the same thing</div>
         </div>
 
         <div class="header-controls">
@@ -1187,17 +1218,69 @@
       </div>
       <div class="builderBody" id="builderBody"></div>
     </div>
+
+    <!-- Slot manager modal -->
+    <div class="modal" id="slotModal" role="dialog" aria-modal="true" aria-label="Save Slot Manager" style="height:min(62vh,560px);">
+      <div class="qa-top" style="justify-content:space-between;">
+        <div class="pill"><strong>SAVE SLOTS</strong></div>
+        <div class="vis">
+          <button class="btn-danger" id="closeSlotModalBtn">Close</button>
+        </div>
+      </div>
+
+      <div class="slotModalBody">
+        <div class="panel" style="margin-bottom:12px;">
+          <h3>Create New Slot</h3>
+          <div class="row">
+            <div class="field">
+              <label for="newSlotName">Slot name</label>
+              <input id="newSlotName" type="text" placeholder="e.g., C Block — Modern Middle East (Day 2)" />
+            </div>
+            <button class="btn-gold" id="createSlotBtn">Create</button>
+          </div>
+          <div class="tiny" style="margin-top:8px;">Tip: slots are separate saved games. Switch slots to resume where you left off.</div>
+        </div>
+
+        <div class="panel" style="margin-bottom:12px;">
+          <h3>Rename Current Slot</h3>
+          <div class="row">
+            <div class="field">
+              <label for="renameSlotName">New name</label>
+              <input id="renameSlotName" type="text" placeholder="Type a new name for the selected slot" />
+            </div>
+            <button id="renameSlotBtn">Rename</button>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-bottom:12px;">
+          <h3>Duplicate Slot</h3>
+          <div class="row">
+            <div class="field">
+              <label for="duplicateSlotName">New slot name</label>
+              <input id="duplicateSlotName" type="text" placeholder="e.g., D Block — same game" />
+            </div>
+            <button id="duplicateSlotBtn">Duplicate</button>
+          </div>
+          <div class="tiny" style="margin-top:8px;">This copies the saved game from the current slot into a new slot (great for cloning C → D).</div>
+        </div>
+
+        <div class="panel">
+          <h3>Danger Zone</h3>
+          <div class="row">
+            <button class="btn-danger" id="deleteSlotBtn">Delete This Slot</button>
+          </div>
+          <div class="tiny" style="margin-top:8px;">Deleting a slot deletes its saved game. This can’t be undone.</div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <script>
     /* =========================================================
-       GEFFEN BOWL — Phase 4 Implementation
-       - 2–6 teams (dynamic)
-       - modes
-       - rounds
-       - projector window w/ safe reveal + dual reveal states
-       - builder
-       - autosave
+       GEFFEN BOWL — Phase 4 + Slot Saves + Export/Import + Template
+       - Save slots (named)
+       - Export/Import current slot
+       - Copy JSON template
     ========================================================== */
 
     // ----------------------------
@@ -1247,7 +1330,6 @@
     function sendToProjector(payload){
       if (!payload) return;
       if (bc) bc.postMessage(payload);
-      // postMessage fallback handled by host when opening projector
       if (projectorWin && !projectorWin.closed){
         try { projectorWin.postMessage(payload, '*'); } catch(e){}
       }
@@ -1261,7 +1343,8 @@
     // ----------------------------
     // Global state
     // ----------------------------
-    const SAVE_KEY = 'geffen_bowl_save_v4';
+    const SAVE_KEY_BASE = 'geffen_bowl_save_v4';
+    const SLOT_INDEX_KEY = `${SAVE_KEY_BASE}__slot_index_v1`;
 
     const defaultState = () => ({
       meta: { version: 4 },
@@ -1272,7 +1355,8 @@
         autosave: true,
         projectorEnabled: true,
         safeMode: true,
-        defaultRevealBoth: false
+        defaultRevealBoth: false,
+        saveSlot: 'Default'
       },
       teams: [
         { id: 't1', name: 'Team 1', score: 0 },
@@ -1285,11 +1369,8 @@
       currentRoundIndex: 0,
       isDouble: false,
       activeTeamIndex: 0,
-      // current question selection (null when none)
       currentPick: null, // { roundIndex, category, index }
-      // timer
       timer: { running: false, paused: false, timeLeft: 10 },
-      // projector connection hint
       projector: { connected: false }
     });
 
@@ -1298,18 +1379,115 @@
     // Host-only window handle
     let projectorWin = null;
 
-    // Undo stack entries:
-    // { type:'award'|'noTeam'|'expired', roundIndex, category, index, prevState, teamIndex, pointsDelta, prevScores }
+    // Undo stack
     let undoStack = [];
 
     // ----------------------------
+    // Slot helpers
+    // ----------------------------
+    function sanitizeSlotName(name){
+      return String(name || '')
+        .trim()
+        .slice(0, 60)
+        .replace(/[^\w\s\-—:()&.]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function readSlotIndex(){
+      try{
+        const raw = localStorage.getItem(SLOT_INDEX_KEY);
+        if (!raw) return ['Default'];
+        const arr = JSON.parse(raw);
+        if (!Array.isArray(arr) || !arr.length) return ['Default'];
+        const uniq = [];
+        for (const s of arr){
+          const ss = sanitizeSlotName(s);
+          if (ss && !uniq.includes(ss)) uniq.push(ss);
+        }
+        return uniq.length ? uniq : ['Default'];
+      }catch(e){
+        return ['Default'];
+      }
+    }
+
+    function writeSlotIndex(slots){
+      try{ localStorage.setItem(SLOT_INDEX_KEY, JSON.stringify(slots, null, 0)); }catch(e){}
+    }
+
+    function ensureSlotExists(slotName){
+      const name = sanitizeSlotName(slotName) || 'Default';
+      const slots = readSlotIndex();
+      if (!slots.includes(name)){
+        slots.push(name);
+        writeSlotIndex(slots);
+      }
+      return name;
+    }
+
+    function getSaveKey(slotName){
+      const slot = sanitizeSlotName(slotName) || 'Default';
+      return `${SAVE_KEY_BASE}__${slot}`;
+    }
+
+    function currentSlot(){
+      return sanitizeSlotName(state?.settings?.saveSlot) || 'Default';
+    }
+
+    function slotHasSave(slotName){
+      try{ return !!localStorage.getItem(getSaveKey(slotName)); }catch(e){ return false; }
+    }
+
+    function renderSlotSelect(selected){
+      const sel = qs('#saveSlotSelect');
+      if (!sel) return;
+
+      const slots = readSlotIndex();
+      const pick = sanitizeSlotName(selected) || slots[0] || 'Default';
+
+      sel.innerHTML = slots.map(s => {
+        const mark = slotHasSave(s) ? ' •' : '';
+        return `<option value="${escapeHtml(s)}">${escapeHtml(s)}${mark}</option>`;
+      }).join('');
+
+      sel.value = slots.includes(pick) ? pick : (slots[0] || 'Default');
+    }
+
+    function setSlot(slotName, {loadIfExists=true} = {}){
+      const slot = ensureSlotExists(slotName);
+      state.settings.saveSlot = slot;
+
+      if (loadIfExists && loadStateForSlot(slot)){
+        state.settings.saveSlot = slot;
+      } else {
+        const prevSettings = state.settings;
+        state = defaultState();
+        state.settings = { ...state.settings, ...prevSettings, saveSlot: slot };
+        undoStack = [];
+      }
+
+      renderSlotSelect(slot);
+
+      // Update title placeholder hint
+      const ph = slotHasSave(slot)
+        ? `Saved game detected in "${slot}". Click Start to resume, or paste JSON to overwrite.`
+        : `No saved game in "${slot}" yet. Paste JSON or use the Builder.`;
+      const ta = qs('#jsonInputTitle');
+      if (ta) ta.placeholder = ph;
+
+      // If we're already in game screen, refresh UI
+      if (!isProjectorView && qs('#gameScreen').style.display === 'block'){
+        renderHeaderPills();
+        renderTeams();
+        renderBoard();
+        setWinnerBanner();
+        broadcastState();
+      }
+      saveState(); // respects autosave toggle
+    }
+
+    // ----------------------------
     // JSON format support
-    // - Old format: { "Category":[{question,answer,points}, ...], ... } => Round 1
-    // - New format:
-    //   {
-    //     "teams":[{"name":"A","score":0}, ...] (optional),
-    //     "rounds":[{"title":"Round 1","categories":{...}}, ...]
-    //   }
     // ----------------------------
     function normalizeQuestion(q){
       return {
@@ -1322,38 +1500,6 @@
       };
     }
 
-    function parseAnyJson(raw){
-      const parsed = JSON.parse(raw);
-      // New format?
-      if (parsed && typeof parsed === 'object' && Array.isArray(parsed.rounds)){
-        const rounds = parsed.rounds.map((r, i) => ({
-          id: r.id || `r${i+1}_${nowId()}`,
-          title: String(r.title ?? `Round ${i+1}`),
-          categories: normalizeCategories(r.categories || {})
-        }));
-        const teams = Array.isArray(parsed.teams)
-          ? parsed.teams.slice(0,6).map((t, i) => ({
-              id: t.id || `t${i+1}_${nowId()}`,
-              name: String(t.name ?? `Team ${i+1}`),
-              score: clampInt(t.score ?? 0, 0)
-            }))
-          : null;
-
-        return { rounds, teams };
-      }
-
-      // Old format: categories at top-level
-      if (parsed && typeof parsed === 'object'){
-        const categories = normalizeCategories(parsed);
-        return {
-          rounds: [{ id: 'r1_'+nowId(), title: 'Round 1', categories }],
-          teams: null
-        };
-      }
-
-      throw new Error('Unsupported JSON shape.');
-    }
-
     function normalizeCategories(obj){
       const out = {};
       for (const cat of Object.keys(obj || {})){
@@ -1363,6 +1509,77 @@
       return out;
     }
 
+function parseAnyJson(raw){
+  const parsed = JSON.parse(raw);
+
+  // ---------- New format ----------
+  // {
+  //   "teams":[{"name":"A","score":0}, ...] (optional),
+  //   "rounds":[{"title":"Round 1","categories":{...}}, ...]
+  // }
+  if (parsed && typeof parsed === 'object' && Array.isArray(parsed.rounds)){
+    const rounds = parsed.rounds.map((r, i) => ({
+      id: r.id || `r${i+1}_${nowId()}`,
+      title: String(r.title ?? `Round ${i+1}`),
+      categories: normalizeCategories(r.categories || {})
+    }));
+
+    const teams = Array.isArray(parsed.teams)
+      ? parsed.teams.slice(0,6).map((t, i) => ({
+          id: t.id || `t${i+1}_${nowId()}`,
+          name: String(t.name ?? `Team ${i+1}`),
+          score: clampInt(t.score ?? 0, 0)
+        }))
+      : null;
+
+    return { rounds, teams };
+  }
+
+  // ---------- Round-map format (your template) ----------
+  // {
+  //   "Round 1": { "Category": [ ... ], ... },
+  //   "Round 2": { ... }
+  // }
+  if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)){
+    const keys = Object.keys(parsed);
+
+    // treat as round-map if EVERY top-level key looks like "Round X"
+    const roundKeyRegex = /^round\s*\d+/i;
+    const looksLikeRoundMap =
+      keys.length > 0 &&
+      keys.every(k => roundKeyRegex.test(String(k).trim())) &&
+      keys.every(k => parsed[k] && typeof parsed[k] === 'object' && !Array.isArray(parsed[k]));
+
+    if (looksLikeRoundMap){
+      // sort rounds by their numeric index if present
+      const sortedKeys = keys.slice().sort((a, b) => {
+        const na = parseInt(String(a).match(/\d+/)?.[0] || '0', 10);
+        const nb = parseInt(String(b).match(/\d+/)?.[0] || '0', 10);
+        return na - nb;
+      });
+
+      const rounds = sortedKeys.map((rk, i) => ({
+        id: `r${i+1}_${nowId()}`,
+        title: String(rk),
+        categories: normalizeCategories(parsed[rk] || {})
+      }));
+
+      return { rounds, teams: null };
+    }
+  }
+
+  // ---------- Old format (single round) ----------
+  // { "Category":[{question,answer,points},...], ... }
+  if (parsed && typeof parsed === 'object'){
+    const categories = normalizeCategories(parsed);
+    return {
+      rounds: [{ id: 'r1_'+nowId(), title: 'Round 1', categories }],
+      teams: null
+    };
+  }
+
+  throw new Error('Unsupported JSON shape.');
+}
     function exportJson(){
       return JSON.stringify({
         teams: state.teams.map(t => ({ name: t.name, score: t.score })),
@@ -1375,24 +1592,54 @@
         }))
       }, null, 2);
     }
-
+function jsonTemplate(){
+  return JSON.stringify({
+    "rounds": [
+      {
+        "title": "Round 1",
+        "categories": {
+          "Category 1": [
+            { "question": "Sample Question 1", "answer": "Sample Answer 1", "points": 100 },
+            { "question": "Sample Question 2", "answer": "Sample Answer 2", "points": 200 },
+            { "question": "Sample Question 3", "answer": "Sample Answer 3", "points": 300 },
+            { "question": "Sample Question 4", "answer": "Sample Answer 4", "points": 400 },
+            { "question": "Sample Question 5", "answer": "Sample Answer 5", "points": 500 }
+          ],
+          "Category 2": [
+            { "question": "Sample Question 1", "answer": "Sample Answer 1", "points": 100 },
+            { "question": "Sample Question 2", "answer": "Sample Answer 2", "points": 200 },
+            { "question": "Sample Question 3", "answer": "Sample Answer 3", "points": 300 },
+            { "question": "Sample Question 4", "answer": "Sample Answer 4", "points": 400 },
+            { "question": "Sample Question 5", "answer": "Sample Answer 5", "points": 500 }
+          ]
+        }
+      },
+      {
+        "title": "Round 2",
+        "categories": {
+          "Category 1": [
+            { "question": "Sample Question 1", "answer": "Sample Answer 1", "points": 100 }
+          ]
+        }
+      }
+    ]
+  }, null, 2);
+}
     // ----------------------------
-    // Persistence
+    // Persistence (slot-based)
     // ----------------------------
     function saveState(){
       if (!state.settings.autosave) return;
       try{
-        const payload = {
-          state,
-          undoStack
-        };
-        localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+        ensureSlotExists(currentSlot());
+        const payload = { state, undoStack };
+        localStorage.setItem(getSaveKey(currentSlot()), JSON.stringify(payload));
       }catch(e){}
     }
 
-    function loadState(){
+    function loadStateForSlot(slotName){
       try{
-        const raw = localStorage.getItem(SAVE_KEY);
+        const raw = localStorage.getItem(getSaveKey(slotName));
         if (!raw) return false;
         const payload = JSON.parse(raw);
         if (!payload?.state) return false;
@@ -1404,8 +1651,70 @@
       }
     }
 
+    function loadState(){
+      // Loads the state for state.settings.saveSlot (or Default)
+      return loadStateForSlot(currentSlot());
+    }
+
     function clearSaved(){
-      try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+      try{ localStorage.removeItem(getSaveKey(currentSlot())); }catch(e){}
+    }
+
+    // ----------------------------
+    // Export / Import save (current slot)
+    // ----------------------------
+    function exportSaveToFile(){
+      const slot = currentSlot();
+      const key = getSaveKey(slot);
+      let raw = null;
+      try{ raw = localStorage.getItem(key); }catch(e){ raw = null; }
+
+      if (!raw){
+        alert(`No saved game found in slot "${slot}".`);
+        return;
+      }
+
+      const blob = new Blob([raw], { type: 'application/json' });
+      const a = document.createElement('a');
+      const safe = slot.replace(/[^\w\-]+/g,'_').slice(0, 40) || 'slot';
+      a.href = URL.createObjectURL(blob);
+      a.download = `geffen_bowl_save__${safe}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 250);
+    }
+
+    function importSaveFromFile(file){
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const txt = String(reader.result || '');
+          const payload = JSON.parse(txt);
+
+          if (!payload?.state || !payload.state?.meta){
+            throw new Error('Not a Geffen Bowl save file.');
+          }
+
+          // Force this imported state into current slot
+          const slot = currentSlot();
+          payload.state.settings = payload.state.settings || {};
+          payload.state.settings.saveSlot = slot;
+
+          // Store it
+          localStorage.setItem(getSaveKey(slot), JSON.stringify(payload));
+
+          // Load into memory immediately
+          loadStateForSlot(slot);
+
+          alert(`Imported save into slot "${slot}".`);
+          renderSlotSelect(slot);
+          qs('#jsonInputTitle').placeholder = `Saved game detected in "${slot}". Click Start to resume, or paste JSON to overwrite.`;
+        }catch(e){
+          alert('Import failed. Please select a valid exported save file.');
+        }
+      };
+      reader.readAsText(file);
     }
 
     // ----------------------------
@@ -1416,14 +1725,12 @@
 
       if (mode === 'classic'){
         state.settings.timerDefault = clampInt(state.settings.timerDefault, 10) || 10;
-        // 1 round
         state.rounds = [state.rounds[0] || { id:'r1_'+nowId(), title:'Round 1', categories:{} }];
         state.rounds[0].title = 'Round 1';
         state.currentRoundIndex = 0;
       }
       if (mode === 'tworound'){
         state.settings.timerDefault = clampInt(state.settings.timerDefault, 10) || 10;
-        // 2 rounds
         const r1 = state.rounds[0] || { id:'r1_'+nowId(), title:'Round 1', categories:{} };
         const r2 = state.rounds[1] || { id:'r2_'+nowId(), title:'Round 2', categories:{} };
         r1.title = 'Round 1';
@@ -1476,9 +1783,6 @@
     function showTitle(){
       qs('#titleScreen').style.display = 'flex';
       qs('#gameScreen').style.display = 'none';
-      if (isProjectorView){
-        // projector view should never be on title in practice
-      }
     }
 
     function showGame(){
@@ -1530,7 +1834,6 @@
             broadcastState();
           });
 
-          // contenteditable safety + update
           const nameEl = el.querySelector('[data-type="teamName"]');
           const scoreEl = el.querySelector('[data-type="teamScore"]');
 
@@ -1603,7 +1906,6 @@
       board.style.gridTemplateColumns = `repeat(${cats.length}, 1fr)`;
       board.style.gridTemplateRows = `repeat(${rows + 1}, auto)`;
 
-      // headers
       for (const cat of cats){
         const cell = document.createElement('div');
         cell.className = 'cell category';
@@ -1611,7 +1913,6 @@
         board.appendChild(cell);
       }
 
-      // cells
       for (let i=0; i<rows; i++){
         for (const cat of cats){
           const q = (r.categories[cat] || [])[i];
@@ -1781,13 +2082,10 @@
       qs('#answerText').innerText = '';
       qs('#answerText').classList.remove('revealed');
 
-      // timer setup
       state.timer.timeLeft = clampInt(state.settings.timerDefault, 10);
       renderTimerUI();
       qs('#timeOverlay').classList.remove('show');
 
-      // reset per-question reveal (do NOT auto-clear; but generally you'd want hidden)
-      // We'll keep existing flags as-is; host/proj buttons govern visibility.
       updateVisibilityPills();
       renderAwardButtons();
 
@@ -1841,12 +2139,10 @@
       const q = currentQuestionObj();
       if (!q) return;
 
-      // host
       q._hostShown = true;
       qs('#answerText').innerText = q.answer;
       qs('#answerText').classList.add('revealed');
 
-      // projector
       q._projShown = true;
 
       updateVisibilityPills();
@@ -1903,7 +2199,6 @@
       state.activeTeamIndex = teamIndex;
 
       q._state = 'answered';
-      // auto-reveal host (convenient)
       q._hostShown = true;
       qs('#answerText').innerText = q.answer;
       qs('#answerText').classList.add('revealed');
@@ -1942,7 +2237,6 @@
       });
 
       q._state = 'missed';
-      // auto-reveal host (convenient)
       q._hostShown = true;
       qs('#answerText').innerText = q.answer;
       qs('#answerText').classList.add('revealed');
@@ -2014,20 +2308,19 @@
     function nextRoundIfAvailable(){
       if (state.currentRoundIndex < state.rounds.length - 1){
         state.currentRoundIndex++;
-        state.isDouble = (state.settings.mode === 'tworound' || state.settings.mode === 'tournament'); // common expectation
+        state.isDouble = (state.settings.mode === 'tworound' || state.settings.mode === 'tournament');
         renderHeaderPills();
         renderBoard();
         showRoundSplash();
         saveState();
         broadcastState();
       } else {
-        // no next round
         alert('No more rounds configured.');
       }
     }
 
     // ----------------------------
-    // Builder (in-place editing of state.rounds)
+    // Builder
     // ----------------------------
     function ensureSomeQuestionsExist(){
       const r = getCurrentRound();
@@ -2125,7 +2418,6 @@
       const body = qs('#builderBody');
       body.innerHTML = '';
 
-      // round selector
       const roundPanel = document.createElement('div');
       roundPanel.className = 'catBlock';
       roundPanel.innerHTML = `
@@ -2185,18 +2477,14 @@
 
         body.appendChild(block);
 
-        // rename category
         const renameInput = block.querySelector('input[type="text"]');
         renameInput.addEventListener('blur', () => {
           renameCategory(cat, renameInput.value);
         });
 
-        // add question
         block.querySelector(`[data-add-q="${cssEscape(cat)}"]`)?.addEventListener('click', () => addQuestion(cat));
-        // delete category
         block.querySelector(`[data-del-cat="${cssEscape(cat)}"]`)?.addEventListener('click', () => removeCategory(cat));
 
-        // questions
         const wrap = block.querySelector(`[data-qwrap="${cssEscape(cat)}"]`);
         (r.categories[cat] || []).forEach((q, idx) => {
           const row = document.createElement('div');
@@ -2223,7 +2511,6 @@
 
           wrap.appendChild(row);
 
-          // bind fields
           row.querySelectorAll('input').forEach(inp => {
             inp.addEventListener('input', () => {
               const c = inp.getAttribute('data-q');
@@ -2236,11 +2523,10 @@
               if (f === 'points') qq.points = clampInt(inp.value, 0);
               saveState();
               broadcastState();
-              renderBoard(); // so points update live
+              renderBoard();
             });
           });
 
-          // delete question
           row.querySelector(`[data-del-q="${cssEscape(cat)}"][data-di="${idx}"]`)?.addEventListener('click', () => removeQuestion(cat, idx));
         });
       }
@@ -2262,8 +2548,6 @@
       hint.textContent = state.projector.connected ? 'PROJECTOR CONNECTED' : 'WAITING FOR HOST';
     }
 
-    // The projector should NEVER show host-only UI. It can show the same board + same modal,
-    // but answer visibility is governed by q._projShown only.
     function projectorRenderModalFromState(){
       if (!isProjectorView) return;
 
@@ -2279,14 +2563,12 @@
         return;
       }
 
-      // show modal on projector
       qs('#qaMetaLeft').innerHTML = `<strong>${escapeHtml(pick.category)}</strong>`;
       const pts = q.points * (state.isDouble ? 2 : 1);
       qs('#qaMetaRight').innerHTML = `<strong>${pts} pts</strong>`;
 
       qs('#questionText').innerText = q.question;
 
-      // projector answer
       if (q._projShown){
         qs('#answerText').innerText = q.answer;
         qs('#answerText').classList.add('revealed');
@@ -2295,7 +2577,6 @@
         qs('#answerText').classList.remove('revealed');
       }
 
-      // timer
       renderTimerUI();
       qs('#timeOverlay').classList.toggle('show', state.timer.timeLeft === 0);
 
@@ -2320,7 +2601,6 @@
       if (!payload || typeof payload !== 'object') return;
 
       if (payload.type === 'PING' && !isProjectorView){
-        // host receives ping from projector; reply with state
         state.projector.connected = true;
         saveState();
         renderProjectorConnectedUI(true);
@@ -2329,7 +2609,6 @@
       }
 
       if (payload.type === 'STATE' && isProjectorView){
-        // projector receives state
         state = payload.state;
         state.projector.connected = true;
         renderProjectorStatus();
@@ -2338,7 +2617,7 @@
         renderBoard();
         setWinnerBanner();
         projectorRenderModalFromState();
-        // splash state
+
         if (payload.extra && 'splash' in payload.extra){
           qs('#roundSplash').classList.toggle('show', !!payload.extra.splash);
           qs('#splashTitle').innerText = (getCurrentRound()?.title || '').toUpperCase();
@@ -2376,7 +2655,7 @@
       try{
         const parsed = parseAnyJson(raw);
         state.rounds = parsed.rounds;
-        // normalize states to unplayed
+
         state.rounds.forEach(r => {
           for (const cat of Object.keys(r.categories || {})){
             r.categories[cat] = (r.categories[cat] || []).map(qq => ({
@@ -2407,8 +2686,8 @@
     let projHoldTimer = null;
     function setupSafeProjectorRevealButton(){
       const btn = qs('#projAnswerBtn');
+      if (!btn) return;
 
-      // Always clear any old handlers
       btn.onmousedown = null;
       btn.onmouseup = null;
       btn.onmouseleave = null;
@@ -2427,7 +2706,6 @@
           return;
         }
 
-        // SAFE MODE: hold to reveal
         btn.style.filter = 'brightness(1.15)';
         projHoldTimer = setTimeout(() => {
           showAnswerProjector(true);
@@ -2439,20 +2717,171 @@
       btn.onmouseup = clearHold;
       btn.onmouseleave = clearHold;
 
-      // touch
       btn.ontouchstart = (e) => { e.preventDefault(); startHold(); };
       btn.ontouchend = (e) => { e.preventDefault(); clearHold(); };
+    }
+
+    // ----------------------------
+    // Slot manager UI handlers
+    // ----------------------------
+    function openSlotModal(){
+      qs('#backdrop').classList.add('show');
+      qs('#slotModal').classList.add('show');
+      qs('#slotModal').style.display = 'block';
+      qs('#newSlotName').value = '';
+      qs('#renameSlotName').value = '';
+      qs('#duplicateSlotName').value = '';
+    }
+
+    function closeSlotModal(){
+      qs('#slotModal').classList.remove('show');
+      qs('#slotModal').style.display = 'none';
+      qs('#backdrop').classList.remove('show');
+    }
+
+    function renameSlot(oldName, newName){
+      const oldN = sanitizeSlotName(oldName) || 'Default';
+      const newN = sanitizeSlotName(newName) || '';
+      if (!newN){ alert('Please enter a new name.'); return false; }
+      if (newN === oldN){ alert('That is already the current name.'); return false; }
+
+      const slots = readSlotIndex();
+      if (slots.includes(newN)){ alert('A slot with that name already exists.'); return false; }
+
+      // Move saved payload if it exists
+      try{
+        const raw = localStorage.getItem(getSaveKey(oldN));
+        if (raw){
+          localStorage.setItem(getSaveKey(newN), raw);
+          localStorage.removeItem(getSaveKey(oldN));
+        }
+      }catch(e){}
+
+      // Update slot index
+      const nextSlots = slots.map(s => (s === oldN ? newN : s));
+      writeSlotIndex(nextSlots);
+
+      // Update state slot
+      state.settings.saveSlot = newN;
+
+      renderSlotSelect(newN);
+      return true;
+    }
+
+    function duplicateSlot(fromName, toName){
+      const fromN = sanitizeSlotName(fromName) || 'Default';
+      const toN = sanitizeSlotName(toName) || '';
+      if (!toN){ alert('Please enter a new slot name.'); return false; }
+
+      const slots = readSlotIndex();
+      if (slots.includes(toN)){ alert('A slot with that name already exists.'); return false; }
+
+      // Copy saved payload (or current in-memory state if none)
+      try{
+        const raw = localStorage.getItem(getSaveKey(fromN));
+        if (raw){
+          localStorage.setItem(getSaveKey(toN), raw);
+        } else {
+          // If no saved payload exists, clone current memory into new slot
+          const payload = { state: deepClone(state), undoStack: deepClone(undoStack) };
+          payload.state.settings.saveSlot = toN;
+          localStorage.setItem(getSaveKey(toN), JSON.stringify(payload));
+        }
+      }catch(e){}
+
+      ensureSlotExists(toN);
+      renderSlotSelect(toN);
+      return true;
+    }
+
+    function deleteSlot(name){
+      const n = sanitizeSlotName(name) || 'Default';
+      if (!confirm(`Delete slot "${n}"? This will delete its saved game.`)) return false;
+
+      try{ localStorage.removeItem(getSaveKey(n)); }catch(e){}
+
+      let slots = readSlotIndex().filter(s => s !== n);
+      if (!slots.length) slots = ['Default'];
+      writeSlotIndex(slots);
+
+      const fallback = slots[0] || 'Default';
+      setSlot(fallback, { loadIfExists: true });
+      renderSlotSelect(fallback);
+      return true;
     }
 
     // ----------------------------
     // Wire up UI
     // ----------------------------
     function wireTitleUI(){
+      // Slot select change
+      qs('#saveSlotSelect')?.addEventListener('change', () => {
+        const slot = qs('#saveSlotSelect').value;
+        setSlot(slot, { loadIfExists: true });
+      });
+
+      qs('#manageSlotsBtn')?.addEventListener('click', openSlotModal);
+      qs('#closeSlotModalBtn')?.addEventListener('click', closeSlotModal);
+
+      qs('#createSlotBtn')?.addEventListener('click', () => {
+        const name = sanitizeSlotName(qs('#newSlotName').value);
+        if (!name){ alert('Please enter a slot name.'); return; }
+        ensureSlotExists(name);
+        renderSlotSelect(name);
+        setSlot(name, { loadIfExists: true });
+        alert(`Created slot: "${name}"`);
+      });
+
+      qs('#renameSlotBtn')?.addEventListener('click', () => {
+        const oldName = currentSlot();
+        const newName = qs('#renameSlotName').value;
+        if (renameSlot(oldName, newName)){
+          alert(`Renamed "${oldName}" → "${sanitizeSlotName(newName)}"`);
+          closeSlotModal();
+        }
+      });
+
+      qs('#duplicateSlotBtn')?.addEventListener('click', () => {
+        const fromName = currentSlot();
+        const toName = qs('#duplicateSlotName').value;
+        const toSan = sanitizeSlotName(toName);
+        if (duplicateSlot(fromName, toName)){
+          alert(`Duplicated "${fromName}" → "${toSan}"`);
+          closeSlotModal();
+        }
+      });
+
+      qs('#deleteSlotBtn')?.addEventListener('click', () => {
+        if (deleteSlot(currentSlot())){
+          closeSlotModal();
+        }
+      });
+
+      // Copy template
+      qs('#copyJsonTemplateBtn')?.addEventListener('click', () => {
+        copyToClipboard(jsonTemplate());
+        alert('JSON template copied.');
+      });
+
+      // Clear current slot save
       qs('#clearSaveBtn').addEventListener('click', () => {
-        const ok = confirm('Clear saved GEFFEN BOWL game state?');
+        const slot = currentSlot();
+        const ok = confirm(`Clear saved GEFFEN BOWL game state for slot "${slot}"?`);
         if (!ok) return;
         clearSaved();
+        renderSlotSelect(slot);
+        qs('#jsonInputTitle').placeholder = `No saved game in "${slot}" yet. Paste JSON or use the Builder.`;
         alert('Saved game cleared.');
+      });
+
+      // Export/Import
+      qs('#exportSaveBtn')?.addEventListener('click', exportSaveToFile);
+      qs('#importSaveBtn')?.addEventListener('click', () => qs('#importFileInput').click());
+      qs('#importFileInput')?.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        importSaveFromFile(file);
+        e.target.value = '';
       });
 
       qs('#pasteJsonFromTitle').addEventListener('click', () => {
@@ -2460,7 +2889,6 @@
       });
 
       qs('#openBuilderFromTitle').addEventListener('click', () => {
-        // ensure at least Round 1 exists
         if (!state.rounds?.length) state.rounds = [{ id:'r1_'+nowId(), title:'Round 1', categories:{} }];
         openBuilder();
       });
@@ -2480,17 +2908,15 @@
         state.settings.timerDefault = timerDefault;
         applyModePreset(mode);
 
-        // try to load JSON if present
+        // try to load JSON if present (overwrites questions)
         loadQuestionsFromTitleTextarea();
 
-        // update pills
         qs('#timerDefaultReadout').innerText = String(state.settings.timerDefault);
         qs('#safeModeReadout').innerText = state.settings.safeMode ? 'ON' : 'OFF';
 
         setupSafeProjectorRevealButton();
         titleToGame();
 
-        // ping projector if already open
         if (state.settings.projectorEnabled){
           broadcastState();
         }
@@ -2516,38 +2942,33 @@
       });
 
       qs('#openBuilderBtn').addEventListener('click', () => openBuilder());
-
       qs('#openProjectorBtn').addEventListener('click', () => openProjectorWindow());
 
       qs('#projectorFullscreenBtn').addEventListener('click', () => {
         try{ document.documentElement.requestFullscreen(); }catch(e){}
       });
 
-      // Modal buttons
       qs('#noTeamBtn').addEventListener('click', noTeamCorrect);
 
       qs('#hostAnswerBtn').addEventListener('click', () => {
         if (state.settings.defaultRevealBoth) showAnswerBoth();
-        else showAnswerHost(true); // toggle
+        else showAnswerHost(true);
       });
 
       qs('#bothAnswerBtn').addEventListener('click', showAnswerBoth);
-
       qs('#pauseBtn').addEventListener('click', pauseTimer);
-
       qs('#closeQuestionBtn').addEventListener('click', closeQuestion);
 
       setupSafeProjectorRevealButton();
 
       qs('#startRoundBtn').addEventListener('click', startRound);
 
-      // Backdrop click closes overlays (host only)
       qs('#backdrop').addEventListener('click', () => {
+        if (qs('#slotModal')?.classList.contains('show')) closeSlotModal();
         if (qs('#builder').classList.contains('show')) closeBuilder();
         if (qs('#questionModal').classList.contains('show')) closeQuestion();
       });
 
-      // Builder controls
       qs('#builderCloseBtn').addEventListener('click', closeBuilder);
       qs('#builderAddCategoryBtn').addEventListener('click', addCategory);
       qs('#builderAddRoundBtn').addEventListener('click', addRound);
@@ -2556,16 +2977,22 @@
         alert('JSON copied.');
       });
 
-      // Keyboard shortcuts
       document.addEventListener('keydown', (e) => {
         if (isProjectorView) return;
 
         const modalOpen = qs('#questionModal').classList.contains('show');
         const builderOpen = qs('#builder').classList.contains('show');
+        const slotOpen = qs('#slotModal')?.classList.contains('show');
+
         const isEditing = document.activeElement && (
           document.activeElement.isContentEditable ||
           ['TEXTAREA','INPUT','SELECT'].includes(document.activeElement.tagName)
         );
+
+        if (slotOpen){
+          if (e.key === 'Escape'){ e.preventDefault(); closeSlotModal(); }
+          return;
+        }
 
         if (isEditing && e.key !== 'Escape') return;
 
@@ -2580,7 +3007,6 @@
 
           if (e.key.toLowerCase() === 'a'){
             if (e.shiftKey){
-              // projector reveal key
               e.preventDefault();
               if (state.settings.safeMode){
                 const ok = confirm('SAFE MODE: Reveal answer on projector?');
@@ -2596,7 +3022,6 @@
             return;
           }
 
-          // award 1-6
           const n = clampInt(e.key, -1);
           if (n >= 1 && n <= 6){
             e.preventDefault();
@@ -2628,7 +3053,6 @@
         return;
       }
 
-      // Open same page in projector mode
       const url = new URL(location.href);
       url.searchParams.set('view', 'projector');
 
@@ -2638,11 +3062,9 @@
         return;
       }
 
-      // Host marks "not yet confirmed"
       state.projector.connected = false;
       renderProjectorConnectedUI(false);
 
-      // After a short delay, ping
       setTimeout(() => {
         sendToProjector({ type:'PING' });
         broadcastState();
@@ -2694,7 +3116,6 @@
       function step(){
         t += 0.016;
 
-        // layer A
         ctx1.clearRect(0,0,w,h);
         ctx1.fillStyle = 'rgba(255,255,255,.9)';
         for (const s of starsA){
@@ -2705,7 +3126,6 @@
           ctx1.fillRect(s.x, s.y, s.s*dpr*0.8, s.s*dpr*0.8);
         }
 
-        // layer B (brighter streaks)
         ctx2.clearRect(0,0,w,h);
         for (const s of starsB){
           s.y += s.v * dpr * 2.4;
@@ -2731,7 +3151,6 @@
     function boot(){
       initStarfield();
 
-      // If projector view, hide title; go straight to "waiting" game shell
       if (isProjectorView){
         showGame();
         qs('#subtitle').innerText = 'PROJECTOR VIEW • read-only';
@@ -2741,25 +3160,26 @@
         qs('#copyJsonBtn')?.remove();
         qs('#toggleDoubleBtn')?.remove();
 
-        // show projector connection UI
         qs('#projHint').style.display = 'inline-block';
         renderProjectorStatus();
 
         onProjectorMessage(handleIncoming);
 
-        // ping host (if opened by host, this will get answered)
         setTimeout(() => {
           sendToProjector({ type:'PING' });
         }, 250);
 
-        // Prevent interactions
         renderTeams();
         renderBoard();
         return;
       }
 
-      // Host: attempt load save
-      const loaded = loadState();
+      // Ensure slot index exists + set default slot
+      state.settings.saveSlot = ensureSlotExists(state.settings.saveSlot || 'Default');
+      renderSlotSelect(state.settings.saveSlot);
+
+      // Attempt to load from selected slot
+      const loaded = loadStateForSlot(state.settings.saveSlot);
 
       // Initialize title UI from state
       qs('#teamCount').value = String(state.settings.teamCount || 3);
@@ -2771,16 +3191,20 @@
       qs('#safeModeToggle').checked = !!state.settings.safeMode;
       qs('#defaultRevealBothToggle').checked = !!state.settings.defaultRevealBoth;
 
-      // Wire
+      // Update placeholder based on slot save existence
+      const slot = currentSlot();
+      qs('#jsonInputTitle').placeholder = slotHasSave(slot)
+        ? `Saved game detected in "${slot}". Click Start to resume, or paste JSON to overwrite.`
+        : `No saved game in "${slot}" yet. Paste JSON or use the Builder.`;
+
       wireTitleUI();
       wireGameUI();
 
-      // Projector messages
       onProjectorMessage(handleIncoming);
 
-      // If a saved game exists, stay on title but make it easy to resume
+      // If slot loaded successfully, keep it on title but ready to resume
       if (loaded){
-        qs('#jsonInputTitle').placeholder = 'Saved game detected. Click Start to resume, or paste JSON to overwrite.';
+        // nothing else needed; Start resumes
       }
 
       showTitle();
