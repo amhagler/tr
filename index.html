@@ -1133,6 +1133,7 @@
           <button id="copyJsonBtn" title="Copy current questions (all rounds) as JSON">Copy JSON</button>
           <button id="toggleDoubleBtn">Double: OFF</button>
           <button id="openProjectorBtn">Open Projector</button>
+<button id="nextRoundBtn">Next Round</button>
           <button class="btn-danger" id="returnToTitleBtn">Title Screen</button>
         </div>
       </div>
@@ -2160,13 +2161,20 @@ function jsonTemplate(){
 
       q._state = 'expired';
 
-      undoStack.push({
+          undoStack.push({
         type:'expired',
         roundIndex, category, index,
         prevState
       });
 
       renderBoard();
+
+      if (isCurrentRoundComplete()){
+        setTimeout(() => {
+          nextRoundIfAvailable();
+        }, 600);
+      }
+
       saveState();
     }
 
@@ -2219,6 +2227,13 @@ function jsonTemplate(){
       clearTimer();
 
       broadcastState();
+
+      if (isCurrentRoundComplete()){
+        setTimeout(() => {
+          nextRoundIfAvailable();
+        }, 600);
+      }
+
       saveState();
     }
 
@@ -2246,6 +2261,13 @@ function jsonTemplate(){
       clearTimer();
 
       broadcastState();
+
+      if (isCurrentRoundComplete()){
+        setTimeout(() => {
+          nextRoundIfAvailable();
+        }, 600);
+      }
+
       saveState();
     }
 
@@ -2264,9 +2286,7 @@ function jsonTemplate(){
 
       if (last.type === 'award' && Array.isArray(last.prevScores)){
         state.teams.forEach((t, i) => t.score = last.prevScores[i] ?? t.score);
-      }
-
-      renderTeams();
+      }      renderTeams();
       setWinnerBanner();
       renderBoard();
 
@@ -2285,7 +2305,15 @@ function jsonTemplate(){
     // ----------------------------
     // Rounds
     // ----------------------------
-    function showRoundSplash(){
+  function isCurrentRoundComplete(){
+const r = getCurrentRound();
+if (!r) return false;
+
+return Object.values(r.categories || {})
+.flat()
+.every(q => (q._state || 'unplayed') !== 'unplayed');
+}
+  function showRoundSplash(){
       const r = getCurrentRound();
       qs('#splashTitle').innerText = (r?.title || `Round ${state.currentRoundIndex+1}`).toUpperCase();
       qs('#splashSubtitle').innerText = 'Get ready.';
@@ -2943,7 +2971,9 @@ function jsonTemplate(){
 
       qs('#openBuilderBtn').addEventListener('click', () => openBuilder());
       qs('#openProjectorBtn').addEventListener('click', () => openProjectorWindow());
-
+qs('#nextRoundBtn').addEventListener('click', () => {
+  nextRoundIfAvailable();
+});
       qs('#projectorFullscreenBtn').addEventListener('click', () => {
         try{ document.documentElement.requestFullscreen(); }catch(e){}
       });
