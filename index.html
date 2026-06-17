@@ -190,6 +190,46 @@
     }
     .check input { width: 17px; height: 17px; }
 
+    .setup-status {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 12px;
+      margin: 18px 18px 0;
+      padding: 14px;
+      border: 1px solid rgba(255,216,77,.24);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(90deg, rgba(255,216,77,.12), transparent 44%),
+        rgba(0,0,0,.22);
+    }
+    @media (max-width: 780px) {
+      .setup-status { grid-template-columns: 1fr; }
+    }
+    .status-title {
+      margin: 0 0 5px;
+      font-size: 16px;
+      font-weight: 1000;
+    }
+    .setup-meter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    @media (max-width: 780px) {
+      .setup-meter { justify-content: flex-start; }
+    }
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px;
+      margin-top: 12px;
+    }
+    @media (max-width: 720px) {
+      .quick-actions { grid-template-columns: 1fr; }
+    }
+
     .game-header {
       position: sticky;
       top: 0;
@@ -422,6 +462,18 @@
       font-weight: 900;
       word-break: break-word;
     }
+    .next-action {
+      width: 100%;
+      min-height: 56px;
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+    .host-hint {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
     .current-question {
       min-height: 90px;
       font-size: 16px;
@@ -558,6 +610,22 @@
       border-bottom: 1px solid var(--line);
       background: rgba(0,0,0,.22);
     }
+    .builder-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,.035);
+    }
+    .builder-help {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-left: auto;
+    }
     .builder-head h2 {
       margin: 0;
       font-size: 14px;
@@ -612,6 +680,13 @@
         <h1 class="logo">GEFFEN BOWL</h1>
         <p class="tagline">A classroom game board with a private teacher view and a clean projector view.</p>
       </div>
+      <div class="setup-status">
+        <div>
+          <p class="status-title" id="setupReadyTitle">Ready when you are.</p>
+          <div class="tiny" id="setupReadyDetail">Choose a slot, check the board, then start.</div>
+        </div>
+        <div class="setup-meter" id="setupMeter"></div>
+      </div>
       <div class="setup-grid">
         <section class="panel">
           <h2>Game Setup</h2>
@@ -646,6 +721,11 @@
             <label class="check"><input id="safeModeToggle" type="checkbox" checked /> Confirm class reveal</label>
           </div>
           <p class="tiny">Teacher view shows answers privately. The projector shows questions only until you reveal the answer to the class.</p>
+          <div class="quick-actions">
+            <button id="blankGameBtn">Blank Game</button>
+            <button id="sampleBoardBtn">Sample Board</button>
+            <button id="fillTemplateBtn">Fill JSON Template</button>
+          </div>
         </section>
 
         <section class="panel">
@@ -660,15 +740,19 @@
             </div>
             <div class="row">
               <button id="openBuilderFromTitle" class="primary">Question Builder</button>
+              <button id="smartParseBtn">Smart Parse Paste</button>
+              <button id="uploadQuestionsBtn">Upload Text/CSV</button>
               <button id="copyTemplateBtn">Copy Template</button>
               <button id="exportSaveBtn">Export Save</button>
               <button id="importSaveBtn">Import Save</button>
               <button id="clearSaveBtn" class="danger">Clear Save</button>
             </div>
             <input id="importFileInput" class="hidden" type="file" accept="application/json" />
+            <input id="questionFileInput" class="hidden" type="file" accept=".docx,.json,.txt,.csv,.tsv,text/plain,text/csv,application/json,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
             <div>
-              <label for="jsonInput">Paste JSON</label>
-              <textarea id="jsonInput" placeholder="Paste question JSON here, or use the builder."></textarea>
+              <label for="jsonInput">Paste Questions</label>
+              <textarea id="jsonInput" placeholder="Paste JSON, a Word/Docs table, TSV/CSV rows, or Q:/A: blocks."></textarea>
+              <div class="tiny" style="margin-top:6px;">Examples: Category | Points | Question | Answer, or Category: Name then Q: ... A: ... Points: 100.</div>
             </div>
             <button id="startGameBtn" class="primary">Start GEFFEN BOWL</button>
           </div>
@@ -717,7 +801,9 @@
         </section>
         <section class="panel">
           <h2>Question Controls</h2>
+          <button id="nextActionBtn" class="primary next-action" disabled>Open a tile</button>
           <div id="hostTimer" class="timer-large">20</div>
+          <div id="hostHint" class="host-hint">The main action will change as you host.</div>
           <div id="awardButtons" class="stack" style="margin-top:12px"></div>
           <div class="row" style="margin-top:12px">
             <button id="revealClassBtn" class="primary" disabled>Reveal to Class</button>
@@ -753,11 +839,14 @@
       <h2>Question Builder</h2>
       <div class="row">
         <button id="addRoundBtn" class="primary">Add Round</button>
+        <button id="addStandardBoardBtn">Standard Board</button>
         <button id="addCategoryBtn">Add Category</button>
+        <button id="addFullCategoryBtn">Full Category</button>
         <button id="builderCopyJsonBtn">Copy JSON</button>
         <button id="closeBuilderBtn" class="danger">Close</button>
       </div>
     </div>
+    <div id="builderSummary" class="builder-summary"></div>
     <div id="builderBody" class="builder-body"></div>
   </section>
 
@@ -1034,6 +1123,68 @@
       }, null, 2);
     }
 
+    function sampleRounds() {
+      return [
+        normalizeRound({
+          title: "Round 1",
+          categories: {
+            "People and Places": [
+              { question: "Which person, place, or group best fits this clue?", answer: "Replace with your answer", points: 100 },
+              { question: "What location mattered most in this event?", answer: "Replace with your answer", points: 200 },
+              { question: "Who had the most power in this situation?", answer: "Replace with your answer", points: 300 },
+              { question: "Which group experienced the biggest consequence?", answer: "Replace with your answer", points: 400 },
+              { question: "Which person or place connects two different units?", answer: "Replace with your answer", points: 500 }
+            ],
+            "Big Ideas": [
+              { question: "What is the main idea behind this concept?", answer: "Replace with your answer", points: 100 },
+              { question: "Which vocabulary word matches this description?", answer: "Replace with your answer", points: 200 },
+              { question: "What changed because of this idea?", answer: "Replace with your answer", points: 300 },
+              { question: "What stayed the same even after this change?", answer: "Replace with your answer", points: 400 },
+              { question: "How would this idea show up in a different time or place?", answer: "Replace with your answer", points: 500 }
+            ],
+            "Evidence": [
+              { question: "What evidence would best support this claim?", answer: "Replace with your answer", points: 100 },
+              { question: "What detail from a source would matter most?", answer: "Replace with your answer", points: 200 },
+              { question: "What makes this evidence reliable or unreliable?", answer: "Replace with your answer", points: 300 },
+              { question: "What counterclaim could someone make?", answer: "Replace with your answer", points: 400 },
+              { question: "What evidence connects cause and effect here?", answer: "Replace with your answer", points: 500 }
+            ]
+          }
+        }, 0)
+      ];
+    }
+
+    function blankRounds() {
+      return [normalizeRound({ title: "Round 1", categories: {} }, 0)];
+    }
+
+    function boardStats() {
+      const rounds = state.rounds.length;
+      const categories = state.rounds.reduce((sum, round) => sum + round.categories.length, 0);
+      const questions = state.rounds.reduce((sum, round) => sum + round.categories.reduce((catSum, cat) => catSum + cat.questions.length, 0), 0);
+      const unplayed = state.rounds.reduce((sum, round) => sum + round.categories.reduce((catSum, cat) => catSum + cat.questions.filter(q => q.state === "unplayed").length, 0), 0);
+      return { rounds, categories, questions, unplayed };
+    }
+
+    function updateSetupSummary() {
+      if (!isHost || !$("#setupReadyTitle")) return;
+      const stats = boardStats();
+      const slot = currentSlot();
+      const hasQuestions = stats.questions > 0;
+      const hasSavedGame = hasSave(slot);
+      $("#setupReadyTitle").textContent = hasSavedGame ? `Resume "${slot}"` : (hasQuestions ? "Board ready to start" : "Build or paste questions");
+      $("#setupReadyDetail").textContent = hasQuestions
+        ? `${stats.rounds} round${stats.rounds === 1 ? "" : "s"}, ${stats.categories} categor${stats.categories === 1 ? "y" : "ies"}, ${stats.questions} question${stats.questions === 1 ? "" : "s"}.`
+        : "Use Sample Board, Blank Game, the Builder, or paste JSON.";
+      const meter = $("#setupMeter");
+      meter.replaceChildren();
+      meter.append(
+        el("span", { class: "pill", text: hasQuestions ? "Questions ready" : "Needs questions" }),
+        el("span", { class: "pill", text: `${state.teams.length} teams` }),
+        el("span", { class: "pill", text: state.settings.projectorEnabled ? "Projector on" : "Projector off" })
+      );
+    }
+
     function parseQuestionJson(raw) {
       const parsed = JSON.parse(raw);
       if (parsed && typeof parsed === "object" && Array.isArray(parsed.rounds)) {
@@ -1056,6 +1207,283 @@
         return { rounds: [normalizeRound({ title: "Round 1", categories: parsed }, 0)], teams: null };
       }
       throw new Error("Unsupported question JSON.");
+    }
+
+    function parseQuestionInput(raw) {
+      try {
+        return parseQuestionJson(raw);
+      } catch {
+        return parseSmartQuestionText(raw);
+      }
+    }
+
+    function parseSmartQuestionText(raw) {
+      const text = String(raw || "").replace(/\r/g, "").trim();
+      if (!text) throw new Error("No question text.");
+
+      const tableRows = parseQuestionTable(text);
+      if (tableRows.length) return rowsToRounds(tableRows);
+
+      const blockRows = parseQuestionBlocks(text);
+      if (blockRows.length) return rowsToRounds(blockRows);
+
+      throw new Error("Could not parse question text.");
+    }
+
+    function splitDelimitedLine(line) {
+      if (line.includes("\t")) return line.split("\t").map(part => part.trim()).filter(Boolean);
+      if (line.includes("|")) return line.split("|").map(part => part.trim()).filter(Boolean);
+      const csvParts = line.split(",").map(part => part.trim()).filter(Boolean);
+      return csvParts.length >= 4 ? csvParts : [];
+    }
+
+    function isHeaderRow(parts) {
+      const joined = parts.join(" ").toLowerCase();
+      return joined.includes("question") && joined.includes("answer");
+    }
+
+    function rowFromParts(parts, fallbackCategory = "General") {
+      if (parts.length < 3) return null;
+      const pointIndex = parts.findIndex(part => /^\$?\d{1,6}$/.test(part.trim()));
+      const categoryIndex = parts.findIndex(part => /category|topic|round/i.test(part));
+      if (isHeaderRow(parts)) return null;
+
+      let category = fallbackCategory;
+      let points = 100;
+      let question = "";
+      let answer = "";
+
+      if (parts.length >= 4) {
+        if (pointIndex >= 0) points = clampInt(parts[pointIndex], 100, 0, 999999);
+        const remaining = parts.filter((_, i) => i !== pointIndex);
+        if (categoryIndex >= 0 && categoryIndex !== pointIndex) {
+          category = parts[categoryIndex] || fallbackCategory;
+          const afterCategory = parts.filter((_, i) => i !== pointIndex && i !== categoryIndex);
+          question = afterCategory[0] || "";
+          answer = afterCategory.slice(1).join(" ") || "";
+        } else {
+          category = remaining[0] || fallbackCategory;
+          question = remaining[1] || "";
+          answer = remaining.slice(2).join(" ") || "";
+        }
+      } else {
+        question = parts[0] || "";
+        answer = parts[1] || "";
+        points = pointIndex >= 0 ? clampInt(parts[pointIndex], 100, 0, 999999) : 100;
+      }
+
+      if (!question || !answer) return null;
+      return { category, question, answer, points };
+    }
+
+    function parseQuestionTable(text) {
+      const rows = [];
+      let fallbackCategory = "General";
+      for (const line of text.split("\n").map(item => item.trim()).filter(Boolean)) {
+        const categoryMatch = line.match(/^category\s*[:\-]\s*(.+)$/i);
+        if (categoryMatch) {
+          fallbackCategory = categoryMatch[1].trim() || fallbackCategory;
+          continue;
+        }
+        const parts = splitDelimitedLine(line);
+        if (!parts.length) continue;
+        const row = rowFromParts(parts, fallbackCategory);
+        if (row) {
+          fallbackCategory = row.category;
+          rows.push(row);
+        }
+      }
+      return rows.length >= 1 ? rows : [];
+    }
+
+    function parseQuestionBlocks(text) {
+      const rows = [];
+      let category = "General";
+      let points = 100;
+      let question = "";
+      let answer = "";
+
+      function commit() {
+        if (!question.trim() || !answer.trim()) return;
+        rows.push({
+          category,
+          question: question.trim(),
+          answer: answer.trim(),
+          points: clampInt(points, 100, 0, 999999)
+        });
+        question = "";
+        answer = "";
+        points = 100;
+      }
+
+      for (const rawLine of text.split("\n")) {
+        const line = rawLine.trim();
+        if (!line) {
+          commit();
+          continue;
+        }
+        let match = line.match(/^category\s*[:\-]\s*(.+)$/i);
+        if (match) {
+          commit();
+          category = match[1].trim() || category;
+          continue;
+        }
+        match = line.match(/^(?:points?|value)\s*[:\-]\s*\$?(\d+)/i) || line.match(/^\$?(\d{2,6})\s*points?$/i);
+        if (match) {
+          points = clampInt(match[1], points, 0, 999999);
+          continue;
+        }
+        match = line.match(/^(?:q|question)\s*\d*\s*[:.)\-]\s*(.+)$/i);
+        if (match) {
+          commit();
+          question = match[1].trim();
+          continue;
+        }
+        match = line.match(/^(?:a|answer)\s*\d*\s*[:.)\-]\s*(.+)$/i);
+        if (match) {
+          answer = match[1].trim();
+          continue;
+        }
+        match = line.match(/^\$?(\d{2,6})\s*[:\-]\s*(.+?)\s*(?:\|\s*|=>\s*)(.+)$/);
+        if (match) {
+          commit();
+          points = clampInt(match[1], 100, 0, 999999);
+          question = match[2].trim();
+          answer = match[3].trim();
+          commit();
+          continue;
+        }
+        if (!question) question = line;
+        else if (!answer) answer = line;
+        else answer += ` ${line}`;
+      }
+      commit();
+      return rows;
+    }
+
+    function rowsToRounds(rows) {
+      const groups = new Map();
+      for (const row of rows) {
+        const category = String(row.category || "General").trim() || "General";
+        if (!groups.has(category)) groups.set(category, []);
+        groups.get(category).push({
+          question: row.question,
+          answer: row.answer,
+          points: row.points || ((groups.get(category).length + 1) * 100)
+        });
+      }
+      return {
+        rounds: [normalizeRound({
+          title: "Round 1",
+          categories: Object.fromEntries([...groups.entries()])
+        }, 0)],
+        teams: null
+      };
+    }
+
+    function loadParsedQuestions(parsed) {
+      state.rounds = parsed.rounds;
+      if (parsed.teams) {
+        state.teams = parsed.teams;
+        state.settings.teamCount = state.teams.length;
+        $("#teamCount").value = String(state.teams.length);
+      }
+      state.currentRoundIndex = 0;
+      state.currentPick = null;
+      undoStack = [];
+      clearTimer();
+      renderAll();
+      saveState();
+    }
+
+    function smartParsePaste({ openAfter = true } = {}) {
+      const raw = $("#jsonInput").value.trim();
+      if (!raw) {
+        alert("Paste questions first.");
+        $("#jsonInput").focus();
+        return false;
+      }
+      try {
+        const parsed = parseQuestionInput(raw);
+        loadParsedQuestions(parsed);
+        const stats = boardStats();
+        alert(`Loaded ${stats.questions} questions into ${stats.categories} categories.`);
+        if (openAfter) openBuilder();
+        return true;
+      } catch {
+        alert("I could not parse that yet. Try a table with Category | Points | Question | Answer, or Q:/A:/Points: blocks.");
+        return false;
+      }
+    }
+
+    function readUInt(view, offset, bytes) {
+      if (bytes === 2) return view.getUint16(offset, true);
+      return view.getUint32(offset, true);
+    }
+
+    function decodeXmlEntities(text) {
+      const box = document.createElement("textarea");
+      box.innerHTML = text;
+      return box.value;
+    }
+
+    async function inflateRaw(data) {
+      if (!("DecompressionStream" in window)) {
+        throw new Error("This browser cannot decompress docx files locally.");
+      }
+      const stream = new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+      return new Uint8Array(await new Response(stream).arrayBuffer());
+    }
+
+    async function extractDocxText(file) {
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const view = new DataView(bytes.buffer);
+      let eocd = -1;
+      for (let i = bytes.length - 22; i >= 0; i--) {
+        if (readUInt(view, i, 4) === 0x06054b50) {
+          eocd = i;
+          break;
+        }
+      }
+      if (eocd < 0) throw new Error("Could not read docx structure.");
+
+      const entries = readUInt(view, eocd + 10, 2);
+      let offset = readUInt(view, eocd + 16, 4);
+      let documentEntry = null;
+      const decoder = new TextDecoder();
+
+      for (let i = 0; i < entries; i++) {
+        if (readUInt(view, offset, 4) !== 0x02014b50) break;
+        const method = readUInt(view, offset + 10, 2);
+        const compressedSize = readUInt(view, offset + 20, 4);
+        const nameLength = readUInt(view, offset + 28, 2);
+        const extraLength = readUInt(view, offset + 30, 2);
+        const commentLength = readUInt(view, offset + 32, 2);
+        const localOffset = readUInt(view, offset + 42, 4);
+        const name = decoder.decode(bytes.slice(offset + 46, offset + 46 + nameLength));
+        if (name === "word/document.xml") {
+          documentEntry = { method, compressedSize, localOffset };
+          break;
+        }
+        offset += 46 + nameLength + extraLength + commentLength;
+      }
+
+      if (!documentEntry) throw new Error("No document text found in docx.");
+      const local = documentEntry.localOffset;
+      if (readUInt(view, local, 4) !== 0x04034b50) throw new Error("Could not read docx file entry.");
+      const localNameLength = readUInt(view, local + 26, 2);
+      const localExtraLength = readUInt(view, local + 28, 2);
+      const dataStart = local + 30 + localNameLength + localExtraLength;
+      const compressed = bytes.slice(dataStart, dataStart + documentEntry.compressedSize);
+      const xmlBytes = documentEntry.method === 0 ? compressed : await inflateRaw(compressed);
+      const xml = decoder.decode(xmlBytes);
+      return decodeXmlEntities(
+        xml
+          .replace(/<w:tab\/>/g, "\t")
+          .replace(/<w:br\/>/g, "\n")
+          .replace(/<\/w:p>/g, "\n")
+          .replace(/<[^>]+>/g, "")
+      ).replace(/\n{3,}/g, "\n\n").trim();
     }
 
     function exportQuestionsJson() {
@@ -1123,6 +1551,7 @@
       $("#titleScreen").classList.remove("hidden");
       $("#gameScreen").classList.add("hidden");
       closeStage();
+      updateSetupSummary();
     }
 
     function showGame() {
@@ -1137,6 +1566,7 @@
       renderBoard();
       renderHostPanel();
       renderStage();
+      updateSetupSummary();
       if (isHost) broadcast();
     }
 
@@ -1248,6 +1678,7 @@
       $("#pauseBtn").disabled = !controlsEnabled;
       $("#pauseBtn").textContent = state.timer.paused ? "Resume" : "Pause";
       $("#closeQuestionBtn").disabled = !controlsEnabled;
+      renderNextAction(details);
 
       const awards = $("#awardButtons");
       awards.replaceChildren();
@@ -1256,6 +1687,48 @@
         button.disabled = !controlsEnabled || details.q.state !== "unplayed";
         awards.append(button);
       });
+    }
+
+    function renderNextAction(details) {
+      const button = $("#nextActionBtn");
+      const hint = $("#hostHint");
+      if (!button || !hint) return;
+      if (!details) {
+        button.textContent = "Open a tile";
+        button.disabled = true;
+        hint.textContent = "Pick a question on the board. The answer will appear here privately.";
+        return;
+      }
+      if (!details.q.projectorShown) {
+        button.textContent = "Reveal to Class";
+        button.disabled = false;
+        hint.textContent = "Students see the question. You can reveal the answer when ready.";
+        return;
+      }
+      if (details.q.state === "unplayed") {
+        const active = state.teams[state.activeTeamIndex]?.name || "active team";
+        button.textContent = `Award ${active}`;
+        button.disabled = false;
+        hint.textContent = "Use the team buttons for a different team, or mark No Team.";
+        return;
+      }
+      button.textContent = "Close Question";
+      button.disabled = false;
+      hint.textContent = "The score is recorded. Close this question and pick the next tile.";
+    }
+
+    function nextHostAction() {
+      const details = findQuestion();
+      if (!details) return;
+      if (!details.q.projectorShown) {
+        revealClass();
+        return;
+      }
+      if (details.q.state === "unplayed") {
+        award(state.activeTeamIndex);
+        return;
+      }
+      closeQuestion();
     }
 
     function renderStage() {
@@ -1428,6 +1901,7 @@
 
     function renderBuilder() {
       const body = $("#builderBody");
+      renderBuilderSummary();
       body.replaceChildren();
       const round = currentRound();
       const top = el("section", { class: "panel" });
@@ -1476,10 +1950,12 @@
           saveState();
         }});
         const addQ = el("button", { class: "primary", text: "Add Question", onclick: () => {
-          cat.questions.push(normalizeQuestion({ question: "New question", answer: "New answer", points: (cat.questions.length + 1) * 100 }));
+          const newQuestion = normalizeQuestion({ question: "", answer: "", points: (cat.questions.length + 1) * 100 });
+          cat.questions.push(newQuestion);
           renderBuilder();
           renderAll();
           saveState();
+          focusBuilderField(cat.id, newQuestion.id, "question");
         }});
         card.append(el("div", { class: "row" }, [
           el("div", { style: "flex:1 1 260px" }, [el("label", { text: "Category Name" }), nameInput]),
@@ -1490,9 +1966,21 @@
           const qInput = el("input", { value: q.question });
           const aInput = el("input", { value: q.answer });
           const pInput = el("input", { type: "number", min: "0", step: "50", value: String(q.points) });
+          qInput.dataset.catId = cat.id;
+          qInput.dataset.questionId = q.id;
+          qInput.dataset.field = "question";
+          aInput.dataset.catId = cat.id;
+          aInput.dataset.questionId = q.id;
+          aInput.dataset.field = "answer";
+          pInput.dataset.catId = cat.id;
+          pInput.dataset.questionId = q.id;
+          pInput.dataset.field = "points";
           qInput.addEventListener("input", () => { q.question = qInput.value; saveState(); broadcast(); });
           aInput.addEventListener("input", () => { q.answer = aInput.value; saveState(); broadcast(); });
           pInput.addEventListener("input", () => { q.points = clampInt(pInput.value, 0); renderBoard(); saveState(); broadcast(); });
+          [qInput, aInput, pInput].forEach(input => {
+            input.addEventListener("keydown", event => handleBuilderFieldKey(event, cat.id, q.id, input.dataset.field));
+          });
           const del = el("button", { class: "danger", text: "Delete", onclick: () => {
             cat.questions = cat.questions.filter(item => item.id !== q.id);
             renderBuilder();
@@ -1508,6 +1996,86 @@
         });
         body.append(card);
       }
+    }
+
+    function renderBuilderSummary() {
+      const summary = $("#builderSummary");
+      if (!summary) return;
+      const stats = boardStats();
+      const current = currentRound();
+      const currentQuestions = current.categories.reduce((sum, cat) => sum + cat.questions.length, 0);
+      summary.replaceChildren(
+        el("span", { class: "pill", text: `${stats.rounds} rounds` }),
+        el("span", { class: "pill", text: `${stats.categories} categories` }),
+        el("span", { class: "pill", text: `${stats.questions} questions total` }),
+        el("span", { class: "pill", text: `${currentQuestions} in this round` }),
+        el("span", { class: "builder-help", text: "Enter moves question -> answer -> points -> next row. Ctrl+Enter adds a row." })
+      );
+    }
+
+    function focusBuilderField(categoryId, questionId, field) {
+      requestAnimationFrame(() => {
+        const input = $(`#builder input[data-cat-id="${categoryId}"][data-question-id="${questionId}"][data-field="${field}"]`);
+        if (!input) return;
+        input.focus();
+        input.select?.();
+      });
+    }
+
+    function focusAdjacentBuilderField(categoryId, questionId, field, direction) {
+      const fields = ["question", "answer", "points"];
+      const round = currentRound();
+      const catIndex = round.categories.findIndex(item => item.id === categoryId);
+      const cat = round.categories[catIndex];
+      const qIndex = cat?.questions.findIndex(item => item.id === questionId) ?? -1;
+      const fieldIndex = fields.indexOf(field);
+      if (!cat || qIndex < 0 || fieldIndex < 0) return;
+
+      let nextCat = cat;
+      let nextQuestion = cat.questions[qIndex];
+      let nextFieldIndex = fieldIndex + direction;
+
+      if (nextFieldIndex >= fields.length) {
+        nextFieldIndex = 0;
+        nextQuestion = cat.questions[qIndex + 1];
+        if (!nextQuestion) {
+          nextQuestion = normalizeQuestion({ question: "", answer: "", points: (qIndex + 2) * 100 });
+          cat.questions.push(nextQuestion);
+          renderBuilder();
+          renderBoard();
+          saveState();
+          broadcast();
+        }
+      }
+
+      if (nextFieldIndex < 0) {
+        nextFieldIndex = fields.length - 1;
+        nextQuestion = cat.questions[qIndex - 1];
+        if (!nextQuestion && catIndex > 0) {
+          nextCat = round.categories[catIndex - 1];
+          nextQuestion = nextCat.questions[nextCat.questions.length - 1];
+        }
+      }
+
+      if (nextQuestion) focusBuilderField(nextCat.id, nextQuestion.id, fields[nextFieldIndex]);
+    }
+
+    function handleBuilderFieldKey(event, categoryId, questionId, field) {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      const cat = currentRound().categories.find(item => item.id === categoryId);
+      if (!cat) return;
+      if (event.ctrlKey || event.metaKey) {
+        const newQuestion = normalizeQuestion({ question: "", answer: "", points: (cat.questions.length + 1) * 100 });
+        cat.questions.push(newQuestion);
+        renderBuilder();
+        renderBoard();
+        saveState();
+        broadcast();
+        focusBuilderField(categoryId, newQuestion.id, "question");
+        return;
+      }
+      focusAdjacentBuilderField(categoryId, questionId, field, event.shiftKey ? -1 : 1);
     }
 
     function openBuilder() {
@@ -1536,9 +2104,50 @@
     }
 
     function addCategory() {
-      currentRound().categories.push(makeCategory(`Category ${currentRound().categories.length + 1}`, [
-        { question: "New question", answer: "New answer", points: 100 }
-      ]));
+      const newCategory = makeCategory(`Category ${currentRound().categories.length + 1}`, [
+        { question: "", answer: "", points: 100 }
+      ]);
+      currentRound().categories.push(newCategory);
+      renderBuilder();
+      renderAll();
+      saveState();
+      focusBuilderField(newCategory.id, newCategory.questions[0].id, "question");
+    }
+
+    function addFullCategory() {
+      const round = currentRound();
+      const nextName = `Category ${round.categories.length + 1}`;
+      const newCategory = makeCategory(nextName, [100, 200, 300, 400, 500].map(points => ({
+        question: "",
+        answer: "",
+        points
+      })));
+      round.categories.push(newCategory);
+      renderBuilder();
+      renderAll();
+      saveState();
+      focusBuilderField(newCategory.id, newCategory.questions[0].id, "question");
+    }
+
+    function addStandardBoard() {
+      if (boardStats().questions > 0 && !confirm("Replace the current board with a standard 5-category board?")) return;
+      state.rounds = [
+        normalizeRound({
+          title: "Round 1",
+          categories: Object.fromEntries(["Category 1", "Category 2", "Category 3", "Category 4", "Category 5"].map(name => [
+            name,
+            [100, 200, 300, 400, 500].map(points => ({
+              question: `${name} ${points}`,
+              answer: "New answer",
+              points
+            }))
+          ]))
+        }, 0)
+      ];
+      state.currentRoundIndex = 0;
+      state.currentPick = null;
+      undoStack = [];
+      clearTimer();
       renderBuilder();
       renderAll();
       saveState();
@@ -1683,6 +2292,18 @@
     }
 
     function wireHost() {
+      ["teamCount", "gameMode", "timerDefault", "autosaveToggle", "projectorToggle", "safeModeToggle"].forEach(id => {
+        $(`#${id}`).addEventListener("change", () => {
+          setTeamCount($("#teamCount").value);
+          state.settings.mode = $("#gameMode").value;
+          state.settings.timerDefault = clampInt($("#timerDefault").value, state.settings.timerDefault, 1, 240);
+          if (!state.currentPick) state.timer.timeLeft = state.settings.timerDefault;
+          state.settings.autosave = $("#autosaveToggle").checked;
+          state.settings.projectorEnabled = $("#projectorToggle").checked;
+          state.settings.safeMode = $("#safeModeToggle").checked;
+          updateSetupSummary();
+        });
+      });
       $("#saveSlotSelect").addEventListener("change", () => {
         loadSlot($("#saveSlotSelect").value);
         renderAll();
@@ -1697,11 +2318,62 @@
         await copyToClipboard(jsonTemplate());
         alert("Template copied.");
       });
+      $("#smartParseBtn").addEventListener("click", () => smartParsePaste({ openAfter: true }));
+      $("#uploadQuestionsBtn").addEventListener("click", () => $("#questionFileInput").click());
+      $("#questionFileInput").addEventListener("change", event => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        const isDocx = /\.docx$/i.test(file.name);
+        if (isDocx) {
+          extractDocxText(file)
+            .then(text => {
+              $("#jsonInput").value = text;
+              smartParsePaste({ openAfter: true });
+            })
+            .catch(() => {
+              alert("This browser could not read the Word doc directly. Open it in Word or Google Docs, copy the questions, and paste them here.");
+            });
+        } else {
+          const reader = new FileReader();
+          reader.onload = () => {
+            $("#jsonInput").value = String(reader.result || "");
+            smartParsePaste({ openAfter: true });
+          };
+          reader.readAsText(file);
+        }
+        event.target.value = "";
+      });
+      $("#blankGameBtn").addEventListener("click", () => {
+        if (boardStats().questions > 0 && !confirm("Start a blank board in this slot?")) return;
+        state.rounds = blankRounds();
+        state.currentRoundIndex = 0;
+        state.currentPick = null;
+        undoStack = [];
+        clearTimer();
+        renderAll();
+        saveState();
+      });
+      $("#sampleBoardBtn").addEventListener("click", () => {
+        if (boardStats().questions > 0 && !confirm("Replace the current board with a sample board?")) return;
+        state.rounds = sampleRounds();
+        state.currentRoundIndex = 0;
+        state.currentPick = null;
+        undoStack = [];
+        clearTimer();
+        renderAll();
+        saveState();
+      });
+      $("#fillTemplateBtn").addEventListener("click", () => {
+        $("#jsonInput").value = jsonTemplate();
+        $("#jsonInput").focus();
+      });
       $("#openBuilderFromTitle").addEventListener("click", openBuilder);
       $("#openBuilderBtn").addEventListener("click", openBuilder);
       $("#closeBuilderBtn").addEventListener("click", closeBuilder);
       $("#addRoundBtn").addEventListener("click", addRound);
+      $("#addStandardBoardBtn").addEventListener("click", addStandardBoard);
       $("#addCategoryBtn").addEventListener("click", addCategory);
+      $("#addFullCategoryBtn").addEventListener("click", addFullCategory);
       $("#builderCopyJsonBtn").addEventListener("click", async () => {
         await copyToClipboard(exportQuestionsJson());
         alert("JSON copied.");
@@ -1732,17 +2404,10 @@
         const raw = $("#jsonInput").value.trim();
         if (raw) {
           try {
-            const parsed = parseQuestionJson(raw);
-            state.rounds = parsed.rounds;
-            if (parsed.teams) {
-              state.teams = parsed.teams;
-              state.settings.teamCount = state.teams.length;
-            }
-            state.currentRoundIndex = 0;
-            state.currentPick = null;
-            undoStack = [];
+            const parsed = parseQuestionInput(raw);
+            loadParsedQuestions(parsed);
           } catch {
-            alert("That JSON did not load. Check the format and try again.");
+            alert("That question text did not load. Try JSON, a table, or Q:/A:/Points: blocks.");
             return;
           }
         }
@@ -1761,6 +2426,7 @@
       $("#undoBtn").addEventListener("click", undo);
       $("#titleBtn").addEventListener("click", showTitle);
       $("#revealClassBtn").addEventListener("click", revealClass);
+      $("#nextActionBtn").addEventListener("click", nextHostAction);
       $("#hideClassBtn").addEventListener("click", hideClassAnswer);
       $("#noTeamBtn").addEventListener("click", noTeam);
       $("#pauseBtn").addEventListener("click", pauseTimer);
