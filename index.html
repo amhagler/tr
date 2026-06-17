@@ -2,1024 +2,622 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>GEFFEN BOWL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GEFFEN BOWL Classroom</title>
   <style>
-    :root{
-      --bg0:#070B1A;
-      --bg1:#0B1230;
-      --panel:#0C1638;
-
-      --electric:#2D7DFF;
-      --electric2:#1E5BFF;
-
-      --gold:#FFE066;     /* brighter */
-      --gold2:#FFB700;    /* hotter */
-      --red:#FF5A5A;
-
-      --ink:#EAF0FF;
-      --muted:#B7C2E6;
-
-      --shadow: 0 18px 60px rgba(0,0,0,.55);
-      --shadow2: 0 10px 28px rgba(0,0,0,.35);
-
-      --radius: 18px;
-      --radius2: 26px;
-
-      --ring: 0 0 0 2px rgba(45,125,255,.35), 0 0 0 6px rgba(255,224,102,.14);
-
-      --cell-min-h: 76px;
-      --maxw: 1200px;
+    :root {
+      --bg: #050812;
+      --bg-soft: #0b1224;
+      --panel: #101a31;
+      --panel-2: #14203b;
+      --tile: #123980;
+      --tile-2: #0f2e69;
+      --gold: #ffd84d;
+      --gold-2: #f4a900;
+      --ink: #f3f6ff;
+      --muted: #aebbe0;
+      --line: rgba(255,255,255,.12);
+      --line-strong: rgba(255,255,255,.22);
+      --danger: #ff6767;
+      --ok: #64d68a;
+      --blue: #3d8cff;
+      --shadow: 0 18px 52px rgba(0,0,0,.46);
+      --radius: 12px;
+      --maxw: 1260px;
     }
 
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
-
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
       color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       background:
-        radial-gradient(1200px 700px at 20% -10%, rgba(45,125,255,.25), transparent 60%),
-        radial-gradient(900px 600px at 90% 10%, rgba(255,183,0,.18), transparent 55%),
-        radial-gradient(1200px 900px at 50% 120%, rgba(45,125,255,.18), transparent 60%),
-        linear-gradient(180deg, var(--bg0), var(--bg1));
-      overflow-x:hidden;
+        radial-gradient(1100px 620px at 20% -8%, rgba(61,140,255,.20), transparent 55%),
+        radial-gradient(900px 520px at 80% 0%, rgba(255,216,77,.13), transparent 52%),
+        linear-gradient(180deg, var(--bg), var(--bg-soft));
+      overflow-x: hidden;
     }
 
-    /* -------------------------
-       1993 Title Screen
-    -------------------------- */
-    #titleScreen{
-      position:relative;
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-    }
-
-    #starfield, #starfield2{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      display:block;
-    }
-
-    .crt{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      background:
-        repeating-linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.03) 1px, transparent 1px, transparent 3px);
-      mix-blend-mode: overlay;
-      opacity:.30;
-      filter: blur(.2px);
-    }
-
-    .vignette{
-      position:absolute;
-      inset:-2px;
-      pointer-events:none;
-      background: radial-gradient(1200px 700px at 50% 35%, transparent 55%, rgba(0,0,0,.55));
-      opacity:.9;
-    }
-
-    .title-card{
-      position:relative;
-      width:min(980px, 92vw);
-      padding: 26px 22px 20px;
-      border-radius: 26px;
-      background:
-        radial-gradient(520px 240px at 20% 20%, rgba(255,224,102,.20), transparent 60%),
-        radial-gradient(540px 260px at 80% 35%, rgba(45,125,255,.22), transparent 62%),
-        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      border: 1px solid rgba(255,255,255,.14);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-      text-align:center;
-    }
-
-    .logo{
-      font-weight: 1000;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-      font-size: clamp(30px, 4.2vw, 54px);
-      margin: 4px 0 6px;
-      text-shadow:
-        0 18px 60px rgba(0,0,0,.65),
-        0 0 26px rgba(45,125,255,.25),
-        0 0 42px rgba(255,224,102,.16);
-    }
-
-    .tagline{
-      color: var(--muted);
-      letter-spacing:.10em;
-      text-transform: uppercase;
-      font-weight: 900;
-      font-size: 12px;
-      margin-bottom: 14px;
-    }
-
-    .glowbar{
-      width:min(720px, 86vw);
-      margin: 10px auto 18px;
-      height: 2px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, transparent, rgba(45,125,255,.55), rgba(255,224,102,.70), rgba(45,125,255,.55), transparent);
-      filter: drop-shadow(0 0 14px rgba(255,224,102,.18));
-      opacity:.95;
-    }
-
-    .title-grid{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 14px;
-      align-items: start;
-    }
-
-    @media (max-width: 860px){
-      .title-grid{ grid-template-columns: 1fr; }
-    }
-
-    .panel{
-      border-radius: 20px;
-      padding: 14px 14px;
-      background: rgba(0,0,0,.28);
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: var(--shadow2);
-      text-align:left;
-    }
-
-    .panel h3{
-      margin: 0 0 10px;
-      font-size: 12px;
-      letter-spacing:.14em;
-      text-transform: uppercase;
-      color: var(--gold);
-      font-weight: 950;
-    }
-
-    .row{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items:center;
-      justify-content:flex-start;
-    }
-
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      min-width: 180px;
-      flex: 1;
-    }
-
-    label{
-      font-size: 11px;
-      letter-spacing:.08em;
-      text-transform: uppercase;
-      color: rgba(183,194,230,.95);
-      font-weight: 900;
-    }
-
-    select, input[type="number"], input[type="text"], textarea{
-      width:100%;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
+    button, input, select, textarea { font: inherit; }
+    button {
+      border: 1px solid var(--line);
+      border-radius: 10px;
       color: var(--ink);
-      padding: 10px 10px;
-      outline:none;
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+      padding: 10px 13px;
       font-weight: 800;
-      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(0,0,0,.24);
+      min-height: 40px;
     }
-    select:focus, input:focus, textarea:focus{ box-shadow: var(--shadow2), var(--ring); border-color: rgba(45,125,255,.55); }
-
-    .toggles{
-      display:flex;
-      gap: 10px;
-      flex-wrap:wrap;
-      margin-top: 8px;
+    button:hover { border-color: rgba(61,140,255,.55); transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid rgba(255,216,77,.45);
+      outline-offset: 2px;
     }
+    button[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
 
-    .toggle{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 16px;
+    .primary {
+      background: linear-gradient(180deg, var(--gold), var(--gold-2));
+      border-color: rgba(255,216,77,.72);
+      color: #080b14;
+    }
+    .danger {
+      background: linear-gradient(180deg, rgba(255,103,103,.28), rgba(255,103,103,.10));
+      border-color: rgba(255,103,103,.42);
+    }
+    .ghost { box-shadow: none; background: rgba(255,255,255,.04); }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--ink);
       background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.12);
-      cursor:pointer;
-      user-select:none;
+      padding: 10px 11px;
+      font-weight: 700;
     }
-    .toggle:hover{ border-color: rgba(45,125,255,.45); }
-
-    .toggle input{ width:18px; height:18px; }
-
-    .title-actions{
-      display:flex;
-      gap: 10px;
-      flex-wrap:wrap;
-      justify-content:center;
-      margin-top: 14px;
-    }
-
-    button{
-      border:none;
-      cursor:pointer;
-      padding: 11px 16px;
-      border-radius: 999px;
-      color: var(--ink);
-      font-weight: 950;
-      letter-spacing: .02em;
-      background:
-        radial-gradient(150px 90px at 20% 20%, rgba(45,125,255,.25), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: 0 10px 24px rgba(0,0,0,.35);
-      transition: transform .12s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease, filter .2s ease;
-      user-select:none;
-    }
-    button:hover{
-      transform: translateY(-1px);
-      border-color: rgba(45,125,255,.55);
-      box-shadow: 0 14px 30px rgba(0,0,0,.42);
-    }
-    button:active{ transform: translateY(0px) scale(.99); }
-
-    .btn-gold{
-      background:
-        radial-gradient(160px 100px at 20% 20%, rgba(255,224,102,.65), transparent 60%),
-        linear-gradient(180deg, rgba(255,224,102,.42), rgba(255,255,255,.06));
-      border-color: rgba(255,224,102,.55);
-      color: #070B1A;
-      text-shadow:none;
-    }
-    .btn-danger{
-      background:
-        radial-gradient(160px 100px at 20% 20%, rgba(255,90,90,.25), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
-      border-color: rgba(255,90,90,.40);
-    }
-
-    .tiny{
+    textarea { min-height: 132px; resize: vertical; line-height: 1.45; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
       font-size: 12px;
-      color: rgba(183,194,230,.92);
-      line-height: 1.35;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
     }
-    .tiny kbd{
-      display:inline-block;
-      padding: 2px 7px;
-      border-radius: 8px;
-      background: rgba(0,0,0,.35);
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow: 0 10px 22px rgba(0,0,0,.18);
-      font-weight: 950;
+
+    .screen { min-height: 100vh; }
+    .hidden { display: none !important; }
+    .shell { max-width: var(--maxw); margin: 0 auto; padding: 18px; }
+
+    .title-screen {
+      position: relative;
+      display: grid;
+      place-items: center;
+      padding: 28px 16px;
+      min-height: 100vh;
+    }
+    #stars {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: .78;
+    }
+    .title-card {
+      position: relative;
+      width: min(1060px, 94vw);
+      border: 1px solid var(--line-strong);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(16,26,49,.88), rgba(8,13,27,.92));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .title-head {
+      padding: 28px 24px 18px;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(90deg, rgba(255,216,77,.18), transparent 34%),
+        linear-gradient(180deg, rgba(255,255,255,.08), transparent);
+    }
+    .logo {
+      margin: 0;
+      font-size: clamp(36px, 5vw, 74px);
+      letter-spacing: .10em;
+      line-height: .94;
+      font-weight: 1000;
+      text-transform: uppercase;
+      text-shadow: 0 16px 42px rgba(0,0,0,.62);
+    }
+    .tagline {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+    .setup-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      padding: 18px;
+    }
+    @media (max-width: 880px) {
+      .setup-grid { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: rgba(0,0,0,.22);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: 0 12px 26px rgba(0,0,0,.24);
+    }
+    .panel h2, .panel h3 {
+      margin: 0 0 12px;
+      color: var(--gold);
+      font-size: 13px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    @media (max-width: 720px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .stack { display: grid; gap: 10px; }
+    .muted { color: var(--muted); }
+    .tiny { color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .checks { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .check {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px 10px;
+      background: rgba(255,255,255,.05);
+      font-weight: 800;
       color: var(--ink);
-      margin: 0 4px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      cursor: pointer;
     }
+    .check input { width: 17px; height: 17px; }
 
-    /* -------------------------
-       Game Screen
-    -------------------------- */
-    #gameScreen{
-      display:none;
-      min-height:100vh;
-    }
-
-    header.game{
+    .game-header {
       position: sticky;
       top: 0;
-      z-index: 5;
-      padding: 16px 16px 10px;
-      background: linear-gradient(180deg, rgba(11,18,48,.92), rgba(11,18,48,.55));
+      z-index: 10;
+      border-bottom: 1px solid var(--line);
+      background: rgba(7,11,24,.88);
       backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255,255,255,.08);
     }
-
-    .topbar{
+    .topbar {
       max-width: var(--maxw);
       margin: 0 auto;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 12px;
-      flex-wrap:wrap;
+      padding: 12px 18px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
     }
-
-    .brand{
-      display:flex;
-      flex-direction:column;
-      gap: 4px;
-      text-align:left;
+    .brand {
+      display: grid;
+      gap: 2px;
+      min-width: 240px;
     }
-
-    .brand .h{
-      font-weight: 1000;
-      letter-spacing: .18em;
+    .brand strong {
+      letter-spacing: .12em;
       text-transform: uppercase;
-      margin:0;
       font-size: 18px;
-      text-shadow: 0 12px 40px rgba(0,0,0,.55);
+    }
+    .brand span { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .header-actions { display: flex; flex-wrap: wrap; gap: 9px; justify-content: flex-end; }
+    .projector .host-only { display: none !important; }
+
+    .status-strip {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 0 18px 12px;
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 10px;
+      color: var(--muted);
+      background: rgba(0,0,0,.24);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .pill strong { color: var(--ink); }
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--danger);
+      box-shadow: 0 0 18px rgba(255,103,103,.38);
+    }
+    .dot.ok {
+      background: var(--ok);
+      box-shadow: 0 0 18px rgba(100,214,138,.38);
     }
 
-    .brand .s{
-      font-size: 11px;
-      letter-spacing:.08em;
-      text-transform: uppercase;
+    .game-layout {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 16px 18px 70px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 330px;
+      gap: 16px;
+      align-items: start;
+    }
+    .projector .game-layout {
+      display: block;
+      max-width: 1500px;
+      padding: 22px;
+    }
+    @media (max-width: 980px) {
+      .game-layout { grid-template-columns: 1fr; }
+    }
+
+    .scoreboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .team {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.035));
+      padding: 11px;
+      min-height: 86px;
+      display: grid;
+      gap: 6px;
+      align-content: center;
+      cursor: pointer;
+    }
+    .projector .team { cursor: default; min-height: 106px; }
+    .team.active {
+      border-color: rgba(255,216,77,.70);
+      box-shadow: inset 0 0 0 1px rgba(255,216,77,.28), 0 14px 28px rgba(0,0,0,.28);
+    }
+    .team-name {
       color: var(--muted);
       font-weight: 900;
-    }
-
-    .header-controls{
-      display:flex;
-      gap: 10px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:flex-end;
-    }
-
-    .teams{
-      max-width: var(--maxw);
-      margin: 12px auto 0;
-      display:flex;
-      justify-content:center;
-      gap: clamp(10px, 2vw, 14px);
-      flex-wrap:wrap;
-    }
-
-    .team{
-      width: 210px;
-      height: 116px;
-      border-radius: 22px;
-      background:
-        radial-gradient(160px 100px at 30% 15%, rgba(255,224,102,.16), transparent 60%),
-        radial-gradient(220px 120px at 60% 80%, rgba(45,125,255,.16), transparent 55%),
-        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow: var(--shadow2);
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      gap: 8px;
-      cursor:pointer;
-      transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
-      user-select:none;
-      position:relative;
-    }
-    .team:hover{
-      transform: translateY(-1px);
-      border-color: rgba(45,125,255,.35);
-      box-shadow: 0 16px 40px rgba(0,0,0,.45);
-    }
-    .team.active{
-      box-shadow: var(--shadow), 0 0 0 2px rgba(45,125,255,.35), 0 0 40px rgba(45,125,255,.22);
-      border-color: rgba(45,125,255,.55);
-      transform: translateY(-2px);
-    }
-
-    .editable{
-      outline:none;
-      display:inline-block;
-      cursor:text;
-      padding: 2px 6px;
-      border-radius: 10px;
-    }
-    .editable:hover{
-      background: rgba(255,255,255,.06);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
-    }
-
-    .team .name{
-      font-weight: 950;
-      letter-spacing:.04em;
-      font-size: 16px;
-      max-width: 188px;
       white-space: nowrap;
-      overflow:hidden;
+      overflow: hidden;
       text-overflow: ellipsis;
     }
-
-    .team .score{
-      font-weight: 1000;
-      font-size: 32px;
+    .team-score {
+      color: var(--gold);
+      font-size: 34px;
       line-height: 1;
-      color: var(--gold);
-      text-shadow:
-        0 14px 40px rgba(0,0,0,.60),
-        0 0 22px rgba(255,183,0,.30),
-        0 0 44px rgba(255,224,102,.18);
-      padding: 4px 10px;
-      border-radius: 14px;
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.08);
-      min-width: 92px;
-      text-align:center;
-    }
-
-    main{
-      padding: 16px 16px 64px;
-      max-width: var(--maxw);
-      margin: 0 auto;
-    }
-
-    .boardWrap{
-      margin-top: 14px;
-    }
-
-    .roundBanner{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      flex-wrap:wrap;
-      margin: 10px 0 10px;
-    }
-
-    .roundPill{
-      display:inline-flex;
-      align-items:center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 999px;
-      background: rgba(0,0,0,.30);
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow: 0 10px 24px rgba(0,0,0,.30);
-      color: var(--muted);
-      font-weight: 950;
-      letter-spacing:.08em;
-      text-transform: uppercase;
-      font-size: 12px;
-      white-space:nowrap;
-    }
-    .roundPill strong{ color: var(--ink); letter-spacing:.02em; }
-
-    .winner{
-      display:none;
-      padding: 14px 14px;
-      border-radius: 18px;
-      background: rgba(0,0,0,.26);
-      border: 1px solid rgba(255,224,102,.22);
-      box-shadow: var(--shadow2);
-      font-size: 16px;
       font-weight: 1000;
-      letter-spacing:.02em;
-      color: var(--gold);
-      text-shadow: 0 14px 40px rgba(0,0,0,.60);
+      font-variant-numeric: tabular-nums;
     }
+    .projector .team-score { font-size: clamp(40px, 5vw, 72px); }
 
-    .board{
-      display:grid;
-      gap: 14px;
+    .board {
+      display: grid;
+      gap: 8px;
       width: 100%;
-      align-items: stretch;
     }
-
-    .cell{
-      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 16px;
-      box-shadow: 0 14px 30px rgba(0,0,0,.35);
-      padding: 14px 10px;
-      min-height: var(--cell-min-h);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease, filter .2s ease, opacity .2s ease;
-      user-select:none;
-      position:relative;
-      overflow:hidden;
+    .board-empty {
+      min-height: 340px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      border: 1px dashed var(--line-strong);
+      border-radius: var(--radius);
+      background: rgba(0,0,0,.18);
+      padding: 24px;
     }
-    .cell.clickable:hover{
-      transform: translateY(-2px);
-      border-color: rgba(45,125,255,.65);
-      box-shadow: 0 18px 40px rgba(0,0,0,.45), 0 0 34px rgba(45,125,255,.20);
-      cursor:pointer;
+    .cell {
+      min-height: 82px;
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 8px;
+      background: linear-gradient(180deg, var(--tile), var(--tile-2));
+      display: grid;
+      place-items: center;
+      padding: 10px;
+      box-shadow: 0 12px 26px rgba(0,0,0,.30);
+      position: relative;
+      overflow: hidden;
+      user-select: none;
     }
-
-    .cell .value{
+    .projector .cell { min-height: clamp(92px, 12vh, 150px); }
+    .cell.category {
+      min-height: 70px;
+      background: linear-gradient(180deg, var(--gold), var(--gold-2));
+      color: #090d18;
       font-weight: 1000;
-      font-size: clamp(22px, 2.6vw, 34px);
-      letter-spacing: .04em;
-      text-shadow: 0 14px 40px rgba(0,0,0,.55);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-size: clamp(12px, 1.3vw, 17px);
+    }
+    .cell.playable { cursor: pointer; }
+    .cell.playable:hover {
+      border-color: rgba(255,216,77,.70);
+      transform: translateY(-1px);
+      box-shadow: 0 16px 34px rgba(0,0,0,.36), 0 0 26px rgba(61,140,255,.22);
+    }
+    .projector .cell.playable { cursor: default; }
+    .value {
+      font-weight: 1000;
+      font-size: clamp(24px, 3.4vw, 46px);
+      color: var(--gold);
+      text-shadow: 0 10px 26px rgba(0,0,0,.55);
+    }
+    .cell.done, .cell.missed, .cell.expired {
+      opacity: .42;
+      filter: grayscale(.35) saturate(.45);
+    }
+    .cell.done::after, .cell.missed::after, .cell.expired::after {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 7px;
+      background: rgba(0,0,0,.35);
+      font-size: 10px;
+      font-weight: 1000;
+      letter-spacing: .08em;
       color: var(--ink);
     }
-
-    /* Category headers */
-    .cell.category{
-      background: linear-gradient(180deg, rgba(255,224,102,.98), rgba(255,183,0,.88));
-      border-color: rgba(255,224,102,.65);
-      cursor:default;
+    .cell.done::after { content: "DONE"; color: var(--gold); }
+    .cell.missed::after { content: "MISSED"; color: var(--danger); }
+    .cell.expired::after { content: "TIME"; color: var(--blue); }
+    .double .cell.playable::before {
+      content: "x2";
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      border: 1px solid rgba(255,216,77,.42);
+      border-radius: 999px;
+      padding: 4px 7px;
+      background: rgba(0,0,0,.32);
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 1000;
     }
-    .cell.category .cat{
+
+    .host-panel {
+      position: sticky;
+      top: 116px;
+      display: grid;
+      gap: 12px;
+    }
+    @media (max-width: 980px) {
+      .host-panel { position: static; }
+    }
+    .private-answer {
+      border-color: rgba(255,216,77,.28);
+      background: linear-gradient(180deg, rgba(255,216,77,.10), rgba(0,0,0,.22));
+    }
+    .answer-box {
+      min-height: 78px;
+      color: var(--ink);
+      font-size: 20px;
+      line-height: 1.25;
+      font-weight: 900;
+      word-break: break-word;
+    }
+    .current-question {
+      min-height: 90px;
+      font-size: 16px;
+      line-height: 1.36;
+      color: var(--muted);
+    }
+    .timer-large {
+      color: var(--gold);
+      font-size: 54px;
+      line-height: 1;
+      font-weight: 1000;
+      font-variant-numeric: tabular-nums;
+      text-align: center;
+      padding: 10px;
+      border-radius: 10px;
+      background: rgba(0,0,0,.28);
+      border: 1px solid var(--line);
+    }
+    .timer-large.low { color: var(--danger); animation: pulse .8s infinite ease-in-out; }
+    @keyframes pulse { 50% { transform: scale(1.04); } }
+
+    .modal-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,.72);
+      backdrop-filter: blur(7px);
+      padding: 18px;
+    }
+    .modal-layer.show { display: flex; }
+    .question-stage {
+      width: min(1100px, 96vw);
+      min-height: min(720px, 84vh);
+      border: 1px solid var(--line-strong);
+      border-radius: 16px;
+      background:
+        linear-gradient(180deg, rgba(18,32,61,.98), rgba(5,8,18,.98));
+      box-shadow: var(--shadow);
+      padding: clamp(18px, 3vw, 34px);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+    }
+    .stage-top {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .stage-question {
+      display: grid;
+      place-items: center;
+      text-align: center;
+      min-height: 260px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(0,0,0,.30);
+      padding: 24px;
+      font-size: clamp(34px, 5.4vw, 78px);
+      line-height: 1.08;
+      font-weight: 1000;
+      text-shadow: 0 18px 48px rgba(0,0,0,.58);
+      word-break: break-word;
+    }
+    .stage-answer {
+      min-height: 86px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      border: 1px solid rgba(255,216,77,.34);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,216,77,.15), rgba(0,0,0,.32));
+      color: var(--gold);
+      padding: 16px;
+      font-size: clamp(24px, 3.4vw, 44px);
+      font-weight: 1000;
+      word-break: break-word;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity .22s ease, transform .22s ease;
+    }
+    .stage-answer.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .stage-bottom {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .stage-timer {
+      color: var(--gold);
+      font-size: clamp(42px, 6vw, 86px);
+      font-weight: 1000;
+      font-variant-numeric: tabular-nums;
+      min-width: 130px;
+      text-align: center;
+    }
+    .stage-timer.low { color: var(--danger); animation: pulse .8s infinite ease-in-out; }
+    .time-up {
+      color: var(--danger);
+      font-size: clamp(32px, 5vw, 72px);
       font-weight: 1000;
       letter-spacing: .12em;
       text-transform: uppercase;
-      font-size: 13px;
-      color: #070B1A;
-      text-shadow:none;
-      line-height: 1.2;
-      text-align:center;
     }
 
-    /* States: MORE obvious */
-    .cell.answered{
-      opacity: .30;
-      filter: grayscale(.2) saturate(.25);
-      background: linear-gradient(180deg, rgba(255,224,102,.20), rgba(255,255,255,.04));
-      border-color: rgba(255,224,102,.22);
-      cursor:default;
-    }
-    .cell.missed{
-      opacity: .28;
-      filter: grayscale(.35) saturate(.20);
-      background: linear-gradient(180deg, rgba(255,90,90,.18), rgba(255,255,255,.03));
-      border-color: rgba(255,90,90,.22);
-      cursor:default;
-    }
-    .cell.expired{
-      opacity: .26;
-      filter: grayscale(.45) saturate(.18);
-      background: linear-gradient(180deg, rgba(45,125,255,.12), rgba(255,255,255,.02));
-      border-color: rgba(45,125,255,.18);
-      cursor:default;
-    }
-
-    /* Stamps */
-    .cell.answered::after,
-    .cell.missed::after,
-    .cell.expired::after{
-      position:absolute;
-      inset:auto 10px 10px auto;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-weight: 1000;
-      letter-spacing:.12em;
-      text-transform: uppercase;
-      font-size: 11px;
-      color: rgba(234,240,255,.92);
-      background: rgba(0,0,0,.35);
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: 0 10px 24px rgba(0,0,0,.30);
-    }
-    .cell.answered::after{ content:"DONE"; border-color: rgba(255,224,102,.28); color: rgba(255,224,102,.95); }
-    .cell.missed::after{ content:"MISSED"; border-color: rgba(255,90,90,.26); color: rgba(255,90,90,.95); }
-    .cell.expired::after{ content:"TIME"; border-color: rgba(45,125,255,.24); color: rgba(45,125,255,.95); }
-
-    /* Double mode badge */
-    .double-on .cell.clickable::before{
-      content:"×2";
-      position:absolute;
-      top:10px;
-      right:12px;
-      font-weight: 1000;
-      font-size: 12px;
-      letter-spacing:.10em;
-      color: rgba(255,224,102,.98);
-      background: rgba(0,0,0,.28);
-      border: 1px solid rgba(255,224,102,.35);
-      padding: 4px 8px;
-      border-radius: 999px;
-      box-shadow: 0 10px 25px rgba(0,0,0,.35);
-    }
-
-    /* -------------------------
-       Backdrop + Modal
-    -------------------------- */
-    .backdrop{
-      display:none;
-      position:fixed;
-      inset:0;
-      background: radial-gradient(1000px 700px at 50% 20%, rgba(45,125,255,.18), rgba(0,0,0,.72));
-      backdrop-filter: blur(6px);
-      z-index: 20;
-    }
-    .backdrop.show{ display:block; }
-
-    .modal{
-      display:none;
+    .builder {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(.96);
-      width: min(980px, 94vw);
-      height: min(74vh, 720px);
-      background: linear-gradient(180deg, rgba(10,16,40,.98), rgba(7,11,26,.98));
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: 26px;
-      box-shadow: var(--shadow), 0 0 60px rgba(45,125,255,.14);
-      z-index: 25;
-      padding: 18px 18px 16px;
-      overflow:hidden;
-      text-align:center;
-    }
-    .modal.show{
-      display:block;
-      animation: popIn .18s ease-out forwards;
-    }
-    @keyframes popIn{
-      from{ transform: translate(-50%, -50%) scale(.92); opacity:0; }
-      to{ transform: translate(-50%, -50%) scale(1); opacity:1; }
-    }
-
-    .qa-top{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap: 10px;
-      padding: 2px 4px 10px;
-      color: var(--muted);
-      font-weight: 1000;
-      letter-spacing:.08em;
-      text-transform: uppercase;
-      font-size: 12px;
-      flex-wrap:wrap;
-    }
-
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(0,0,0,.35);
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow: 0 10px 24px rgba(0,0,0,.30);
-      color: var(--muted);
-      white-space: nowrap;
-    }
-    .pill strong{ color: var(--ink); letter-spacing:.02em; }
-
-    .vis{
-      display:flex;
-      gap: 8px;
-      flex-wrap:wrap;
-      justify-content:center;
-    }
-    .vis .pill{
-      padding: 7px 10px;
-      font-size: 11px;
-    }
-    .vis .ok{ border-color: rgba(255,224,102,.22); color: rgba(255,224,102,.95); }
-    .vis .no{ border-color: rgba(255,90,90,.18); color: rgba(183,194,230,.95); opacity:.9; }
-
-    .question{
-      font-size: clamp(24px, 3.2vw, 46px);
-      font-weight: 1000;
-      letter-spacing: .01em;
-      line-height: 1.12;
-      margin: 10px auto 0;
-      max-width: 920px;
-      text-shadow: 0 18px 60px rgba(0,0,0,.70);
-      padding: 18px 18px;
-      border-radius: 18px;
-      background: rgba(0,0,0,.40);
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: 0 18px 55px rgba(0,0,0,.45);
-    }
-
-    .answer{
-      font-size: clamp(18px, 2.2vw, 30px);
-      font-weight: 950;
-      letter-spacing: .01em;
-      margin: 16px auto 0;
-      max-width: 920px;
-      padding: 14px 14px;
-      border-radius: 18px;
-      background: rgba(0,0,0,.48);
-      border: 1px solid rgba(255,183,0,.24);
-      color: rgba(234,240,255,.95);
-      text-shadow: 0 14px 40px rgba(0,0,0,.65);
-      min-height: 56px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .answer.revealed{
-      box-shadow: 0 0 50px rgba(255,183,0,.18), 0 18px 55px rgba(0,0,0,.45);
-      border-color: rgba(255,183,0,.44);
-    }
-
-    .modal-controls{
-      position:absolute;
-      left: 0;
-      right: 0;
-      bottom: 104px;
-      padding: 0 18px;
-      display:flex;
-      flex-direction:column;
-      gap: 10px;
-      align-items:center;
-    }
-
-    .team-buttons{
-      display:flex;
-      gap: 10px;
-      justify-content:center;
-      flex-wrap:wrap;
-      width: 100%;
-    }
-
-    .team-button{
-      min-width: 220px;
-      font-size: 16px;
-      padding: 12px 16px;
-    }
-    .team-button.primary{
-      background:
-        radial-gradient(160px 100px at 20% 20%, rgba(255,224,102,.65), transparent 60%),
-        linear-gradient(180deg, rgba(255,224,102,.42), rgba(255,255,255,.06));
-      border-color: rgba(255,224,102,.55);
-      color: #070B1A;
-    }
-
-    .row-buttons{
-      display:flex;
-      gap: 10px;
-      justify-content:center;
-      flex-wrap:wrap;
-    }
-    .row-buttons button{ min-width: 160px; }
-
-    .timer{
-      position:absolute;
-      bottom: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: clamp(34px, 5vw, 70px);
-      font-weight: 1000;
-      letter-spacing:.06em;
-      color: var(--gold);
-      text-shadow:
-        0 18px 60px rgba(0,0,0,.65),
-        0 0 26px rgba(255,183,0,.35),
-        0 0 52px rgba(255,224,102,.22);
-      padding: 8px 18px;
-      border-radius: 999px;
-      background: rgba(0,0,0,.35);
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow: 0 14px 36px rgba(0,0,0,.38);
-      min-width: 120px;
-    }
-    .timer.low{
-      animation: pulse 0.8s infinite ease-in-out;
-      box-shadow: 0 0 60px rgba(255,183,0,.24), 0 18px 60px rgba(0,0,0,.60);
-    }
-    @keyframes pulse{
-      0%{ transform: translateX(-50%) scale(1); }
-      50%{ transform: translateX(-50%) scale(1.05); }
-      100%{ transform: translateX(-50%) scale(1); }
-    }
-
-    .time-overlay{
-      position:absolute;
-      inset:0;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      font-size: clamp(40px, 7vw, 92px);
-      font-weight: 1000;
-      letter-spacing:.18em;
-      text-transform: uppercase;
-      color: rgba(234,240,255,.92);
-      text-shadow: 0 20px 80px rgba(0,0,0,.75);
-      background: radial-gradient(700px 500px at 50% 40%, rgba(255,90,90,.22), rgba(0,0,0,.70));
-      backdrop-filter: blur(2px);
-    }
-    .time-overlay.show{ display:flex; }
-
-    /* Round splash */
-    .splash{
-      display:none;
-      position:fixed;
-      inset:0;
-      z-index: 40;
-      background:
-        radial-gradient(900px 540px at 50% 25%, rgba(255,224,102,.18), transparent 60%),
-        radial-gradient(900px 540px at 50% 30%, rgba(45,125,255,.20), transparent 62%),
-        rgba(0,0,0,.66);
-      backdrop-filter: blur(8px);
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      padding: 18px;
-    }
-    .splash.show{ display:flex; }
-    .splash .box{
-      width: min(920px, 92vw);
-      padding: 22px 18px;
-      border-radius: 26px;
-      background: rgba(0,0,0,.40);
-      border: 1px solid rgba(255,255,255,.14);
+      inset: 4vh 4vw;
+      z-index: 50;
+      display: none;
+      grid-template-rows: auto 1fr;
+      border: 1px solid var(--line-strong);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(16,26,49,.99), rgba(5,8,18,.99));
       box-shadow: var(--shadow);
+      overflow: hidden;
     }
-    .splash .big{
-      font-size: clamp(30px, 6vw, 78px);
-      font-weight: 1000;
-      letter-spacing: .20em;
-      text-transform: uppercase;
-      margin: 6px 0 10px;
-      text-shadow: 0 18px 60px rgba(0,0,0,.70);
-    }
-    .splash .small{
-      color: var(--muted);
-      letter-spacing:.10em;
-      text-transform:uppercase;
-      font-weight: 950;
-      font-size: 12px;
-      margin-bottom: 16px;
-    }
-
-    /* -------------------------
-       Builder (Phase 2B style)
-    -------------------------- */
-    .builder{
-      display:none;
-      position:fixed;
-      inset: 5vh 4vw;
-      z-index: 60;
-      background: linear-gradient(180deg, rgba(10,16,40,.98), rgba(7,11,26,.98));
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: 26px;
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .builder.show{ display:block; }
-
-    .builderHead{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
+    .builder.show { display: grid; }
+    .builder-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       gap: 10px;
-      padding: 14px 14px;
-      border-bottom: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.18);
-      flex-wrap:wrap;
+      flex-wrap: wrap;
+      padding: 13px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(0,0,0,.22);
     }
-    .builderHead h2{
-      margin:0;
+    .builder-head h2 {
+      margin: 0;
       font-size: 14px;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      font-weight: 1000;
-      color: var(--ink);
+      letter-spacing: .12em;
+      text-transform: uppercase;
     }
-
-    .builderBody{
-      height: calc(100% - 64px);
-      overflow:auto;
-      padding: 14px 14px 18px;
+    .builder-body {
+      overflow: auto;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
     }
-
-    .catBlock{
-      padding: 14px 14px;
-      border-radius: 20px;
-      background: rgba(0,0,0,.30);
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow: 0 10px 24px rgba(0,0,0,.25);
-      margin-bottom: 14px;
-    }
-
-    .catTop{
-      display:flex;
+    .cat-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(0,0,0,.24);
+      padding: 12px;
+      display: grid;
       gap: 10px;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      margin-bottom: 10px;
+    }
+    .question-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 110px 86px;
+      gap: 9px;
+      align-items: end;
+    }
+    @media (max-width: 860px) {
+      .question-row { grid-template-columns: 1fr; }
     }
 
-    .catName{
-      font-weight: 1000;
-      letter-spacing:.08em;
-      text-transform: uppercase;
-      font-size: 12px;
-      color: var(--gold);
+    .slot-modal {
+      position: fixed;
+      inset: 10vh 6vw;
+      z-index: 55;
+      display: none;
+      border: 1px solid var(--line-strong);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(16,26,49,.99), rgba(5,8,18,.99));
+      box-shadow: var(--shadow);
+      padding: 14px;
+      overflow: auto;
     }
-
-    .qRow{
-      display:grid;
-      grid-template-columns: 1.3fr 1fr 100px 120px;
-      gap: 10px;
-      align-items:center;
-      margin: 10px 0;
-    }
-    @media (max-width: 980px){
-      .qRow{ grid-template-columns: 1fr; }
-    }
-    .qRow .mini{
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing:.10em;
-      color: rgba(183,194,230,.92);
-      font-weight: 950;
-      margin-bottom: 4px;
-    }
-
-    .qBox{
-      display:flex;
-      flex-direction:column;
-      gap: 6px;
-    }
-
-    .qRow input[type="text"]{ width:100%; }
-    .qRow input[type="number"]{ width: 100%; }
-
-    .hr{
-      height:1px;
-      background: rgba(255,255,255,.08);
-      margin: 10px 0;
-    }
-
-    /* Projector mode hint */
-    .projHint{
-      display:none;
-      margin-left: 8px;
-      padding: 8px 10px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,224,102,.22);
-      background: rgba(0,0,0,.20);
-      color: rgba(255,224,102,.95);
-      font-weight: 1000;
-      font-size: 11px;
-      letter-spacing:.10em;
-      text-transform: uppercase;
-      white-space:nowrap;
-    }
-
-    /* Projector-only UI adjustments */
-    body.projector header.game .header-controls,
-    body.projector header.game .teams,
-    body.projector .winner,
-    body.projector .header-controls,
-    body.projector .team{ cursor:default; }
-    body.projector .editable{ cursor:default; }
-    body.projector .header-controls button{ display:none; }
-
-    .projectorTop{
-      display:none;
-      max-width: var(--maxw);
-      margin: 0 auto 10px;
-      padding: 10px 0 0;
-      text-align:right;
-    }
-    body.projector .projectorTop{ display:block; }
-
-    .statusDot{
-      display:inline-block;
-      width:10px;
-      height:10px;
-      border-radius:999px;
-      background: rgba(255,90,90,.9);
-      box-shadow: 0 0 18px rgba(255,90,90,.25);
-      margin-right:8px;
-      vertical-align:middle;
-    }
-    .statusDot.ok{
-      background: rgba(45,125,255,.9);
-      box-shadow: 0 0 18px rgba(45,125,255,.25);
-    }
-
-    /* -------------------------
-       NEW: Slot manager modal
-    -------------------------- */
-    .slotModalBody{
-      max-width: 920px;
-      margin: 10px auto 0;
-      text-align:left;
-      overflow:auto;
-      height: calc(100% - 56px);
-      padding-right: 6px;
-    }
+    .slot-modal.show { display: block; }
   </style>
 </head>
-
 <body>
-  <!-- TITLE SCREEN -->
-  <section id="titleScreen" aria-label="Title screen">
-    <canvas id="starfield"></canvas>
-    <canvas id="starfield2"></canvas>
-    <div class="crt"></div>
-    <div class="vignette"></div>
-
+  <section id="titleScreen" class="screen title-screen">
+    <canvas id="stars" aria-hidden="true"></canvas>
     <div class="title-card">
-      <div class="logo">GEFFEN BOWL</div>
-      <div class="tagline">Powerful Communication • Adaptable Learning • Restorative Trivia • Like Regular Trivia but more *Geffen* </div>
-      <div class="glowbar"></div>
-
-      <div class="title-grid">
-        <div class="panel">
-          <h3>Game Setup</h3>
-
-          <div class="row">
-            <div class="field">
-              <label for="teamCount">Teams (2–6)</label>
+      <div class="title-head">
+        <h1 class="logo">GEFFEN BOWL</h1>
+        <p class="tagline">A classroom game board with a private teacher view and a clean projector view.</p>
+      </div>
+      <div class="setup-grid">
+        <section class="panel">
+          <h2>Game Setup</h2>
+          <div class="form-grid">
+            <div>
+              <label for="teamCount">Teams</label>
               <select id="teamCount">
                 <option value="2">2 Teams</option>
                 <option value="3" selected>3 Teams</option>
@@ -1028,2216 +626,1226 @@
                 <option value="6">6 Teams</option>
               </select>
             </div>
-
-            <div class="field">
+            <div>
               <label for="gameMode">Mode</label>
               <select id="gameMode">
-                <option value="classic" selected>Classic (1 round)</option>
-                <option value="tworound">Two-Round (Round 1 + Round 2)</option>
-                <option value="lightning">Lightning (shorter timer defaults)</option>
-                <option value="tournament">Tournament (locks edits midgame)</option>
+                <option value="classic" selected>Classic</option>
+                <option value="tworound">Two Round</option>
+                <option value="lightning">Lightning</option>
+                <option value="tournament">Tournament</option>
               </select>
             </div>
-
-            <div class="field">
-              <label for="timerDefault">Timer (seconds)</label>
-              <input id="timerDefault" type="number" min="1" max="240" value="10" />
+            <div>
+              <label for="timerDefault">Timer</label>
+              <input id="timerDefault" type="number" min="1" max="240" value="20" />
             </div>
           </div>
-
-          <div class="toggles">
-            <label class="toggle" title="Autosave game state so refresh doesn't wipe everything">
-              <input type="checkbox" id="autosaveToggle" checked />
-              <span>Autosave</span>
-            </label>
-
-            <label class="toggle" title="Adds a separate read-only projector window">
-              <input type="checkbox" id="projectorToggle" checked />
-              <span>Projector Mode</span>
-            </label>
-
-            <label class="toggle" title="Prevents accidental answer reveals on the projector">
-              <input type="checkbox" id="safeModeToggle" checked />
-              <span>SAFE MODE (Projector)</span>
-            </label>
-
-            <label class="toggle" title="Default behavior for the Show Answer button">
-              <input type="checkbox" id="defaultRevealBothToggle" />
-              <span>Default reveal BOTH</span>
-            </label>
+          <div class="checks">
+            <label class="check"><input id="autosaveToggle" type="checkbox" checked /> Autosave</label>
+            <label class="check"><input id="projectorToggle" type="checkbox" checked /> Projector</label>
+            <label class="check"><input id="safeModeToggle" type="checkbox" checked /> Confirm class reveal</label>
           </div>
+          <p class="tiny">Teacher view shows answers privately. The projector shows questions only until you reveal the answer to the class.</p>
+        </section>
 
-          <div style="margin-top:10px;" class="tiny">
-            Host hotkeys (in question): <kbd>1</kbd>–<kbd>6</kbd> award • <kbd>A</kbd> host answer • <kbd>Shift</kbd>+<kbd>A</kbd> projector answer • <kbd>Space</kbd> pause • <kbd>Esc</kbd> close • <kbd>U</kbd> undo
-          </div>
-        </div>
-
-        <div class="panel">
-          <h3>Questions</h3>
-
-          <!-- NEW: JSON template + copy button -->
-          <div class="tiny" style="margin-bottom:10px;">
-            You can paste JSON <em>or</em> build questions inside the editor.
-            Old JSON still works (loads as Round 1).
-          </div>
-
-          <div class="row" style="margin-bottom:10px;">
-            <button class="btn-gold" id="openBuilderFromTitle">Open Question Builder</button>
-            <button id="pasteJsonFromTitle">Paste JSON</button>
-            <button id="copyJsonTemplateBtn" title="Copy a starter JSON template">Copy JSON Template</button>
-          </div>
-
-          <div class="field" style="margin-bottom:10px;">
-            <label for="saveSlotSelect">Save Slot</label>
-            <div style="display:flex; gap:10px; align-items:center;">
-              <select id="saveSlotSelect" style="flex:1; min-width:240px;"></select>
-              <button id="manageSlotsBtn" title="Create, rename, or delete save slots">Manage</button>
+        <section class="panel">
+          <h2>Questions and Saves</h2>
+          <div class="stack">
+            <div>
+              <label for="saveSlotSelect">Save Slot</label>
+              <div class="row">
+                <select id="saveSlotSelect" style="flex:1 1 260px"></select>
+                <button id="manageSlotsBtn">Manage</button>
+              </div>
             </div>
-            <div class="tiny" style="margin-top:6px;">
-              Each slot is its own saved game (perfect for C block vs D block). Switch slots to resume that class.
+            <div class="row">
+              <button id="openBuilderFromTitle" class="primary">Question Builder</button>
+              <button id="copyTemplateBtn">Copy Template</button>
+              <button id="exportSaveBtn">Export Save</button>
+              <button id="importSaveBtn">Import Save</button>
+              <button id="clearSaveBtn" class="danger">Clear Save</button>
             </div>
+            <input id="importFileInput" class="hidden" type="file" accept="application/json" />
+            <div>
+              <label for="jsonInput">Paste JSON</label>
+              <textarea id="jsonInput" placeholder="Paste question JSON here, or use the builder."></textarea>
+            </div>
+            <button id="startGameBtn" class="primary">Start GEFFEN BOWL</button>
           </div>
-
-          <div style="margin-top:10px;">
-            <textarea id="jsonInputTitle" placeholder="Paste JSON here (optional)"></textarea>
-          </div>
-
-          <div class="title-actions">
-            <button class="btn-gold" id="startFromTitle">Start GEFFEN BOWL</button>
-            <button id="exportSaveBtn" title="Download the current slot's saved game as a file">Export Save</button>
-            <button id="importSaveBtn" title="Import a previously exported save file">Import Save</button>
-            <button class="btn-danger" id="clearSaveBtn">Clear Saved Game</button>
-          </div>
-
-          <input id="importFileInput" type="file" accept="application/json" style="display:none;" />
-
-          <div class="tiny" style="margin-top:8px;">
-            Tip: if popups are blocked, allow popups for this page so the projector window can open.
-          </div>
-        </div>
+        </section>
       </div>
     </div>
   </section>
 
-  <!-- GAME SCREEN -->
-  <section id="gameScreen" aria-label="Game screen">
-    <header class="game">
+  <section id="gameScreen" class="screen hidden">
+    <header class="game-header">
       <div class="topbar">
         <div class="brand">
-          <div class="h">GEFFEN BOWL</div>
-          <div class="s" id="subtitle">History is not trivia • Trivia is not history • Facts and truths are not the same thing</div>
+          <strong>GEFFEN BOWL</strong>
+          <span id="viewSubtitle">Teacher view: answers and controls stay private.</span>
         </div>
-
-        <div class="header-controls">
-          <button id="openBuilderBtn">Question Builder</button>
-          <button id="copyJsonBtn" title="Copy current questions (all rounds) as JSON">Copy JSON</button>
-          <button id="toggleDoubleBtn">Double: OFF</button>
-          <button id="openProjectorBtn">Open Projector</button>
-<button id="nextRoundBtn">Next Round</button>
-          <button class="btn-danger" id="returnToTitleBtn">Title Screen</button>
+        <div class="header-actions host-only">
+          <button id="openBuilderBtn">Builder</button>
+          <button id="copyJsonBtn">Copy JSON</button>
+          <button id="toggleDoubleBtn">Double: Off</button>
+          <button id="openProjectorBtn" class="primary">Open Projector</button>
+          <button id="nextRoundBtn">Next Round</button>
+          <button id="undoBtn">Undo</button>
+          <button id="titleBtn" class="danger">Title</button>
         </div>
       </div>
-
-      <div class="projectorTop" id="projectorTop">
-        <span class="statusDot" id="projStatusDot"></span>
-        <span class="projHint" id="projHint">PROJECTOR CONNECTED</span>
-        <button class="btn-gold" id="projectorFullscreenBtn">Fullscreen</button>
+      <div class="status-strip">
+        <span class="pill"><strong id="roundLabel">Round 1</strong></span>
+        <span class="pill">Mode <strong id="modeLabel">Classic</strong></span>
+        <span class="pill">Timer <strong id="timerLabel">20s</strong></span>
+        <span class="pill host-only"><span id="projectorDot" class="dot"></span><strong id="projectorLabel">Projector idle</strong></span>
+        <button id="fullscreenBtn" class="ghost hidden">Fullscreen</button>
       </div>
-
-      <div class="teams" id="teamsRow"></div>
     </header>
 
-    <main>
-      <div class="roundBanner">
-        <div class="roundPill" id="roundPill"><strong>Round 1</strong></div>
-        <div class="roundPill" id="modePill"><strong>Classic</strong></div>
-        <div class="roundPill" id="timerPill"><strong>Timer:</strong> <span id="timerDefaultReadout">10</span>s</div>
-        <div class="roundPill" id="safePill"><strong>SAFE:</strong> <span id="safeModeReadout">ON</span></div>
-      </div>
+    <main class="game-layout">
+      <section>
+        <div id="scoreboard" class="scoreboard" aria-live="polite"></div>
+        <div id="board" class="board" aria-label="Question board"></div>
+      </section>
 
-      <div class="winner" id="winner"></div>
-
-      <div class="boardWrap">
-        <div class="board" id="board"></div>
-      </div>
+      <aside class="host-panel host-only" aria-label="Teacher controls">
+        <section class="panel private-answer">
+          <h2>Private Teacher View</h2>
+          <div id="hostQuestion" class="current-question">Open a tile to see the question and answer here.</div>
+          <div id="hostAnswer" class="answer-box">Answer will appear privately.</div>
+        </section>
+        <section class="panel">
+          <h2>Question Controls</h2>
+          <div id="hostTimer" class="timer-large">20</div>
+          <div id="awardButtons" class="stack" style="margin-top:12px"></div>
+          <div class="row" style="margin-top:12px">
+            <button id="revealClassBtn" class="primary" disabled>Reveal to Class</button>
+            <button id="hideClassBtn" disabled>Hide Class Answer</button>
+            <button id="noTeamBtn" disabled>No Team</button>
+            <button id="pauseBtn" disabled>Pause</button>
+            <button id="closeQuestionBtn" class="danger" disabled>Close</button>
+          </div>
+        </section>
+      </aside>
     </main>
+  </section>
 
-    <div class="backdrop" id="backdrop"></div>
-
-    <!-- Question Modal -->
-    <div class="modal" id="questionModal" role="dialog" aria-modal="true" aria-label="Question">
-      <div class="qa-top">
-        <div class="pill" id="qaMetaLeft"><strong>—</strong></div>
-        <div class="pill" id="qaMetaRight"><strong>—</strong></div>
-        <div class="vis">
-          <div class="pill" id="hostVisPill">HOST: <strong id="hostVisText">HIDDEN</strong></div>
-          <div class="pill" id="projVisPill">PROJECTOR: <strong id="projVisText">HIDDEN</strong></div>
+  <div id="stageLayer" class="modal-layer" role="dialog" aria-modal="true" aria-label="Question">
+    <section class="question-stage">
+      <div class="stage-top">
+        <span class="pill"><strong id="stageCategory">Category</strong></span>
+        <span class="pill"><strong id="stagePoints">0 pts</strong></span>
+      </div>
+      <div id="stageQuestion" class="stage-question"></div>
+      <div>
+        <div id="stageAnswer" class="stage-answer"></div>
+        <div class="stage-bottom">
+          <div id="stageTimer" class="stage-timer">20</div>
+          <div id="timeUp" class="time-up hidden">Time</div>
         </div>
       </div>
+    </section>
+  </div>
 
-      <div class="question" id="questionText"></div>
-      <div class="answer" id="answerText" aria-live="polite"></div>
-
-      <div class="modal-controls">
-        <div class="team-buttons" id="awardButtonsRow"></div>
-
-        <div class="row-buttons">
-          <button class="btn-gold" id="noTeamBtn">No Team</button>
-          <button id="hostAnswerBtn">Show Answer (Host)</button>
-          <button id="projAnswerBtn" title="SAFE MODE may require hold/confirm">Reveal Answer (Projector)</button>
-          <button id="bothAnswerBtn">Reveal Both</button>
-          <button id="pauseBtn">Pause</button>
-          <button class="btn-danger" id="closeQuestionBtn">Close</button>
-        </div>
-      </div>
-
-      <div class="timer" id="timer">10</div>
-      <div class="time-overlay" id="timeOverlay">TIME</div>
-    </div>
-
-    <!-- Round splash -->
-    <div class="splash" id="roundSplash" aria-label="Round splash">
-      <div class="box">
-        <div class="big" id="splashTitle">ROUND 1</div>
-        <div class="small" id="splashSubtitle">Get ready.</div>
-        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-          <button class="btn-gold" id="startRoundBtn">Start Round</button>
-        </div>
+  <section id="builder" class="builder" aria-label="Question builder">
+    <div class="builder-head">
+      <h2>Question Builder</h2>
+      <div class="row">
+        <button id="addRoundBtn" class="primary">Add Round</button>
+        <button id="addCategoryBtn">Add Category</button>
+        <button id="builderCopyJsonBtn">Copy JSON</button>
+        <button id="closeBuilderBtn" class="danger">Close</button>
       </div>
     </div>
+    <div id="builderBody" class="builder-body"></div>
+  </section>
 
-    <!-- Builder -->
-    <div class="builder" id="builder">
-      <div class="builderHead">
-        <h2>Question Builder</h2>
-        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
-          <button class="btn-gold" id="builderAddRoundBtn">Add Round</button>
-          <button id="builderAddCategoryBtn">Add Category</button>
-          <button id="builderCopyJsonBtn">Copy JSON</button>
-          <button class="btn-danger" id="builderCloseBtn">Close</button>
-        </div>
-      </div>
-      <div class="builderBody" id="builderBody"></div>
+  <section id="slotModal" class="slot-modal" aria-label="Save slot manager">
+    <div class="row" style="justify-content:space-between;margin-bottom:12px">
+      <h2 style="margin:0;font-size:16px">Save Slots</h2>
+      <button id="closeSlotBtn" class="danger">Close</button>
     </div>
-
-    <!-- Slot manager modal -->
-    <div class="modal" id="slotModal" role="dialog" aria-modal="true" aria-label="Save Slot Manager" style="height:min(62vh,560px);">
-      <div class="qa-top" style="justify-content:space-between;">
-        <div class="pill"><strong>SAVE SLOTS</strong></div>
-        <div class="vis">
-          <button class="btn-danger" id="closeSlotModalBtn">Close</button>
-        </div>
-      </div>
-
-      <div class="slotModalBody">
-        <div class="panel" style="margin-bottom:12px;">
-          <h3>Create New Slot</h3>
-          <div class="row">
-            <div class="field">
-              <label for="newSlotName">Slot name</label>
-              <input id="newSlotName" type="text" placeholder="e.g., C Block — Modern Middle East (Day 2)" />
-            </div>
-            <button class="btn-gold" id="createSlotBtn">Create</button>
-          </div>
-          <div class="tiny" style="margin-top:8px;">Tip: slots are separate saved games. Switch slots to resume where you left off.</div>
-        </div>
-
-        <div class="panel" style="margin-bottom:12px;">
-          <h3>Rename Current Slot</h3>
-          <div class="row">
-            <div class="field">
-              <label for="renameSlotName">New name</label>
-              <input id="renameSlotName" type="text" placeholder="Type a new name for the selected slot" />
-            </div>
-            <button id="renameSlotBtn">Rename</button>
-          </div>
-        </div>
-
-        <div class="panel" style="margin-bottom:12px;">
-          <h3>Duplicate Slot</h3>
-          <div class="row">
-            <div class="field">
-              <label for="duplicateSlotName">New slot name</label>
-              <input id="duplicateSlotName" type="text" placeholder="e.g., D Block — same game" />
-            </div>
-            <button id="duplicateSlotBtn">Duplicate</button>
-          </div>
-          <div class="tiny" style="margin-top:8px;">This copies the saved game from the current slot into a new slot (great for cloning C → D).</div>
-        </div>
-
-        <div class="panel">
-          <h3>Danger Zone</h3>
-          <div class="row">
-            <button class="btn-danger" id="deleteSlotBtn">Delete This Slot</button>
-          </div>
-          <div class="tiny" style="margin-top:8px;">Deleting a slot deletes its saved game. This can’t be undone.</div>
-        </div>
-      </div>
+    <div class="setup-grid" style="padding:0">
+      <section class="panel">
+        <h3>Create Slot</h3>
+        <label for="newSlotName">Name</label>
+        <input id="newSlotName" type="text" placeholder="C Block - Day 2" />
+        <button id="createSlotBtn" class="primary" style="margin-top:10px">Create</button>
+      </section>
+      <section class="panel">
+        <h3>Rename Current Slot</h3>
+        <label for="renameSlotName">New name</label>
+        <input id="renameSlotName" type="text" />
+        <button id="renameSlotBtn" style="margin-top:10px">Rename</button>
+      </section>
+      <section class="panel">
+        <h3>Duplicate Current Slot</h3>
+        <label for="duplicateSlotName">New copy name</label>
+        <input id="duplicateSlotName" type="text" />
+        <button id="duplicateSlotBtn" style="margin-top:10px">Duplicate</button>
+      </section>
+      <section class="panel">
+        <h3>Danger Zone</h3>
+        <button id="deleteSlotBtn" class="danger">Delete Current Slot</button>
+      </section>
     </div>
   </section>
 
   <script>
-    /* =========================================================
-       GEFFEN BOWL — Phase 4 + Slot Saves + Export/Import + Template
-       - Save slots (named)
-       - Export/Import current slot
-       - Copy JSON template
-    ========================================================== */
+    "use strict";
 
-    // ----------------------------
-    // Utilities
-    // ----------------------------
-    const qs = (sel) => document.querySelector(sel);
-    const qsa = (sel) => Array.from(document.querySelectorAll(sel));
-
-    function clampInt(n, fallback=0){
-      const x = parseInt(String(n).replace(/[^\d-]/g,''), 10);
-      return Number.isFinite(x) ? x : fallback;
-    }
-
-    function escapeHtml(str){
-      return String(str)
-        .replaceAll('&','&amp;')
-        .replaceAll('<','&lt;')
-        .replaceAll('>','&gt;')
-        .replaceAll('"','&quot;')
-        .replaceAll("'","&#039;");
-    }
-
-    function cssEscape(s){
-      if (window.CSS && CSS.escape) return CSS.escape(s);
-      return String(s).replace(/["\\]/g, '\\$&');
-    }
-
-    function nowId(){
-      return Math.random().toString(36).slice(2,10);
-    }
-
-    function deepClone(o){
-      return JSON.parse(JSON.stringify(o));
-    }
-
-    // ----------------------------
-    // Projector detection + channel
-    // ----------------------------
+    const View = Object.freeze({ HOST: "host", PROJECTOR: "projector" });
     const params = new URLSearchParams(location.search);
-    const isProjectorView = params.get('view') === 'projector';
-    if (isProjectorView) document.body.classList.add('projector');
+    const viewMode = params.get("view") === "projector" ? View.PROJECTOR : View.HOST;
+    const isHost = viewMode === View.HOST;
+    document.body.classList.toggle("projector", !isHost);
 
-    const CHANNEL_NAME = 'geffenbowl_channel_v1';
-    let bc = null;
-    try { bc = new BroadcastChannel(CHANNEL_NAME); } catch(e){ bc = null; }
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
-    function sendToProjector(payload){
-      if (!payload) return;
-      if (bc) bc.postMessage(payload);
-      if (projectorWin && !projectorWin.closed){
-        try { projectorWin.postMessage(payload, '*'); } catch(e){}
+    function el(tag, attrs = {}, children = []) {
+      const node = document.createElement(tag);
+      for (const [key, value] of Object.entries(attrs)) {
+        if (key === "class") node.className = value;
+        else if (key === "text") node.textContent = value;
+        else if (key === "dataset") Object.assign(node.dataset, value);
+        else if (key.startsWith("on") && typeof value === "function") node.addEventListener(key.slice(2), value);
+        else if (value !== false && value !== null && value !== undefined) node.setAttribute(key, String(value));
       }
+      for (const child of children) node.append(child);
+      return node;
     }
 
-    function onProjectorMessage(handler){
-      if (bc) bc.onmessage = (e) => handler(e.data);
-      window.addEventListener('message', (e) => handler(e.data));
+    function clampInt(value, fallback = 0, min = -Infinity, max = Infinity) {
+      const parsed = parseInt(String(value).replace(/[^\d-]/g, ""), 10);
+      const next = Number.isFinite(parsed) ? parsed : fallback;
+      return Math.max(min, Math.min(max, next));
     }
 
-    // ----------------------------
-    // Global state
-    // ----------------------------
-    const SAVE_KEY_BASE = 'geffen_bowl_save_v4';
-    const SLOT_INDEX_KEY = `${SAVE_KEY_BASE}__slot_index_v1`;
-
-    const defaultState = () => ({
-      meta: { version: 4 },
-      settings: {
-        mode: 'classic',
-        teamCount: 3,
-        timerDefault: 10,
-        autosave: true,
-        projectorEnabled: true,
-        safeMode: true,
-        defaultRevealBoth: false,
-        saveSlot: 'Default'
-      },
-      teams: [
-        { id: 't1', name: 'Team 1', score: 0 },
-        { id: 't2', name: 'Team 2', score: 0 },
-        { id: 't3', name: 'Team 3', score: 0 }
-      ],
-      rounds: [
-        { id: 'r1', title: 'Round 1', categories: {} }
-      ],
-      currentRoundIndex: 0,
-      isDouble: false,
-      activeTeamIndex: 0,
-      currentPick: null, // { roundIndex, category, index }
-      timer: { running: false, paused: false, timeLeft: 10 },
-      projector: { connected: false }
-    });
-
-    let state = defaultState();
-
-    // Host-only window handle
-    let projectorWin = null;
-
-    // Undo stack
-    let undoStack = [];
-
-    // ----------------------------
-    // Slot helpers
-    // ----------------------------
-    function sanitizeSlotName(name){
-      return String(name || '')
-        .trim()
-        .slice(0, 60)
-        .replace(/[^\w\s\-—:()&.]/g, '')
-        .replace(/\s+/g, ' ')
-        .trim();
+    function uid(prefix) {
+      return `${prefix}_${Math.random().toString(36).slice(2, 9)}`;
     }
 
-    function readSlotIndex(){
-      try{
-        const raw = localStorage.getItem(SLOT_INDEX_KEY);
-        if (!raw) return ['Default'];
-        const arr = JSON.parse(raw);
-        if (!Array.isArray(arr) || !arr.length) return ['Default'];
-        const uniq = [];
-        for (const s of arr){
-          const ss = sanitizeSlotName(s);
-          if (ss && !uniq.includes(ss)) uniq.push(ss);
-        }
-        return uniq.length ? uniq : ['Default'];
-      }catch(e){
-        return ['Default'];
-      }
+    function clone(value) {
+      return JSON.parse(JSON.stringify(value));
     }
 
-    function writeSlotIndex(slots){
-      try{ localStorage.setItem(SLOT_INDEX_KEY, JSON.stringify(slots, null, 0)); }catch(e){}
-    }
-
-    function ensureSlotExists(slotName){
-      const name = sanitizeSlotName(slotName) || 'Default';
-      const slots = readSlotIndex();
-      if (!slots.includes(name)){
-        slots.push(name);
-        writeSlotIndex(slots);
-      }
-      return name;
-    }
-
-    function getSaveKey(slotName){
-      const slot = sanitizeSlotName(slotName) || 'Default';
-      return `${SAVE_KEY_BASE}__${slot}`;
-    }
-
-    function currentSlot(){
-      return sanitizeSlotName(state?.settings?.saveSlot) || 'Default';
-    }
-
-    function slotHasSave(slotName){
-      try{ return !!localStorage.getItem(getSaveKey(slotName)); }catch(e){ return false; }
-    }
-
-    function renderSlotSelect(selected){
-      const sel = qs('#saveSlotSelect');
-      if (!sel) return;
-
-      const slots = readSlotIndex();
-      const pick = sanitizeSlotName(selected) || slots[0] || 'Default';
-
-      sel.innerHTML = slots.map(s => {
-        const mark = slotHasSave(s) ? ' •' : '';
-        return `<option value="${escapeHtml(s)}">${escapeHtml(s)}${mark}</option>`;
-      }).join('');
-
-      sel.value = slots.includes(pick) ? pick : (slots[0] || 'Default');
-    }
-
-    function setSlot(slotName, {loadIfExists=true} = {}){
-      const slot = ensureSlotExists(slotName);
-      state.settings.saveSlot = slot;
-
-      if (loadIfExists && loadStateForSlot(slot)){
-        state.settings.saveSlot = slot;
-      } else {
-        const prevSettings = state.settings;
-        state = defaultState();
-        state.settings = { ...state.settings, ...prevSettings, saveSlot: slot };
-        undoStack = [];
-      }
-
-      renderSlotSelect(slot);
-
-      // Update title placeholder hint
-      const ph = slotHasSave(slot)
-        ? `Saved game detected in "${slot}". Click Start to resume, or paste JSON to overwrite.`
-        : `No saved game in "${slot}" yet. Paste JSON or use the Builder.`;
-      const ta = qs('#jsonInputTitle');
-      if (ta) ta.placeholder = ph;
-
-      // If we're already in game screen, refresh UI
-      if (!isProjectorView && qs('#gameScreen').style.display === 'block'){
-        renderHeaderPills();
-        renderTeams();
-        renderBoard();
-        setWinnerBanner();
-        broadcastState();
-      }
-      saveState(); // respects autosave toggle
-    }
-
-    // ----------------------------
-    // JSON format support
-    // ----------------------------
-    function normalizeQuestion(q){
+    function normalizeQuestion(q = {}, idx = 0) {
       return {
-        question: String(q?.question ?? ''),
-        answer: String(q?.answer ?? ''),
-        points: clampInt(q?.points ?? 0, 0),
-        _state: q?._state || 'unplayed', // unplayed|answered|missed|expired
-        _hostShown: !!q?._hostShown,
-        _projShown: !!q?._projShown
+        id: q.id || uid("q"),
+        question: String(q.question ?? `Question ${idx + 1}`),
+        answer: String(q.answer ?? ""),
+        points: clampInt(q.points ?? ((idx + 1) * 100), 100, 0, 999999),
+        state: ["unplayed", "done", "missed", "expired"].includes(q.state || q._state) ? (q.state || q._state) : "unplayed",
+        hostShown: Boolean(q.hostShown || q._hostShown),
+        projectorShown: Boolean(q.projectorShown || q._projShown)
       };
     }
 
-    function normalizeCategories(obj){
-      const out = {};
-      for (const cat of Object.keys(obj || {})){
-        const arr = Array.isArray(obj[cat]) ? obj[cat] : [];
-        out[String(cat)] = arr.map(normalizeQuestion);
+    function makeCategory(name = "New Category", questions = []) {
+      return {
+        id: uid("cat"),
+        name: String(name || "New Category"),
+        questions: questions.map(normalizeQuestion)
+      };
+    }
+
+    function normalizeCategories(input = {}) {
+      if (Array.isArray(input)) {
+        return input.map((cat, i) => makeCategory(cat.name || `Category ${i + 1}`, cat.questions || []));
       }
-      return out;
+      return Object.entries(input).map(([name, questions]) => makeCategory(name, Array.isArray(questions) ? questions : []));
     }
 
-function parseAnyJson(raw){
-  const parsed = JSON.parse(raw);
-
-  // ---------- New format ----------
-  // {
-  //   "teams":[{"name":"A","score":0}, ...] (optional),
-  //   "rounds":[{"title":"Round 1","categories":{...}}, ...]
-  // }
-  if (parsed && typeof parsed === 'object' && Array.isArray(parsed.rounds)){
-    const rounds = parsed.rounds.map((r, i) => ({
-      id: r.id || `r${i+1}_${nowId()}`,
-      title: String(r.title ?? `Round ${i+1}`),
-      categories: normalizeCategories(r.categories || {})
-    }));
-
-    const teams = Array.isArray(parsed.teams)
-      ? parsed.teams.slice(0,6).map((t, i) => ({
-          id: t.id || `t${i+1}_${nowId()}`,
-          name: String(t.name ?? `Team ${i+1}`),
-          score: clampInt(t.score ?? 0, 0)
-        }))
-      : null;
-
-    return { rounds, teams };
-  }
-
-  // ---------- Round-map format (your template) ----------
-  // {
-  //   "Round 1": { "Category": [ ... ], ... },
-  //   "Round 2": { ... }
-  // }
-  if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)){
-    const keys = Object.keys(parsed);
-
-    // treat as round-map if EVERY top-level key looks like "Round X"
-    const roundKeyRegex = /^round\s*\d+/i;
-    const looksLikeRoundMap =
-      keys.length > 0 &&
-      keys.every(k => roundKeyRegex.test(String(k).trim())) &&
-      keys.every(k => parsed[k] && typeof parsed[k] === 'object' && !Array.isArray(parsed[k]));
-
-    if (looksLikeRoundMap){
-      // sort rounds by their numeric index if present
-      const sortedKeys = keys.slice().sort((a, b) => {
-        const na = parseInt(String(a).match(/\d+/)?.[0] || '0', 10);
-        const nb = parseInt(String(b).match(/\d+/)?.[0] || '0', 10);
-        return na - nb;
-      });
-
-      const rounds = sortedKeys.map((rk, i) => ({
-        id: `r${i+1}_${nowId()}`,
-        title: String(rk),
-        categories: normalizeCategories(parsed[rk] || {})
-      }));
-
-      return { rounds, teams: null };
+    function normalizeRound(round = {}, idx = 0) {
+      return {
+        id: round.id || uid("round"),
+        title: String(round.title || `Round ${idx + 1}`),
+        categories: normalizeCategories(round.categories || {})
+      };
     }
-  }
 
-  // ---------- Old format (single round) ----------
-  // { "Category":[{question,answer,points},...], ... }
-  if (parsed && typeof parsed === 'object'){
-    const categories = normalizeCategories(parsed);
-    return {
-      rounds: [{ id: 'r1_'+nowId(), title: 'Round 1', categories }],
-      teams: null
-    };
-  }
+    function defaultState() {
+      return {
+        meta: { version: 5 },
+        settings: {
+          mode: "classic",
+          teamCount: 3,
+          timerDefault: 20,
+          autosave: true,
+          projectorEnabled: true,
+          safeMode: true,
+          saveSlot: "Default"
+        },
+        teams: [
+          { id: uid("team"), name: "Team 1", score: 0 },
+          { id: uid("team"), name: "Team 2", score: 0 },
+          { id: uid("team"), name: "Team 3", score: 0 }
+        ],
+        rounds: [
+          normalizeRound({
+            title: "Round 1",
+            categories: {
+              "People and Places": [
+                { question: "Sample question one", answer: "Sample answer one", points: 100 },
+                { question: "Sample question two", answer: "Sample answer two", points: 200 },
+                { question: "Sample question three", answer: "Sample answer three", points: 300 }
+              ],
+              "Big Ideas": [
+                { question: "Sample question one", answer: "Sample answer one", points: 100 },
+                { question: "Sample question two", answer: "Sample answer two", points: 200 },
+                { question: "Sample question three", answer: "Sample answer three", points: 300 }
+              ]
+            }
+          }, 0)
+        ],
+        currentRoundIndex: 0,
+        activeTeamIndex: 0,
+        isDouble: false,
+        currentPick: null,
+        timer: { running: false, paused: false, timeLeft: 20 },
+        projector: { connected: false }
+      };
+    }
 
-  throw new Error('Unsupported JSON shape.');
-}
-    function exportJson(){
+    let state = defaultState();
+    let undoStack = [];
+    let timerHandle = null;
+    let projectorWindow = null;
+
+    const SAVE_BASE = "geffen_bowl_classroom_v5";
+    const SLOT_INDEX = `${SAVE_BASE}__slots`;
+
+    function sanitizeSlotName(name) {
+      return String(name || "")
+        .trim()
+        .slice(0, 60)
+        .replace(/[^\w\s\-:()&.]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function saveKey(slot) {
+      return `${SAVE_BASE}__${sanitizeSlotName(slot) || "Default"}`;
+    }
+
+    function readSlots() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(SLOT_INDEX) || "[]");
+        const clean = parsed.map(sanitizeSlotName).filter(Boolean);
+        return clean.length ? [...new Set(clean)] : ["Default"];
+      } catch {
+        return ["Default"];
+      }
+    }
+
+    function writeSlots(slots) {
+      localStorage.setItem(SLOT_INDEX, JSON.stringify([...new Set(slots.map(sanitizeSlotName).filter(Boolean))]));
+    }
+
+    function ensureSlot(slot) {
+      const name = sanitizeSlotName(slot) || "Default";
+      const slots = readSlots();
+      if (!slots.includes(name)) writeSlots([...slots, name]);
+      return name;
+    }
+
+    function currentSlot() {
+      return ensureSlot(state.settings.saveSlot || "Default");
+    }
+
+    function hasSave(slot) {
+      return Boolean(localStorage.getItem(saveKey(slot)));
+    }
+
+    function saveState() {
+      if (!isHost || !state.settings.autosave) return;
+      localStorage.setItem(saveKey(currentSlot()), JSON.stringify({ state, undoStack }));
+      renderSlotSelect();
+    }
+
+    function loadSlot(slot) {
+      const name = ensureSlot(slot);
+      const raw = localStorage.getItem(saveKey(name));
+      if (!raw) {
+        const keep = clone(state.settings);
+        state = defaultState();
+        state.settings = { ...state.settings, ...keep, saveSlot: name };
+        undoStack = [];
+        return false;
+      }
+      const payload = JSON.parse(raw);
+      state = migrateState(payload.state || defaultState());
+      state.settings.saveSlot = name;
+      undoStack = Array.isArray(payload.undoStack) ? payload.undoStack : [];
+      return true;
+    }
+
+    function migrateState(next) {
+      const migrated = defaultState();
+      migrated.settings = { ...migrated.settings, ...(next.settings || {}) };
+      migrated.teams = Array.isArray(next.teams) ? next.teams.slice(0, 6).map((t, i) => ({
+        id: t.id || uid("team"),
+        name: String(t.name || `Team ${i + 1}`),
+        score: clampInt(t.score, 0)
+      })) : migrated.teams;
+      migrated.rounds = Array.isArray(next.rounds) && next.rounds.length ? next.rounds.map(normalizeRound) : migrated.rounds;
+      migrated.currentRoundIndex = clampInt(next.currentRoundIndex, 0, 0, Math.max(0, migrated.rounds.length - 1));
+      migrated.activeTeamIndex = clampInt(next.activeTeamIndex, 0, 0, Math.max(0, migrated.teams.length - 1));
+      migrated.isDouble = Boolean(next.isDouble);
+      migrated.currentPick = next.currentPick || null;
+      migrated.timer = { ...migrated.timer, ...(next.timer || {}) };
+      migrated.projector = { connected: false };
+      return migrated;
+    }
+
+    function renderSlotSelect() {
+      const select = $("#saveSlotSelect");
+      if (!select) return;
+      const selected = currentSlot();
+      select.replaceChildren();
+      for (const slot of readSlots()) {
+        const option = el("option", { value: slot, text: `${slot}${hasSave(slot) ? " *" : ""}` });
+        select.append(option);
+      }
+      select.value = selected;
+    }
+
+    function jsonTemplate() {
+      return JSON.stringify({
+        rounds: [
+          {
+            title: "Round 1",
+            categories: {
+              "Category 1": [
+                { question: "Question 1", answer: "Answer 1", points: 100 },
+                { question: "Question 2", answer: "Answer 2", points: 200 },
+                { question: "Question 3", answer: "Answer 3", points: 300 }
+              ],
+              "Category 2": [
+                { question: "Question 1", answer: "Answer 1", points: 100 },
+                { question: "Question 2", answer: "Answer 2", points: 200 },
+                { question: "Question 3", answer: "Answer 3", points: 300 }
+              ]
+            }
+          }
+        ]
+      }, null, 2);
+    }
+
+    function parseQuestionJson(raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object" && Array.isArray(parsed.rounds)) {
+        return {
+          rounds: parsed.rounds.map(normalizeRound),
+          teams: Array.isArray(parsed.teams) ? parsed.teams.slice(0, 6).map((t, i) => ({
+            id: uid("team"),
+            name: String(t.name || `Team ${i + 1}`),
+            score: clampInt(t.score, 0)
+          })) : null
+        };
+      }
+      const keys = parsed && typeof parsed === "object" && !Array.isArray(parsed) ? Object.keys(parsed) : [];
+      const looksRoundMap = keys.length && keys.every(k => /^round\s*\d+/i.test(k)) && keys.every(k => parsed[k] && typeof parsed[k] === "object");
+      if (looksRoundMap) {
+        const sorted = keys.slice().sort((a, b) => clampInt(a, 0) - clampInt(b, 0));
+        return { rounds: sorted.map((key, i) => normalizeRound({ title: key, categories: parsed[key] }, i)), teams: null };
+      }
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        return { rounds: [normalizeRound({ title: "Round 1", categories: parsed }, 0)], teams: null };
+      }
+      throw new Error("Unsupported question JSON.");
+    }
+
+    function exportQuestionsJson() {
       return JSON.stringify({
         teams: state.teams.map(t => ({ name: t.name, score: t.score })),
-        rounds: state.rounds.map(r => ({
-          title: r.title,
-          categories: Object.fromEntries(Object.entries(r.categories).map(([cat, arr]) => [
-            cat,
-            (arr || []).map(q => ({ question: q.question, answer: q.answer, points: q.points }))
+        rounds: state.rounds.map(round => ({
+          title: round.title,
+          categories: Object.fromEntries(round.categories.map(cat => [
+            cat.name,
+            cat.questions.map(q => ({ question: q.question, answer: q.answer, points: q.points }))
           ]))
         }))
       }, null, 2);
     }
-function jsonTemplate(){
-  return JSON.stringify({
-    "rounds": [
-      {
-        "title": "Round 1",
-        "categories": {
-          "Category 1": [
-            { "question": "Sample Question 1", "answer": "Sample Answer 1", "points": 100 },
-            { "question": "Sample Question 2", "answer": "Sample Answer 2", "points": 200 },
-            { "question": "Sample Question 3", "answer": "Sample Answer 3", "points": 300 },
-            { "question": "Sample Question 4", "answer": "Sample Answer 4", "points": 400 },
-            { "question": "Sample Question 5", "answer": "Sample Answer 5", "points": 500 }
-          ],
-          "Category 2": [
-            { "question": "Sample Question 1", "answer": "Sample Answer 1", "points": 100 },
-            { "question": "Sample Question 2", "answer": "Sample Answer 2", "points": 200 },
-            { "question": "Sample Question 3", "answer": "Sample Answer 3", "points": 300 },
-            { "question": "Sample Question 4", "answer": "Sample Answer 4", "points": 400 },
-            { "question": "Sample Question 5", "answer": "Sample Answer 5", "points": 500 }
-          ]
-        }
-      },
-      {
-        "title": "Round 2",
-        "categories": {
-          "Category 1": [
-            { "question": "Sample Question 1", "answer": "Sample Answer 1", "points": 100 }
-          ]
-        }
-      }
-    ]
-  }, null, 2);
-}
-    // ----------------------------
-    // Persistence (slot-based)
-    // ----------------------------
-    function saveState(){
-      if (!state.settings.autosave) return;
-      try{
-        ensureSlotExists(currentSlot());
-        const payload = { state, undoStack };
-        localStorage.setItem(getSaveKey(currentSlot()), JSON.stringify(payload));
-      }catch(e){}
-    }
 
-    function loadStateForSlot(slotName){
-      try{
-        const raw = localStorage.getItem(getSaveKey(slotName));
-        if (!raw) return false;
-        const payload = JSON.parse(raw);
-        if (!payload?.state) return false;
-        state = payload.state;
-        undoStack = payload.undoStack || [];
-        return true;
-      }catch(e){
-        return false;
+    async function copyToClipboard(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const temp = el("textarea");
+        temp.value = text;
+        document.body.append(temp);
+        temp.select();
+        document.execCommand("copy");
+        temp.remove();
       }
     }
 
-    function loadState(){
-      // Loads the state for state.settings.saveSlot (or Default)
-      return loadStateForSlot(currentSlot());
+    function currentRound() {
+      return state.rounds[state.currentRoundIndex] || state.rounds[0];
     }
 
-    function clearSaved(){
-      try{ localStorage.removeItem(getSaveKey(currentSlot())); }catch(e){}
+    function findQuestion(pick = state.currentPick) {
+      if (!pick) return null;
+      const round = state.rounds[pick.roundIndex];
+      const cat = round?.categories.find(c => c.id === pick.categoryId);
+      const q = cat?.questions.find(item => item.id === pick.questionId);
+      return q ? { round, cat, q } : null;
     }
 
-    // ----------------------------
-    // Export / Import save (current slot)
-    // ----------------------------
-    function exportSaveToFile(){
-      const slot = currentSlot();
-      const key = getSaveKey(slot);
-      let raw = null;
-      try{ raw = localStorage.getItem(key); }catch(e){ raw = null; }
+    function pushUndo() {
+      undoStack.push(clone(state));
+      if (undoStack.length > 50) undoStack.shift();
+    }
 
-      if (!raw){
-        alert(`No saved game found in slot "${slot}".`);
+    function setTeamCount(count) {
+      const n = clampInt(count, 3, 2, 6);
+      while (state.teams.length < n) state.teams.push({ id: uid("team"), name: `Team ${state.teams.length + 1}`, score: 0 });
+      state.teams = state.teams.slice(0, n);
+      state.settings.teamCount = n;
+      state.activeTeamIndex = Math.min(state.activeTeamIndex, n - 1);
+    }
+
+    function applyMode(mode) {
+      state.settings.mode = mode;
+      if (mode === "lightning") state.settings.timerDefault = 7;
+      if ((mode === "tworound" || mode === "tournament") && state.rounds.length < 2) {
+        state.rounds.push(normalizeRound({ title: "Round 2", categories: {} }, 1));
+      }
+      state.currentRoundIndex = Math.min(state.currentRoundIndex, state.rounds.length - 1);
+      state.timer.timeLeft = state.settings.timerDefault;
+    }
+
+    function showTitle() {
+      $("#titleScreen").classList.remove("hidden");
+      $("#gameScreen").classList.add("hidden");
+      closeStage();
+    }
+
+    function showGame() {
+      $("#titleScreen").classList.add("hidden");
+      $("#gameScreen").classList.remove("hidden");
+      renderAll();
+    }
+
+    function renderAll() {
+      renderLabels();
+      renderScoreboard();
+      renderBoard();
+      renderHostPanel();
+      renderStage();
+      if (isHost) broadcast();
+    }
+
+    function renderLabels() {
+      const round = currentRound();
+      $("#roundLabel").textContent = round?.title || "Round";
+      $("#modeLabel").textContent = ({ classic: "Classic", tworound: "Two Round", lightning: "Lightning", tournament: "Tournament" })[state.settings.mode] || "Classic";
+      $("#timerLabel").textContent = `${state.settings.timerDefault}s`;
+      $("#toggleDoubleBtn").textContent = `Double: ${state.isDouble ? "On" : "Off"}`;
+      const dot = $("#projectorDot");
+      if (dot) dot.classList.toggle("ok", Boolean(state.projector.connected));
+      const label = $("#projectorLabel");
+      if (label) label.textContent = state.projector.connected ? "Projector connected" : "Projector idle";
+      $("#fullscreenBtn").classList.toggle("hidden", isHost);
+      $("#viewSubtitle").textContent = isHost ? "Teacher view: answers and controls stay private." : "Projector view: class-safe display.";
+    }
+
+    function renderScoreboard() {
+      const box = $("#scoreboard");
+      box.replaceChildren();
+      const editsLocked = state.settings.mode === "tournament" && !$("#gameScreen").classList.contains("hidden");
+      state.teams.forEach((team, index) => {
+        const card = el("article", { class: `team${index === state.activeTeamIndex ? " active" : ""}`, onclick: () => {
+          if (!isHost) return;
+          state.activeTeamIndex = index;
+          renderScoreboard();
+          saveState();
+          broadcast();
+        }});
+        const name = el("div", { class: "team-name", text: team.name });
+        const score = el("div", { class: "team-score", text: String(team.score) });
+        if (isHost && !editsLocked) {
+          name.contentEditable = "true";
+          score.contentEditable = "true";
+          name.addEventListener("keydown", stopEnter);
+          score.addEventListener("keydown", stopEnter);
+          name.addEventListener("blur", () => {
+            team.name = name.textContent.trim() || `Team ${index + 1}`;
+            renderAll();
+            saveState();
+          });
+          score.addEventListener("blur", () => {
+            team.score = clampInt(score.textContent, 0);
+            renderAll();
+            saveState();
+          });
+        }
+        card.append(name, score);
+        box.append(card);
+      });
+    }
+
+    function stopEnter(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        event.currentTarget.blur();
+      }
+    }
+
+    function renderBoard() {
+      const board = $("#board");
+      board.classList.toggle("double", state.isDouble);
+      board.replaceChildren();
+      const round = currentRound();
+      const cats = round?.categories || [];
+      if (!cats.length) {
+        board.className = "board";
+        board.append(el("div", { class: "board-empty" }, [
+          el("div", {}, [
+            el("h2", { text: "No questions loaded" }),
+            el("p", { class: "tiny", text: "Open the builder or paste JSON from the title screen." })
+          ])
+        ]));
         return;
       }
-
-      const blob = new Blob([raw], { type: 'application/json' });
-      const a = document.createElement('a');
-      const safe = slot.replace(/[^\w\-]+/g,'_').slice(0, 40) || 'slot';
-      a.href = URL.createObjectURL(blob);
-      a.download = `geffen_bowl_save__${safe}.json`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 250);
+      const maxRows = Math.max(...cats.map(cat => cat.questions.length), 0);
+      board.style.gridTemplateColumns = `repeat(${cats.length}, minmax(0, 1fr))`;
+      for (const cat of cats) board.append(el("div", { class: "cell category", text: cat.name }));
+      for (let row = 0; row < maxRows; row++) {
+        for (const cat of cats) {
+          const q = cat.questions[row];
+          const cell = el("div", { class: "cell" });
+          if (!q) {
+            cell.style.opacity = ".12";
+            board.append(cell);
+            continue;
+          }
+          const classes = ["cell", q.state === "unplayed" ? "playable" : q.state];
+          cell.className = classes.join(" ");
+          cell.append(el("div", { class: "value", text: String(q.points * (state.isDouble ? 2 : 1)) }));
+          if (isHost && q.state === "unplayed") {
+            cell.addEventListener("click", () => openQuestion(cat.id, q.id));
+          }
+          board.append(cell);
+        }
+      }
     }
 
-    function importSaveFromFile(file){
+    function renderHostPanel() {
+      const details = findQuestion();
+      const controlsEnabled = Boolean(details && isHost);
+      $("#hostQuestion").textContent = details ? details.q.question : "Open a tile to see the question and answer here.";
+      $("#hostAnswer").textContent = details ? details.q.answer : "Answer will appear privately.";
+      $("#hostTimer").textContent = String(state.timer.timeLeft);
+      $("#hostTimer").classList.toggle("low", state.timer.timeLeft <= 5 && controlsEnabled);
+      $("#revealClassBtn").disabled = !controlsEnabled;
+      $("#hideClassBtn").disabled = !controlsEnabled;
+      $("#noTeamBtn").disabled = !controlsEnabled || details.q.state !== "unplayed";
+      $("#pauseBtn").disabled = !controlsEnabled;
+      $("#pauseBtn").textContent = state.timer.paused ? "Resume" : "Pause";
+      $("#closeQuestionBtn").disabled = !controlsEnabled;
+
+      const awards = $("#awardButtons");
+      awards.replaceChildren();
+      state.teams.forEach((team, index) => {
+        const button = el("button", { class: "primary", text: `Award ${team.name}`, onclick: () => award(index) });
+        button.disabled = !controlsEnabled || details.q.state !== "unplayed";
+        awards.append(button);
+      });
+    }
+
+    function renderStage() {
+      const details = findQuestion();
+      if (!details) {
+        closeStage();
+        return;
+      }
+      $("#stageCategory").textContent = details.cat.name;
+      $("#stagePoints").textContent = `${details.q.points * (state.isDouble ? 2 : 1)} pts`;
+      $("#stageQuestion").textContent = details.q.question;
+      $("#stageAnswer").textContent = details.q.answer;
+      $("#stageAnswer").classList.toggle("show", isHost ? details.q.hostShown : details.q.projectorShown);
+      $("#stageTimer").textContent = String(state.timer.timeLeft);
+      $("#stageTimer").classList.toggle("low", state.timer.timeLeft <= 5);
+      $("#timeUp").classList.toggle("hidden", state.timer.timeLeft > 0);
+      $("#stageLayer").classList.add("show");
+    }
+
+    function closeStage() {
+      $("#stageLayer").classList.remove("show");
+    }
+
+    function openQuestion(categoryId, questionId) {
+      const roundIndex = state.currentRoundIndex;
+      const cat = currentRound().categories.find(c => c.id === categoryId);
+      const q = cat?.questions.find(item => item.id === questionId);
+      if (!q || q.state !== "unplayed") return;
+      pushUndo();
+      state.currentPick = { roundIndex, categoryId, questionId };
+      q.hostShown = true;
+      q.projectorShown = false;
+      state.timer = { running: true, paused: false, timeLeft: state.settings.timerDefault };
+      startTimer();
+      renderAll();
+      saveState();
+    }
+
+    function startTimer() {
+      clearTimer(false);
+      state.timer.running = true;
+      timerHandle = setInterval(() => {
+        if (!state.timer.running || state.timer.paused) return;
+        state.timer.timeLeft = Math.max(0, state.timer.timeLeft - 1);
+        renderHostPanel();
+        renderStage();
+        broadcast({ timer: true });
+        if (state.timer.timeLeft === 0) {
+          expireQuestion();
+          clearTimer(false);
+        }
+      }, 1000);
+    }
+
+    function clearTimer(reset = true) {
+      if (timerHandle) clearInterval(timerHandle);
+      timerHandle = null;
+      if (reset) state.timer = { running: false, paused: false, timeLeft: state.settings.timerDefault };
+    }
+
+    function expireQuestion() {
+      const details = findQuestion();
+      if (!details || details.q.state !== "unplayed") return;
+      details.q.state = "expired";
+      renderAll();
+      saveState();
+      maybeAdvanceRound();
+    }
+
+    function pointsFor(details) {
+      return details.q.points * (state.isDouble ? 2 : 1);
+    }
+
+    function award(teamIndex) {
+      const details = findQuestion();
+      if (!details || details.q.state !== "unplayed") return;
+      pushUndo();
+      state.teams[teamIndex].score += pointsFor(details);
+      state.activeTeamIndex = teamIndex;
+      details.q.state = "done";
+      details.q.hostShown = true;
+      details.q.projectorShown = true;
+      clearTimer(false);
+      renderAll();
+      saveState();
+      maybeAdvanceRound();
+    }
+
+    function noTeam() {
+      const details = findQuestion();
+      if (!details || details.q.state !== "unplayed") return;
+      pushUndo();
+      details.q.state = "missed";
+      details.q.hostShown = true;
+      details.q.projectorShown = true;
+      clearTimer(false);
+      renderAll();
+      saveState();
+      maybeAdvanceRound();
+    }
+
+    function revealClass() {
+      const details = findQuestion();
+      if (!details) return;
+      if (state.settings.safeMode && !confirm("Reveal this answer on the class projector?")) return;
+      details.q.projectorShown = true;
+      renderAll();
+      saveState();
+    }
+
+    function hideClassAnswer() {
+      const details = findQuestion();
+      if (!details) return;
+      details.q.projectorShown = false;
+      renderAll();
+      saveState();
+    }
+
+    function closeQuestion() {
+      clearTimer();
+      state.currentPick = null;
+      renderAll();
+      saveState();
+    }
+
+    function pauseTimer() {
+      if (!state.currentPick) return;
+      state.timer.paused = !state.timer.paused;
+      renderAll();
+      saveState();
+    }
+
+    function roundComplete() {
+      const round = currentRound();
+      const questions = round.categories.flatMap(cat => cat.questions);
+      return questions.length > 0 && questions.every(q => q.state !== "unplayed");
+    }
+
+    function maybeAdvanceRound() {
+      if (roundComplete() && state.currentRoundIndex < state.rounds.length - 1) {
+        setTimeout(() => nextRound(), 500);
+      }
+    }
+
+    function nextRound() {
+      closeQuestion();
+      if (state.currentRoundIndex >= state.rounds.length - 1) {
+        alert("No more rounds configured.");
+        return;
+      }
+      pushUndo();
+      state.currentRoundIndex += 1;
+      state.isDouble = ["tworound", "tournament"].includes(state.settings.mode);
+      renderAll();
+      saveState();
+    }
+
+    function undo() {
+      const previous = undoStack.pop();
+      if (!previous) {
+        alert("Nothing to undo.");
+        return;
+      }
+      clearTimer(false);
+      state = previous;
+      if (state.timer.running && state.currentPick) startTimer();
+      renderAll();
+      saveState();
+    }
+
+    function renderBuilder() {
+      const body = $("#builderBody");
+      body.replaceChildren();
+      const round = currentRound();
+      const top = el("section", { class: "panel" });
+      const roundSelect = el("select");
+      state.rounds.forEach((item, index) => {
+        const opt = el("option", { value: String(index), text: item.title });
+        if (index === state.currentRoundIndex) opt.selected = true;
+        roundSelect.append(opt);
+      });
+      roundSelect.addEventListener("change", () => {
+        state.currentRoundIndex = clampInt(roundSelect.value, 0, 0, state.rounds.length - 1);
+        renderBuilder();
+        renderAll();
+        saveState();
+      });
+      const titleInput = el("input", { value: round.title });
+      titleInput.addEventListener("input", () => {
+        round.title = titleInput.value || "Round";
+        renderLabels();
+        saveState();
+      });
+      top.append(el("div", { class: "form-grid" }, [
+        el("div", {}, [el("label", { text: "Editing Round" }), roundSelect]),
+        el("div", {}, [el("label", { text: "Round Title" }), titleInput])
+      ]));
+      body.append(top);
+
+      if (!round.categories.length) {
+        body.append(el("section", { class: "panel" }, [el("p", { class: "tiny", text: "No categories yet. Add one to start building the board." })]));
+      }
+
+      for (const cat of round.categories) {
+        const card = el("section", { class: "cat-card" });
+        const nameInput = el("input", { value: cat.name });
+        nameInput.addEventListener("input", () => {
+          cat.name = nameInput.value || "Category";
+          renderBoard();
+          saveState();
+          broadcast();
+        });
+        const removeCat = el("button", { class: "danger", text: "Delete Category", onclick: () => {
+          if (!confirm(`Delete ${cat.name}?`)) return;
+          round.categories = round.categories.filter(item => item.id !== cat.id);
+          renderBuilder();
+          renderAll();
+          saveState();
+        }});
+        const addQ = el("button", { class: "primary", text: "Add Question", onclick: () => {
+          cat.questions.push(normalizeQuestion({ question: "New question", answer: "New answer", points: (cat.questions.length + 1) * 100 }));
+          renderBuilder();
+          renderAll();
+          saveState();
+        }});
+        card.append(el("div", { class: "row" }, [
+          el("div", { style: "flex:1 1 260px" }, [el("label", { text: "Category Name" }), nameInput]),
+          addQ,
+          removeCat
+        ]));
+        cat.questions.forEach((q) => {
+          const qInput = el("input", { value: q.question });
+          const aInput = el("input", { value: q.answer });
+          const pInput = el("input", { type: "number", min: "0", step: "50", value: String(q.points) });
+          qInput.addEventListener("input", () => { q.question = qInput.value; saveState(); broadcast(); });
+          aInput.addEventListener("input", () => { q.answer = aInput.value; saveState(); broadcast(); });
+          pInput.addEventListener("input", () => { q.points = clampInt(pInput.value, 0); renderBoard(); saveState(); broadcast(); });
+          const del = el("button", { class: "danger", text: "Delete", onclick: () => {
+            cat.questions = cat.questions.filter(item => item.id !== q.id);
+            renderBuilder();
+            renderAll();
+            saveState();
+          }});
+          card.append(el("div", { class: "question-row" }, [
+            el("div", {}, [el("label", { text: "Question" }), qInput]),
+            el("div", {}, [el("label", { text: "Answer" }), aInput]),
+            el("div", {}, [el("label", { text: "Points" }), pInput]),
+            del
+          ]));
+        });
+        body.append(card);
+      }
+    }
+
+    function openBuilder() {
+      if (!isHost) return;
+      if (state.settings.mode === "tournament" && !$("#gameScreen").classList.contains("hidden")) {
+        alert("Tournament mode locks question edits once the game starts. Return to the title screen to edit.");
+        return;
+      }
+      renderBuilder();
+      $("#builder").classList.add("show");
+      $("#closeBuilderBtn").focus();
+    }
+
+    function closeBuilder() {
+      $("#builder").classList.remove("show");
+      renderAll();
+      saveState();
+    }
+
+    function addRound() {
+      state.rounds.push(normalizeRound({ title: `Round ${state.rounds.length + 1}`, categories: {} }, state.rounds.length));
+      state.currentRoundIndex = state.rounds.length - 1;
+      renderBuilder();
+      renderAll();
+      saveState();
+    }
+
+    function addCategory() {
+      currentRound().categories.push(makeCategory(`Category ${currentRound().categories.length + 1}`, [
+        { question: "New question", answer: "New answer", points: 100 }
+      ]));
+      renderBuilder();
+      renderAll();
+      saveState();
+    }
+
+    let channel = null;
+    try { channel = new BroadcastChannel("geffen_bowl_classroom_channel_v5"); } catch {}
+
+    function send(payload) {
+      if (channel) channel.postMessage(payload);
+      if (projectorWindow && !projectorWindow.closed) {
+        projectorWindow.postMessage(payload, location.origin);
+      }
+    }
+
+    function broadcast(extra = {}) {
+      if (!isHost || !state.settings.projectorEnabled) return;
+      send({ type: "STATE", state: clone(state), extra });
+    }
+
+    function handleMessage(payload) {
+      if (!payload || typeof payload !== "object") return;
+      if (payload.type === "PING" && isHost) {
+        state.projector.connected = true;
+        renderLabels();
+        broadcast({ pingReply: true });
+        return;
+      }
+      if (payload.type === "STATE" && !isHost) {
+        state = migrateState(payload.state);
+        state.projector.connected = true;
+        renderAll();
+      }
+    }
+
+    if (channel) channel.onmessage = (event) => handleMessage(event.data);
+    window.addEventListener("message", (event) => {
+      if (event.origin !== location.origin) return;
+      handleMessage(event.data);
+    });
+
+    function openProjector() {
+      if (!state.settings.projectorEnabled) {
+        alert("Projector mode is turned off on the title screen.");
+        return;
+      }
+      const url = new URL(location.href);
+      url.searchParams.set("view", "projector");
+      projectorWindow = window.open(url.toString(), "GEFFEN_BOWL_PROJECTOR", "popup,width=1280,height=800");
+      if (!projectorWindow) {
+        alert("Popup blocked. Allow popups for this page, then try again.");
+        return;
+      }
+      setTimeout(() => {
+        send({ type: "PING" });
+        broadcast();
+      }, 300);
+    }
+
+    function exportSave() {
+      const raw = localStorage.getItem(saveKey(currentSlot()));
+      if (!raw) {
+        alert("No save exists in this slot yet.");
+        return;
+      }
+      const blob = new Blob([raw], { type: "application/json" });
+      const link = el("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `geffen-bowl-${currentSlot().replace(/[^\w-]+/g, "_")}.json`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(link.href), 300);
+    }
+
+    function importSave(file) {
       const reader = new FileReader();
       reader.onload = () => {
-        try{
-          const txt = String(reader.result || '');
-          const payload = JSON.parse(txt);
-
-          if (!payload?.state || !payload.state?.meta){
-            throw new Error('Not a Geffen Bowl save file.');
-          }
-
-          // Force this imported state into current slot
-          const slot = currentSlot();
-          payload.state.settings = payload.state.settings || {};
-          payload.state.settings.saveSlot = slot;
-
-          // Store it
-          localStorage.setItem(getSaveKey(slot), JSON.stringify(payload));
-
-          // Load into memory immediately
-          loadStateForSlot(slot);
-
-          alert(`Imported save into slot "${slot}".`);
-          renderSlotSelect(slot);
-          qs('#jsonInputTitle').placeholder = `Saved game detected in "${slot}". Click Start to resume, or paste JSON to overwrite.`;
-        }catch(e){
-          alert('Import failed. Please select a valid exported save file.');
+        try {
+          const payload = JSON.parse(String(reader.result || ""));
+          if (!payload.state) throw new Error("Bad save file.");
+          payload.state.settings.saveSlot = currentSlot();
+          localStorage.setItem(saveKey(currentSlot()), JSON.stringify(payload));
+          loadSlot(currentSlot());
+          renderAll();
+          alert("Save imported into the current slot.");
+        } catch {
+          alert("That file does not look like a Geffen Bowl save.");
         }
       };
       reader.readAsText(file);
     }
 
-    // ----------------------------
-    // Mode presets
-    // ----------------------------
-    function applyModePreset(mode){
-      state.settings.mode = mode;
+    function createSlot() {
+      const name = sanitizeSlotName($("#newSlotName").value);
+      if (!name) return alert("Enter a slot name.");
+      ensureSlot(name);
+      state.settings.saveSlot = name;
+      loadSlot(name);
+      renderSlotSelect();
+      renderAll();
+    }
 
-      if (mode === 'classic'){
-        state.settings.timerDefault = clampInt(state.settings.timerDefault, 10) || 10;
-        state.rounds = [state.rounds[0] || { id:'r1_'+nowId(), title:'Round 1', categories:{} }];
-        state.rounds[0].title = 'Round 1';
-        state.currentRoundIndex = 0;
+    function renameSlot() {
+      const oldName = currentSlot();
+      const newName = sanitizeSlotName($("#renameSlotName").value);
+      if (!newName) return alert("Enter a new name.");
+      if (readSlots().includes(newName)) return alert("That slot already exists.");
+      const raw = localStorage.getItem(saveKey(oldName));
+      if (raw) {
+        localStorage.setItem(saveKey(newName), raw);
+        localStorage.removeItem(saveKey(oldName));
       }
-      if (mode === 'tworound'){
-        state.settings.timerDefault = clampInt(state.settings.timerDefault, 10) || 10;
-        const r1 = state.rounds[0] || { id:'r1_'+nowId(), title:'Round 1', categories:{} };
-        const r2 = state.rounds[1] || { id:'r2_'+nowId(), title:'Round 2', categories:{} };
-        r1.title = 'Round 1';
-        r2.title = 'Round 2';
-        state.rounds = [r1, r2];
-        state.currentRoundIndex = 0;
-      }
-      if (mode === 'lightning'){
-        state.settings.timerDefault = 7;
-        const r1 = state.rounds[0] || { id:'r1_'+nowId(), title:'Round 1', categories:{} };
-        r1.title = 'Round 1';
-        state.rounds = [r1];
-        state.currentRoundIndex = 0;
-      }
-      if (mode === 'tournament'){
-        state.settings.timerDefault = clampInt(state.settings.timerDefault, 10) || 10;
-        const r1 = state.rounds[0] || { id:'r1_'+nowId(), title:'Round 1', categories:{} };
-        const r2 = state.rounds[1] || { id:'r2_'+nowId(), title:'Round 2', categories:{} };
-        r1.title = 'Round 1';
-        r2.title = 'Round 2';
-        state.rounds = [r1, r2];
-        state.currentRoundIndex = 0;
-      }
-
-      state.timer.timeLeft = state.settings.timerDefault;
-      state.timer.running = false;
-      state.timer.paused = false;
-      state.isDouble = false;
-    }
-
-    // ----------------------------
-    // Teams
-    // ----------------------------
-    function setTeamCount(n){
-      const count = Math.max(2, Math.min(6, clampInt(n, 3)));
-      state.settings.teamCount = count;
-
-      const next = [];
-      for (let i=0; i<count; i++){
-        const existing = state.teams[i];
-        next.push(existing || { id:`t${i+1}_${nowId()}`, name:`Team ${i+1}`, score:0 });
-      }
-      state.teams = next;
-      state.activeTeamIndex = Math.min(state.activeTeamIndex, state.teams.length - 1);
-    }
-
-    // ----------------------------
-    // Rendering
-    // ----------------------------
-    function showTitle(){
-      qs('#titleScreen').style.display = 'flex';
-      qs('#gameScreen').style.display = 'none';
-    }
-
-    function showGame(){
-      qs('#titleScreen').style.display = 'none';
-      qs('#gameScreen').style.display = 'block';
-    }
-
-    function renderHeaderPills(){
-      qs('#modePill strong').innerText = ({
-        classic:'Classic',
-        tworound:'Two-Round',
-        lightning:'Lightning',
-        tournament:'Tournament'
-      })[state.settings.mode] || 'Mode';
-
-      qs('#timerDefaultReadout').innerText = String(state.settings.timerDefault);
-      qs('#safeModeReadout').innerText = state.settings.safeMode ? 'ON' : 'OFF';
-
-      const round = state.rounds[state.currentRoundIndex];
-      qs('#roundPill strong').innerText = round?.title || `Round ${state.currentRoundIndex+1}`;
-
-      qs('#toggleDoubleBtn').innerText = `Double: ${state.isDouble ? 'ON' : 'OFF'}`;
-      const board = qs('#board');
-      if (state.isDouble) board.classList.add('double-on');
-      else board.classList.remove('double-on');
-
-      qs('#safePill').style.borderColor = state.settings.safeMode ? 'rgba(255,224,102,.30)' : 'rgba(255,255,255,.10)';
-    }
-
-    function renderTeams(){
-      const row = qs('#teamsRow');
-      row.innerHTML = '';
-
-      state.teams.forEach((t, idx) => {
-        const el = document.createElement('div');
-        el.className = 'team' + (idx === state.activeTeamIndex ? ' active' : '');
-        el.dataset.teamIndex = String(idx);
-
-        el.innerHTML = `
-          <div class="name editable" contenteditable="${isProjectorView ? 'false':'true'}" data-type="teamName">${escapeHtml(t.name)}</div>
-          <div class="score editable" contenteditable="${isProjectorView ? 'false':'true'}" data-type="teamScore">${escapeHtml(String(t.score))}</div>
-        `;
-
-        if (!isProjectorView){
-          el.addEventListener('click', () => {
-            state.activeTeamIndex = idx;
-            renderTeams();
-            saveState();
-            broadcastState();
-          });
-
-          const nameEl = el.querySelector('[data-type="teamName"]');
-          const scoreEl = el.querySelector('[data-type="teamScore"]');
-
-          nameEl.addEventListener('keydown', preventEnterKey);
-          nameEl.addEventListener('blur', () => {
-            t.name = nameEl.innerText.replace(/\s+/g,' ').trim() || `Team ${idx+1}`;
-            renderTeams();
-            setWinnerBanner();
-            saveState();
-            broadcastState();
-          });
-
-          scoreEl.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter'){ e.preventDefault(); scoreEl.blur(); }
-          });
-          scoreEl.addEventListener('blur', () => {
-            t.score = clampInt(scoreEl.innerText, 0);
-            renderTeams();
-            setWinnerBanner();
-            saveState();
-            broadcastState();
-          });
-        }
-
-        row.appendChild(el);
-      });
-    }
-
-    function getCurrentRound(){
-      return state.rounds[state.currentRoundIndex] || state.rounds[0];
-    }
-
-    function getCategories(){
-      const r = getCurrentRound();
-      return Object.keys(r?.categories || {});
-    }
-
-    function maxRows(){
-      const r = getCurrentRound();
-      const cats = getCategories();
-      if (!cats.length) return 0;
-      return Math.max(...cats.map(c => (r.categories[c] || []).length), 0);
-    }
-
-    function applyCellStateClass(cell, st){
-      cell.classList.remove('answered','missed','expired','clickable');
-      if (st === 'answered') cell.classList.add('answered');
-      if (st === 'missed') cell.classList.add('missed');
-      if (st === 'expired') cell.classList.add('expired');
-      if (st === 'unplayed') cell.classList.add('clickable');
-    }
-
-    function renderBoard(){
-      const board = qs('#board');
-      board.innerHTML = '';
-
-      const r = getCurrentRound();
-      const cats = getCategories();
-      if (!cats.length){
-        board.innerHTML = `
-          <div class="panel" style="max-width:760px; margin: 0 auto; text-align:center;">
-            <h3 style="margin:0 0 10px; letter-spacing:.14em; text-transform:uppercase; color: var(--gold);">No questions loaded</h3>
-            <div class="tiny">Open the Question Builder, or paste JSON on the title screen.</div>
-          </div>
-        `;
-        return;
-      }
-
-      const rows = maxRows();
-      board.style.gridTemplateColumns = `repeat(${cats.length}, 1fr)`;
-      board.style.gridTemplateRows = `repeat(${rows + 1}, auto)`;
-
-      for (const cat of cats){
-        const cell = document.createElement('div');
-        cell.className = 'cell category';
-        cell.innerHTML = `<div class="cat">${escapeHtml(cat)}</div>`;
-        board.appendChild(cell);
-      }
-
-      for (let i=0; i<rows; i++){
-        for (const cat of cats){
-          const q = (r.categories[cat] || [])[i];
-          const cell = document.createElement('div');
-          cell.className = 'cell';
-
-          if (q){
-            const st = q._state || 'unplayed';
-            const value = q.points * (state.isDouble ? 2 : 1);
-
-            cell.dataset.category = cat;
-            cell.dataset.index = String(i);
-            cell.dataset.state = st;
-
-            cell.innerHTML = `<div class="value">${escapeHtml(String(value))}</div>`;
-            applyCellStateClass(cell, st);
-
-            if (!isProjectorView && st === 'unplayed'){
-              cell.onclick = () => selectQuestion(state.currentRoundIndex, cat, i);
-            }
-          } else {
-            cell.style.opacity = '.12';
-            cell.style.borderColor = 'rgba(255,255,255,.06)';
-            cell.style.filter = 'saturate(.2)';
-          }
-
-          board.appendChild(cell);
-        }
-      }
-
-      renderHeaderPills();
-    }
-
-    function setWinnerBanner(){
-      const winnerEl = qs('#winner');
-      const max = Math.max(...state.teams.map(t => t.score), 0);
-      const winners = state.teams.filter(t => t.score === max).map(t => t.name || 'Team');
-
-      if (!getCategories().length){
-        winnerEl.style.display = 'none';
-        return;
-      }
-
-      winnerEl.style.display = 'block';
-      winnerEl.innerText = (winners.length === 1)
-        ? `Leading: ${winners[0]} (${max})`
-        : `Tie: ${winners.join(' & ')} (${max})`;
-    }
-
-    // ----------------------------
-    // Modal + timer
-    // ----------------------------
-    let timerInterval = null;
-
-    function showBackdrop(){ qs('#backdrop').classList.add('show'); }
-    function hideBackdrop(){ qs('#backdrop').classList.remove('show'); }
-
-    function showModal(){
-      showBackdrop();
-      qs('#questionModal').classList.add('show');
-      qs('#questionModal').style.display = 'block';
-    }
-    function hideModal(){
-      qs('#questionModal').classList.remove('show');
-      qs('#questionModal').style.display = 'none';
-      hideBackdrop();
-    }
-
-    function clearTimer(){
-      if (timerInterval) clearInterval(timerInterval);
-      timerInterval = null;
-      state.timer.running = false;
-      state.timer.paused = false;
-      qs('#pauseBtn').innerText = 'Pause';
-      qs('#timer').classList.remove('low');
-      qs('#timeOverlay').classList.remove('show');
-    }
-
-    function startTimer(){
-      clearTimer();
-      state.timer.running = true;
-      state.timer.paused = false;
-      timerInterval = setInterval(() => {
-        if (state.timer.paused) return;
-
-        if (state.timer.timeLeft > 0){
-          state.timer.timeLeft--;
-          renderTimerUI();
-          broadcastState({ timerTick: true });
-          saveState();
-
-          if (state.timer.timeLeft === 0){
-            qs('#timeOverlay').classList.add('show');
-            markExpiredIfStillUnplayed();
-            clearTimer();
-            broadcastState();
-            saveState();
-          }
-        }
-      }, 1000);
-    }
-
-    function renderTimerUI(){
-      qs('#timer').innerText = String(state.timer.timeLeft);
-      qs('#timer').classList.toggle('low', state.timer.timeLeft <= 5);
-    }
-
-    function preventEnterKey(e){
-      if (e.key === 'Enter'){
-        e.preventDefault();
-        document.execCommand('insertText', false, ' ');
-      }
-    }
-
-    function currentQuestionObj(){
-      if (!state.currentPick) return null;
-      const { roundIndex, category, index } = state.currentPick;
-      const r = state.rounds[roundIndex];
-      const q = r?.categories?.[category]?.[index];
-      return q || null;
-    }
-
-    function updateVisibilityPills(){
-      const q = currentQuestionObj();
-      const hostShown = !!q?._hostShown;
-      const projShown = !!q?._projShown;
-
-      qs('#hostVisText').innerText = hostShown ? 'SHOWN' : 'HIDDEN';
-      qs('#projVisText').innerText = projShown ? 'SHOWN' : 'HIDDEN';
-
-      const hostPill = qs('#hostVisPill');
-      const projPill = qs('#projVisPill');
-
-      hostPill.classList.toggle('ok', hostShown);
-      hostPill.classList.toggle('no', !hostShown);
-
-      projPill.classList.toggle('ok', projShown);
-      projPill.classList.toggle('no', !projShown);
-    }
-
-    function renderAwardButtons(){
-      const row = qs('#awardButtonsRow');
-      row.innerHTML = '';
-
-      state.teams.forEach((t, idx) => {
-        const b = document.createElement('button');
-        b.className = 'team-button primary';
-        b.innerText = t.name || `Team ${idx+1}`;
-        b.addEventListener('click', () => awardToTeam(idx));
-        row.appendChild(b);
-      });
-    }
-
-    function selectQuestion(roundIndex, category, index){
-      const r = state.rounds[roundIndex];
-      const q = r?.categories?.[category]?.[index];
-      if (!q) return;
-      if ((q._state || 'unplayed') !== 'unplayed') return;
-
-      state.currentPick = { roundIndex, category, index };
-
-      qs('#qaMetaLeft').innerHTML = `<strong>${escapeHtml(category)}</strong>`;
-      const pts = q.points * (state.isDouble ? 2 : 1);
-      qs('#qaMetaRight').innerHTML = `<strong>${pts} pts</strong>`;
-
-      qs('#questionText').innerText = q.question;
-      qs('#answerText').innerText = '';
-      qs('#answerText').classList.remove('revealed');
-
-      state.timer.timeLeft = clampInt(state.settings.timerDefault, 10);
-      renderTimerUI();
-      qs('#timeOverlay').classList.remove('show');
-
-      updateVisibilityPills();
-      renderAwardButtons();
-
-      showModal();
-      startTimer();
-
-      broadcastState();
+      writeSlots(readSlots().map(slot => slot === oldName ? newName : slot));
+      state.settings.saveSlot = newName;
+      renderSlotSelect();
       saveState();
     }
 
-    function pauseTimer(){
-      if (!state.currentPick) return;
-      state.timer.paused = !state.timer.paused;
-      qs('#pauseBtn').innerText = state.timer.paused ? 'Resume' : 'Pause';
-      broadcastState();
-      saveState();
+    function duplicateSlot() {
+      const name = sanitizeSlotName($("#duplicateSlotName").value);
+      if (!name) return alert("Enter a slot name.");
+      if (readSlots().includes(name)) return alert("That slot already exists.");
+      const payload = { state: clone(state), undoStack: clone(undoStack) };
+      payload.state.settings.saveSlot = name;
+      localStorage.setItem(saveKey(name), JSON.stringify(payload));
+      ensureSlot(name);
+      state.settings.saveSlot = name;
+      renderSlotSelect();
     }
 
-    function showAnswerHost(toggle=true){
-      const q = currentQuestionObj();
-      if (!q) return;
-
-      q._hostShown = toggle ? !q._hostShown : true;
-
-      if (q._hostShown){
-        qs('#answerText').innerText = q.answer;
-        qs('#answerText').classList.add('revealed');
-      } else {
-        qs('#answerText').innerText = '';
-        qs('#answerText').classList.remove('revealed');
-      }
-
-      updateVisibilityPills();
-      broadcastState();
-      saveState();
-    }
-
-    function showAnswerProjector(forceOn=null){
-      const q = currentQuestionObj();
-      if (!q) return;
-
-      const target = (forceOn === null) ? !q._projShown : !!forceOn;
-      q._projShown = target;
-
-      updateVisibilityPills();
-      broadcastState();
-      saveState();
-    }
-
-    function showAnswerBoth(){
-      const q = currentQuestionObj();
-      if (!q) return;
-
-      q._hostShown = true;
-      qs('#answerText').innerText = q.answer;
-      qs('#answerText').classList.add('revealed');
-
-      q._projShown = true;
-
-      updateVisibilityPills();
-      broadcastState();
-      saveState();
-    }
-
-    function markExpiredIfStillUnplayed(){
-      const q = currentQuestionObj();
-      if (!q) return;
-      if ((q._state || 'unplayed') !== 'unplayed') return;
-
-      const { roundIndex, category, index } = state.currentPick;
-      const prevState = q._state || 'unplayed';
-
-      q._state = 'expired';
-
-          undoStack.push({
-        type:'expired',
-        roundIndex, category, index,
-        prevState
-      });
-
-      renderBoard();
-
-      if (isCurrentRoundComplete()){
-        setTimeout(() => {
-          nextRoundIfAvailable();
-        }, 600);
-      }
-
-      saveState();
-    }
-
-    function closeQuestion(){
-      clearTimer();
-      hideModal();
-      state.currentPick = null;
-      broadcastState();
-      saveState();
-    }
-
-    function pointsForCurrent(){
-      const q = currentQuestionObj();
-      if (!q) return 0;
-      return q.points * (state.isDouble ? 2 : 1);
-    }
-
-    function awardToTeam(teamIndex){
-      const q = currentQuestionObj();
-      if (!q) return;
-
-      const { roundIndex, category, index } = state.currentPick;
-      const prevState = q._state || 'unplayed';
-      if (prevState !== 'unplayed') return;
-
-      const pts = pointsForCurrent();
-      const prevScores = state.teams.map(t => t.score);
-
-      state.teams[teamIndex].score += pts;
-      state.activeTeamIndex = teamIndex;
-
-      q._state = 'answered';
-      q._hostShown = true;
-      qs('#answerText').innerText = q.answer;
-      qs('#answerText').classList.add('revealed');
-
-      undoStack.push({
-        type:'award',
-        roundIndex, category, index,
-        prevState,
-        teamIndex,
-        pointsDelta: pts,
-        prevScores
-      });
-
-      renderTeams();
-      setWinnerBanner();
-      renderBoard();
-      updateVisibilityPills();
-      clearTimer();
-
-      broadcastState();
-
-      if (isCurrentRoundComplete()){
-        setTimeout(() => {
-          nextRoundIfAvailable();
-        }, 600);
-      }
-
-      saveState();
-    }
-
-    function noTeamCorrect(){
-      const q = currentQuestionObj();
-      if (!q) return;
-
-      const { roundIndex, category, index } = state.currentPick;
-      const prevState = q._state || 'unplayed';
-      if (prevState !== 'unplayed') return;
-
-      undoStack.push({
-        type:'noTeam',
-        roundIndex, category, index,
-        prevState
-      });
-
-      q._state = 'missed';
-      q._hostShown = true;
-      qs('#answerText').innerText = q.answer;
-      qs('#answerText').classList.add('revealed');
-
-      renderBoard();
-      updateVisibilityPills();
-      clearTimer();
-
-      broadcastState();
-
-      if (isCurrentRoundComplete()){
-        setTimeout(() => {
-          nextRoundIfAvailable();
-        }, 600);
-      }
-
-      saveState();
-    }
-
-    function undoLast(){
-      if (!undoStack.length){
-        alert('No actions to undo.');
-        return;
-      }
-
-      const last = undoStack.pop();
-      const r = state.rounds[last.roundIndex];
-      const q = r?.categories?.[last.category]?.[last.index];
-      if (!q) return;
-
-      q._state = last.prevState || 'unplayed';
-
-      if (last.type === 'award' && Array.isArray(last.prevScores)){
-        state.teams.forEach((t, i) => t.score = last.prevScores[i] ?? t.score);
-      }      renderTeams();
-      setWinnerBanner();
-      renderBoard();
-
-      broadcastState();
-      saveState();
-    }
-
-    function toggleDouble(){
-      state.isDouble = !state.isDouble;
-      renderHeaderPills();
-      renderBoard();
-      broadcastState();
-      saveState();
-    }
-
-    // ----------------------------
-    // Rounds
-    // ----------------------------
-  function isCurrentRoundComplete(){
-const r = getCurrentRound();
-if (!r) return false;
-
-return Object.values(r.categories || {})
-.flat()
-.every(q => (q._state || 'unplayed') !== 'unplayed');
-}
-  function showRoundSplash(){
-      const r = getCurrentRound();
-      qs('#splashTitle').innerText = (r?.title || `Round ${state.currentRoundIndex+1}`).toUpperCase();
-      qs('#splashSubtitle').innerText = 'Get ready.';
-      qs('#roundSplash').classList.add('show');
-      broadcastState({ splash: true });
-    }
-
-    function hideRoundSplash(){
-      qs('#roundSplash').classList.remove('show');
-      broadcastState({ splash: false });
-    }
-
-    function startRound(){
-      hideRoundSplash();
-      renderBoard();
-      broadcastState();
-      saveState();
-    }
-
-    function nextRoundIfAvailable(){
-      if (state.currentRoundIndex < state.rounds.length - 1){
-        state.currentRoundIndex++;
-        state.isDouble = (state.settings.mode === 'tworound' || state.settings.mode === 'tournament');
-        renderHeaderPills();
-        renderBoard();
-        showRoundSplash();
-        saveState();
-        broadcastState();
-      } else {
-        alert('No more rounds configured.');
-      }
-    }
-
-    // ----------------------------
-    // Builder
-    // ----------------------------
-    function ensureSomeQuestionsExist(){
-      const r = getCurrentRound();
-      if (!Object.keys(r.categories).length){
-        r.categories['Category 1'] = [
-          normalizeQuestion({question:'Sample Q1', answer:'Sample A1', points:100}),
-          normalizeQuestion({question:'Sample Q2', answer:'Sample A2', points:200}),
-          normalizeQuestion({question:'Sample Q3', answer:'Sample A3', points:300})
-        ];
-      }
-    }
-
-    function openBuilder(){
-      if (isProjectorView) return;
-
-      ensureSomeQuestionsExist();
-      renderBuilder();
-      qs('#builder').classList.add('show');
-      qs('#backdrop').classList.add('show');
-    }
-
-    function closeBuilder(){
-      qs('#builder').classList.remove('show');
-      qs('#backdrop').classList.remove('show');
-      renderBoard();
-      saveState();
-      broadcastState();
-    }
-
-    function addRound(){
-      const n = state.rounds.length + 1;
-      state.rounds.push({ id: `r${n}_${nowId()}`, title:`Round ${n}`, categories:{} });
-      renderBuilder();
-      saveState();
-      broadcastState();
-    }
-
-    function addCategory(){
-      const r = getCurrentRound();
-      const base = 'New Category';
-      let name = base;
-      let i = 2;
-      while (r.categories[name]){ name = `${base} ${i++}`; }
-      r.categories[name] = [
-        normalizeQuestion({question:'New question', answer:'New answer', points:100})
-      ];
-      renderBuilder();
-      saveState();
-      broadcastState();
-    }
-
-    function addQuestion(cat){
-      const r = getCurrentRound();
-      r.categories[cat] = r.categories[cat] || [];
-      r.categories[cat].push(normalizeQuestion({question:'New question', answer:'New answer', points:100}));
-      renderBuilder();
-      saveState();
-      broadcastState();
-    }
-
-    function removeCategory(cat){
-      const r = getCurrentRound();
-      if (!confirm(`Delete category "${cat}"?`)) return;
-      delete r.categories[cat];
-      renderBuilder();
-      saveState();
-      broadcastState();
-    }
-
-    function removeQuestion(cat, idx){
-      const r = getCurrentRound();
-      if (!confirm('Delete this question?')) return;
-      r.categories[cat].splice(idx, 1);
-      renderBuilder();
-      saveState();
-      broadcastState();
-    }
-
-    function renameCategory(oldName, newName){
-      const r = getCurrentRound();
-      const nn = String(newName || '').trim();
-      if (!nn || nn === oldName) return;
-      if (r.categories[nn]){
-        alert('That category name already exists.');
-        return;
-      }
-      r.categories[nn] = r.categories[oldName];
-      delete r.categories[oldName];
-      renderBuilder();
-      saveState();
-      broadcastState();
-    }
-
-    function renderBuilder(){
-      const body = qs('#builderBody');
-      body.innerHTML = '';
-
-      const roundPanel = document.createElement('div');
-      roundPanel.className = 'catBlock';
-      roundPanel.innerHTML = `
-        <div class="catTop">
-          <div class="catName">Editing Round</div>
-          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-            <select id="builderRoundSelect" style="min-width:220px;">
-              ${state.rounds.map((r,i) => `<option value="${i}" ${i===state.currentRoundIndex?'selected':''}>${escapeHtml(r.title)}</option>`).join('')}
-            </select>
-            <button id="builderNextRoundBtn">Next Round</button>
-          </div>
-        </div>
-        <div class="tiny">Tip: keep category names short for cleaner projector layout.</div>
-      `;
-      body.appendChild(roundPanel);
-
-      const roundSelect = roundPanel.querySelector('#builderRoundSelect');
-      roundSelect.addEventListener('change', () => {
-        state.currentRoundIndex = clampInt(roundSelect.value, 0);
-        renderBuilder();
-        renderHeaderPills();
-        saveState();
-        broadcastState();
-      });
-
-      roundPanel.querySelector('#builderNextRoundBtn').addEventListener('click', () => nextRoundIfAvailable());
-
-      const r = getCurrentRound();
-      const cats = Object.keys(r.categories || {});
-      if (!cats.length){
-        const empty = document.createElement('div');
-        empty.className = 'catBlock';
-        empty.innerHTML = `<div class="tiny">No categories yet. Click <strong>Add Category</strong>.</div>`;
-        body.appendChild(empty);
-        return;
-      }
-
-      for (const cat of cats){
-        const block = document.createElement('div');
-        block.className = 'catBlock';
-
-        block.innerHTML = `
-          <div class="catTop">
-            <div>
-              <div class="catName">Category</div>
-              <input type="text" value="${escapeHtml(cat)}" data-cat-rename="${escapeHtml(cat)}" />
-            </div>
-            <div style="display:flex; gap:10px; flex-wrap:wrap;">
-              <button class="btn-gold" data-add-q="${escapeHtml(cat)}">Add Question</button>
-              <button class="btn-danger" data-del-cat="${escapeHtml(cat)}">Delete Category</button>
-            </div>
-          </div>
-          <div class="hr"></div>
-          <div class="tiny" style="margin-bottom:10px;">Questions</div>
-          <div data-qwrap="${escapeHtml(cat)}"></div>
-        `;
-
-        body.appendChild(block);
-
-        const renameInput = block.querySelector('input[type="text"]');
-        renameInput.addEventListener('blur', () => {
-          renameCategory(cat, renameInput.value);
-        });
-
-        block.querySelector(`[data-add-q="${cssEscape(cat)}"]`)?.addEventListener('click', () => addQuestion(cat));
-        block.querySelector(`[data-del-cat="${cssEscape(cat)}"]`)?.addEventListener('click', () => removeCategory(cat));
-
-        const wrap = block.querySelector(`[data-qwrap="${cssEscape(cat)}"]`);
-        (r.categories[cat] || []).forEach((q, idx) => {
-          const row = document.createElement('div');
-          row.className = 'qRow';
-
-          row.innerHTML = `
-            <div class="qBox">
-              <div class="mini">Question</div>
-              <input type="text" value="${escapeHtml(q.question)}" data-q="${escapeHtml(cat)}" data-i="${idx}" data-field="question" />
-            </div>
-            <div class="qBox">
-              <div class="mini">Answer</div>
-              <input type="text" value="${escapeHtml(q.answer)}" data-q="${escapeHtml(cat)}" data-i="${idx}" data-field="answer" />
-            </div>
-            <div class="qBox">
-              <div class="mini">Points</div>
-              <input type="number" min="0" step="50" value="${escapeHtml(String(q.points))}" data-q="${escapeHtml(cat)}" data-i="${idx}" data-field="points" />
-            </div>
-            <div class="qBox">
-              <div class="mini">Actions</div>
-              <button class="btn-danger" data-del-q="${escapeHtml(cat)}" data-di="${idx}">Delete</button>
-            </div>
-          `;
-
-          wrap.appendChild(row);
-
-          row.querySelectorAll('input').forEach(inp => {
-            inp.addEventListener('input', () => {
-              const c = inp.getAttribute('data-q');
-              const i = clampInt(inp.getAttribute('data-i'), -1);
-              const f = inp.getAttribute('data-field');
-              const qq = r.categories[c]?.[i];
-              if (!qq) return;
-              if (f === 'question') qq.question = inp.value;
-              if (f === 'answer') qq.answer = inp.value;
-              if (f === 'points') qq.points = clampInt(inp.value, 0);
-              saveState();
-              broadcastState();
-              renderBoard();
-            });
-          });
-
-          row.querySelector(`[data-del-q="${cssEscape(cat)}"][data-di="${idx}"]`)?.addEventListener('click', () => removeQuestion(cat, idx));
-        });
-      }
-    }
-
-    // ----------------------------
-    // Projector window rendering
-    // ----------------------------
-    function renderProjectorStatus(){
-      if (!isProjectorView) return;
-
-      const dot = qs('#projStatusDot');
-      const hint = qs('#projHint');
-
-      if (!dot || !hint) return;
-
-      dot.classList.toggle('ok', state.projector.connected);
-      hint.style.display = 'inline-block';
-      hint.textContent = state.projector.connected ? 'PROJECTOR CONNECTED' : 'WAITING FOR HOST';
-    }
-
-    function projectorRenderModalFromState(){
-      if (!isProjectorView) return;
-
-      const pick = state.currentPick;
-      if (!pick){
-        hideModal();
-        return;
-      }
-
-      const q = currentQuestionObj();
-      if (!q){
-        hideModal();
-        return;
-      }
-
-      qs('#qaMetaLeft').innerHTML = `<strong>${escapeHtml(pick.category)}</strong>`;
-      const pts = q.points * (state.isDouble ? 2 : 1);
-      qs('#qaMetaRight').innerHTML = `<strong>${pts} pts</strong>`;
-
-      qs('#questionText').innerText = q.question;
-
-      if (q._projShown){
-        qs('#answerText').innerText = q.answer;
-        qs('#answerText').classList.add('revealed');
-      } else {
-        qs('#answerText').innerText = '';
-        qs('#answerText').classList.remove('revealed');
-      }
-
-      renderTimerUI();
-      qs('#timeOverlay').classList.toggle('show', state.timer.timeLeft === 0);
-
-      showModal();
-    }
-
-    // ----------------------------
-    // Broadcast / sync
-    // ----------------------------
-    function broadcastState(extra={}){
-      if (isProjectorView) return;
-      if (!state.settings.projectorEnabled) return;
-
-      sendToProjector({
-        type:'STATE',
-        state: deepClone(state),
-        extra
-      });
-    }
-
-    function handleIncoming(payload){
-      if (!payload || typeof payload !== 'object') return;
-
-      if (payload.type === 'PING' && !isProjectorView){
-        state.projector.connected = true;
-        saveState();
-        renderProjectorConnectedUI(true);
-        broadcastState({ pingReply:true });
-        return;
-      }
-
-      if (payload.type === 'STATE' && isProjectorView){
-        state = payload.state;
-        state.projector.connected = true;
-        renderProjectorStatus();
-        renderHeaderPills();
-        renderTeams();
-        renderBoard();
-        setWinnerBanner();
-        projectorRenderModalFromState();
-
-        if (payload.extra && 'splash' in payload.extra){
-          qs('#roundSplash').classList.toggle('show', !!payload.extra.splash);
-          qs('#splashTitle').innerText = (getCurrentRound()?.title || '').toUpperCase();
-        }
-        return;
-      }
-    }
-
-    function renderProjectorConnectedUI(connected){
-      if (isProjectorView) return;
-      const hint = qs('#projHint');
-      if (!hint) return;
-      hint.style.display = connected ? 'inline-block' : 'none';
-      hint.textContent = connected ? 'PROJECTOR CONNECTED' : '';
-    }
-
-    // ----------------------------
-    // Title -> Start game
-    // ----------------------------
-    function titleToGame(){
-      showGame();
-      renderHeaderPills();
-      renderTeams();
-      renderBoard();
-      setWinnerBanner();
-      showRoundSplash();
-      saveState();
-      broadcastState();
-    }
-
-    function loadQuestionsFromTitleTextarea(){
-      const raw = qs('#jsonInputTitle').value.trim();
-      if (!raw) return false;
-
-      try{
-        const parsed = parseAnyJson(raw);
-        state.rounds = parsed.rounds;
-
-        state.rounds.forEach(r => {
-          for (const cat of Object.keys(r.categories || {})){
-            r.categories[cat] = (r.categories[cat] || []).map(qq => ({
-              ...normalizeQuestion(qq),
-              _state: 'unplayed',
-              _hostShown: false,
-              _projShown: false
-            }));
-          }
-        });
-
-        if (parsed.teams){
-          state.teams = parsed.teams;
-          state.settings.teamCount = Math.min(6, Math.max(2, state.teams.length));
-        }
-        state.currentRoundIndex = 0;
-        undoStack = [];
-        return true;
-      }catch(e){
-        alert('Invalid JSON. Please check your data and try again.');
-        return false;
-      }
-    }
-
-    // ----------------------------
-    // Safe Mode (Projector reveal)
-    // ----------------------------
-    let projHoldTimer = null;
-    function setupSafeProjectorRevealButton(){
-      const btn = qs('#projAnswerBtn');
-      if (!btn) return;
-
-      btn.onmousedown = null;
-      btn.onmouseup = null;
-      btn.onmouseleave = null;
-      btn.ontouchstart = null;
-      btn.ontouchend = null;
-
-      function clearHold(){
-        if (projHoldTimer) clearTimeout(projHoldTimer);
-        projHoldTimer = null;
-        btn.style.filter = '';
-      }
-
-      function startHold(){
-        if (!state.settings.safeMode){
-          showAnswerProjector();
-          return;
-        }
-
-        btn.style.filter = 'brightness(1.15)';
-        projHoldTimer = setTimeout(() => {
-          showAnswerProjector(true);
-          clearHold();
-        }, 700);
-      }
-
-      btn.onmousedown = startHold;
-      btn.onmouseup = clearHold;
-      btn.onmouseleave = clearHold;
-
-      btn.ontouchstart = (e) => { e.preventDefault(); startHold(); };
-      btn.ontouchend = (e) => { e.preventDefault(); clearHold(); };
-    }
-
-    // ----------------------------
-    // Slot manager UI handlers
-    // ----------------------------
-    function openSlotModal(){
-      qs('#backdrop').classList.add('show');
-      qs('#slotModal').classList.add('show');
-      qs('#slotModal').style.display = 'block';
-      qs('#newSlotName').value = '';
-      qs('#renameSlotName').value = '';
-      qs('#duplicateSlotName').value = '';
-    }
-
-    function closeSlotModal(){
-      qs('#slotModal').classList.remove('show');
-      qs('#slotModal').style.display = 'none';
-      qs('#backdrop').classList.remove('show');
-    }
-
-    function renameSlot(oldName, newName){
-      const oldN = sanitizeSlotName(oldName) || 'Default';
-      const newN = sanitizeSlotName(newName) || '';
-      if (!newN){ alert('Please enter a new name.'); return false; }
-      if (newN === oldN){ alert('That is already the current name.'); return false; }
-
-      const slots = readSlotIndex();
-      if (slots.includes(newN)){ alert('A slot with that name already exists.'); return false; }
-
-      // Move saved payload if it exists
-      try{
-        const raw = localStorage.getItem(getSaveKey(oldN));
-        if (raw){
-          localStorage.setItem(getSaveKey(newN), raw);
-          localStorage.removeItem(getSaveKey(oldN));
-        }
-      }catch(e){}
-
-      // Update slot index
-      const nextSlots = slots.map(s => (s === oldN ? newN : s));
-      writeSlotIndex(nextSlots);
-
-      // Update state slot
-      state.settings.saveSlot = newN;
-
-      renderSlotSelect(newN);
-      return true;
-    }
-
-    function duplicateSlot(fromName, toName){
-      const fromN = sanitizeSlotName(fromName) || 'Default';
-      const toN = sanitizeSlotName(toName) || '';
-      if (!toN){ alert('Please enter a new slot name.'); return false; }
-
-      const slots = readSlotIndex();
-      if (slots.includes(toN)){ alert('A slot with that name already exists.'); return false; }
-
-      // Copy saved payload (or current in-memory state if none)
-      try{
-        const raw = localStorage.getItem(getSaveKey(fromN));
-        if (raw){
-          localStorage.setItem(getSaveKey(toN), raw);
-        } else {
-          // If no saved payload exists, clone current memory into new slot
-          const payload = { state: deepClone(state), undoStack: deepClone(undoStack) };
-          payload.state.settings.saveSlot = toN;
-          localStorage.setItem(getSaveKey(toN), JSON.stringify(payload));
-        }
-      }catch(e){}
-
-      ensureSlotExists(toN);
-      renderSlotSelect(toN);
-      return true;
-    }
-
-    function deleteSlot(name){
-      const n = sanitizeSlotName(name) || 'Default';
-      if (!confirm(`Delete slot "${n}"? This will delete its saved game.`)) return false;
-
-      try{ localStorage.removeItem(getSaveKey(n)); }catch(e){}
-
-      let slots = readSlotIndex().filter(s => s !== n);
-      if (!slots.length) slots = ['Default'];
-      writeSlotIndex(slots);
-
-      const fallback = slots[0] || 'Default';
-      setSlot(fallback, { loadIfExists: true });
-      renderSlotSelect(fallback);
-      return true;
-    }
-
-    // ----------------------------
-    // Wire up UI
-    // ----------------------------
-    function wireTitleUI(){
-      // Slot select change
-      qs('#saveSlotSelect')?.addEventListener('change', () => {
-        const slot = qs('#saveSlotSelect').value;
-        setSlot(slot, { loadIfExists: true });
-      });
-
-      qs('#manageSlotsBtn')?.addEventListener('click', openSlotModal);
-      qs('#closeSlotModalBtn')?.addEventListener('click', closeSlotModal);
-
-      qs('#createSlotBtn')?.addEventListener('click', () => {
-        const name = sanitizeSlotName(qs('#newSlotName').value);
-        if (!name){ alert('Please enter a slot name.'); return; }
-        ensureSlotExists(name);
-        renderSlotSelect(name);
-        setSlot(name, { loadIfExists: true });
-        alert(`Created slot: "${name}"`);
-      });
-
-      qs('#renameSlotBtn')?.addEventListener('click', () => {
-        const oldName = currentSlot();
-        const newName = qs('#renameSlotName').value;
-        if (renameSlot(oldName, newName)){
-          alert(`Renamed "${oldName}" → "${sanitizeSlotName(newName)}"`);
-          closeSlotModal();
-        }
-      });
-
-      qs('#duplicateSlotBtn')?.addEventListener('click', () => {
-        const fromName = currentSlot();
-        const toName = qs('#duplicateSlotName').value;
-        const toSan = sanitizeSlotName(toName);
-        if (duplicateSlot(fromName, toName)){
-          alert(`Duplicated "${fromName}" → "${toSan}"`);
-          closeSlotModal();
-        }
-      });
-
-      qs('#deleteSlotBtn')?.addEventListener('click', () => {
-        if (deleteSlot(currentSlot())){
-          closeSlotModal();
-        }
-      });
-
-      // Copy template
-      qs('#copyJsonTemplateBtn')?.addEventListener('click', () => {
-        copyToClipboard(jsonTemplate());
-        alert('JSON template copied.');
-      });
-
-      // Clear current slot save
-      qs('#clearSaveBtn').addEventListener('click', () => {
-        const slot = currentSlot();
-        const ok = confirm(`Clear saved GEFFEN BOWL game state for slot "${slot}"?`);
-        if (!ok) return;
-        clearSaved();
-        renderSlotSelect(slot);
-        qs('#jsonInputTitle').placeholder = `No saved game in "${slot}" yet. Paste JSON or use the Builder.`;
-        alert('Saved game cleared.');
-      });
-
-      // Export/Import
-      qs('#exportSaveBtn')?.addEventListener('click', exportSaveToFile);
-      qs('#importSaveBtn')?.addEventListener('click', () => qs('#importFileInput').click());
-      qs('#importFileInput')?.addEventListener('change', (e) => {
-        const file = e.target.files && e.target.files[0];
-        if (!file) return;
-        importSaveFromFile(file);
-        e.target.value = '';
-      });
-
-      qs('#pasteJsonFromTitle').addEventListener('click', () => {
-        qs('#jsonInputTitle').focus();
-      });
-
-      qs('#openBuilderFromTitle').addEventListener('click', () => {
-        if (!state.rounds?.length) state.rounds = [{ id:'r1_'+nowId(), title:'Round 1', categories:{} }];
-        openBuilder();
-      });
-
-      qs('#startFromTitle').addEventListener('click', () => {
-        // apply settings from title UI
-        const teamCount = clampInt(qs('#teamCount').value, 3);
-        const mode = qs('#gameMode').value;
-        const timerDefault = clampInt(qs('#timerDefault').value, 10);
-
-        state.settings.autosave = !!qs('#autosaveToggle').checked;
-        state.settings.projectorEnabled = !!qs('#projectorToggle').checked;
-        state.settings.safeMode = !!qs('#safeModeToggle').checked;
-        state.settings.defaultRevealBoth = !!qs('#defaultRevealBothToggle').checked;
-
-        setTeamCount(teamCount);
-        state.settings.timerDefault = timerDefault;
-        applyModePreset(mode);
-
-        // try to load JSON if present (overwrites questions)
-        loadQuestionsFromTitleTextarea();
-
-        qs('#timerDefaultReadout').innerText = String(state.settings.timerDefault);
-        qs('#safeModeReadout').innerText = state.settings.safeMode ? 'ON' : 'OFF';
-
-        setupSafeProjectorRevealButton();
-        titleToGame();
-
-        if (state.settings.projectorEnabled){
-          broadcastState();
-        }
-      });
-    }
-
-    function wireGameUI(){
-      qs('#returnToTitleBtn').addEventListener('click', () => {
-        const ok = confirm('Return to title screen? (Game state remains saved if Autosave is on.)');
-        if (!ok) return;
-        closeQuestion();
-        closeBuilder();
-        showTitle();
-        saveState();
-      });
-
-      qs('#toggleDoubleBtn').addEventListener('click', toggleDouble);
-
-      qs('#copyJsonBtn').addEventListener('click', () => {
-        const json = exportJson();
-        copyToClipboard(json);
-        alert('Current JSON copied.');
-      });
-
-      qs('#openBuilderBtn').addEventListener('click', () => openBuilder());
-      qs('#openProjectorBtn').addEventListener('click', () => openProjectorWindow());
-qs('#nextRoundBtn').addEventListener('click', () => {
-  nextRoundIfAvailable();
-});
-      qs('#projectorFullscreenBtn').addEventListener('click', () => {
-        try{ document.documentElement.requestFullscreen(); }catch(e){}
-      });
-
-      qs('#noTeamBtn').addEventListener('click', noTeamCorrect);
-
-      qs('#hostAnswerBtn').addEventListener('click', () => {
-        if (state.settings.defaultRevealBoth) showAnswerBoth();
-        else showAnswerHost(true);
-      });
-
-      qs('#bothAnswerBtn').addEventListener('click', showAnswerBoth);
-      qs('#pauseBtn').addEventListener('click', pauseTimer);
-      qs('#closeQuestionBtn').addEventListener('click', closeQuestion);
-
-      setupSafeProjectorRevealButton();
-
-      qs('#startRoundBtn').addEventListener('click', startRound);
-
-      qs('#backdrop').addEventListener('click', () => {
-        if (qs('#slotModal')?.classList.contains('show')) closeSlotModal();
-        if (qs('#builder').classList.contains('show')) closeBuilder();
-        if (qs('#questionModal').classList.contains('show')) closeQuestion();
-      });
-
-      qs('#builderCloseBtn').addEventListener('click', closeBuilder);
-      qs('#builderAddCategoryBtn').addEventListener('click', addCategory);
-      qs('#builderAddRoundBtn').addEventListener('click', addRound);
-      qs('#builderCopyJsonBtn').addEventListener('click', () => {
-        copyToClipboard(exportJson());
-        alert('JSON copied.');
-      });
-
-      document.addEventListener('keydown', (e) => {
-        if (isProjectorView) return;
-
-        const modalOpen = qs('#questionModal').classList.contains('show');
-        const builderOpen = qs('#builder').classList.contains('show');
-        const slotOpen = qs('#slotModal')?.classList.contains('show');
-
-        const isEditing = document.activeElement && (
-          document.activeElement.isContentEditable ||
-          ['TEXTAREA','INPUT','SELECT'].includes(document.activeElement.tagName)
-        );
-
-        if (slotOpen){
-          if (e.key === 'Escape'){ e.preventDefault(); closeSlotModal(); }
-          return;
-        }
-
-        if (isEditing && e.key !== 'Escape') return;
-
-        if (builderOpen){
-          if (e.key === 'Escape'){ e.preventDefault(); closeBuilder(); }
-          return;
-        }
-
-        if (modalOpen){
-          if (e.key === 'Escape'){ e.preventDefault(); closeQuestion(); return; }
-          if (e.key === ' '){ e.preventDefault(); pauseTimer(); return; }
-
-          if (e.key.toLowerCase() === 'a'){
-            if (e.shiftKey){
-              e.preventDefault();
-              if (state.settings.safeMode){
-                const ok = confirm('SAFE MODE: Reveal answer on projector?');
-                if (ok) showAnswerProjector(true);
-              } else {
-                showAnswerProjector();
-              }
-            } else {
-              e.preventDefault();
-              if (state.settings.defaultRevealBoth) showAnswerBoth();
-              else showAnswerHost(true);
-            }
-            return;
-          }
-
-          const n = clampInt(e.key, -1);
-          if (n >= 1 && n <= 6){
-            e.preventDefault();
-            if (n <= state.teams.length) awardToTeam(n - 1);
-            return;
-          }
-        } else {
-          if (e.key.toLowerCase() === 'u'){ e.preventDefault(); undoLast(); return; }
-        }
-      });
-    }
-
-    function copyToClipboard(text){
-      const temp = document.createElement('textarea');
-      temp.value = text;
-      document.body.appendChild(temp);
-      temp.select();
-      document.execCommand('copy');
-      document.body.removeChild(temp);
-    }
-
-    // ----------------------------
-    // Projector window open + handshake
-    // ----------------------------
-    function openProjectorWindow(){
-      if (isProjectorView) return;
-      if (!state.settings.projectorEnabled){
-        alert('Projector Mode is disabled on the title screen settings.');
-        return;
-      }
-
-      const url = new URL(location.href);
-      url.searchParams.set('view', 'projector');
-
-      projectorWin = window.open(url.toString(), 'GEFFEN_BOWL_PROJECTOR', 'popup,width=1200,height=800');
-      if (!projectorWin){
-        alert('Popup blocked. Allow popups for this page, then try again.');
-        return;
-      }
-
-      state.projector.connected = false;
-      renderProjectorConnectedUI(false);
-
-      setTimeout(() => {
-        sendToProjector({ type:'PING' });
-        broadcastState();
-      }, 300);
-    }
-
-    // ----------------------------
-    // Starfield (1993 vibe)
-    // ----------------------------
-    function initStarfield(){
-      const c1 = qs('#starfield');
-      const c2 = qs('#starfield2');
-      if (!c1 || !c2) return;
-
-      const ctx1 = c1.getContext('2d');
-      const ctx2 = c2.getContext('2d');
-
-      let w=0,h=0, dpr=1;
-
-      function resize(){
-        dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-        w = Math.floor(window.innerWidth * dpr);
-        h = Math.floor(window.innerHeight * dpr);
-        c1.width = w; c1.height = h;
-        c2.width = w; c2.height = h;
-        c1.style.width = '100%'; c1.style.height='100%';
-        c2.style.width = '100%'; c2.style.height='100%';
-      }
-      window.addEventListener('resize', resize);
-      resize();
-
-      const starsA = Array.from({length: 220}, () => ({
-        x: Math.random()*w,
-        y: Math.random()*h,
-        z: Math.random()*1,
-        s: 0.6 + Math.random()*1.4,
-        v: 0.25 + Math.random()*0.8
-      }));
-
-      const starsB = Array.from({length: 90}, () => ({
-        x: Math.random()*w,
-        y: Math.random()*h,
-        s: 1.2 + Math.random()*2.2,
-        v: 0.55 + Math.random()*1.2
-      }));
-
-      let t=0;
-
-      function step(){
-        t += 0.016;
-
-        ctx1.clearRect(0,0,w,h);
-        ctx1.fillStyle = 'rgba(255,255,255,.9)';
-        for (const s of starsA){
-          s.y += s.v * dpr * 1.2;
-          s.x += Math.sin(t*0.7 + s.z*10) * 0.12 * dpr;
-          if (s.y > h) { s.y = -10; s.x = Math.random()*w; }
-          ctx1.globalAlpha = 0.55 + s.z*0.35;
-          ctx1.fillRect(s.x, s.y, s.s*dpr*0.8, s.s*dpr*0.8);
-        }
-
-        ctx2.clearRect(0,0,w,h);
-        for (const s of starsB){
-          s.y += s.v * dpr * 2.4;
-          if (s.y > h){ s.y = -30; s.x = Math.random()*w; }
-          const glow = 0.35 + Math.sin(t*2 + s.x*0.002)*0.15;
-          ctx2.globalAlpha = glow;
-          ctx2.fillStyle = 'rgba(45,125,255,.8)';
-          ctx2.fillRect(s.x, s.y, s.s*dpr*0.5, s.s*dpr*2.5);
-
-          ctx2.globalAlpha = glow*0.8;
-          ctx2.fillStyle = 'rgba(255,224,102,.85)';
-          ctx2.fillRect(s.x + 2*dpr, s.y + 4*dpr, s.s*dpr*0.35, s.s*dpr*1.7);
-        }
-
-        requestAnimationFrame(step);
-      }
-      step();
-    }
-
-    // ----------------------------
-    // Boot
-    // ----------------------------
-    function boot(){
-      initStarfield();
-
-      if (isProjectorView){
-        showGame();
-        qs('#subtitle').innerText = 'PROJECTOR VIEW • read-only';
-        qs('#openProjectorBtn')?.remove();
-        qs('#returnToTitleBtn')?.remove();
-        qs('#openBuilderBtn')?.remove();
-        qs('#copyJsonBtn')?.remove();
-        qs('#toggleDoubleBtn')?.remove();
-
-        qs('#projHint').style.display = 'inline-block';
-        renderProjectorStatus();
-
-        onProjectorMessage(handleIncoming);
-
-        setTimeout(() => {
-          sendToProjector({ type:'PING' });
-        }, 250);
-
-        renderTeams();
-        renderBoard();
-        return;
-      }
-
-      // Ensure slot index exists + set default slot
-      state.settings.saveSlot = ensureSlotExists(state.settings.saveSlot || 'Default');
-      renderSlotSelect(state.settings.saveSlot);
-
-      // Attempt to load from selected slot
-      const loaded = loadStateForSlot(state.settings.saveSlot);
-
-      // Initialize title UI from state
-      qs('#teamCount').value = String(state.settings.teamCount || 3);
-      qs('#gameMode').value = state.settings.mode || 'classic';
-      qs('#timerDefault').value = String(state.settings.timerDefault || 10);
-
-      qs('#autosaveToggle').checked = !!state.settings.autosave;
-      qs('#projectorToggle').checked = !!state.settings.projectorEnabled;
-      qs('#safeModeToggle').checked = !!state.settings.safeMode;
-      qs('#defaultRevealBothToggle').checked = !!state.settings.defaultRevealBoth;
-
-      // Update placeholder based on slot save existence
+    function deleteSlot() {
       const slot = currentSlot();
-      qs('#jsonInputTitle').placeholder = slotHasSave(slot)
-        ? `Saved game detected in "${slot}". Click Start to resume, or paste JSON to overwrite.`
-        : `No saved game in "${slot}" yet. Paste JSON or use the Builder.`;
+      if (!confirm(`Delete slot "${slot}"?`)) return;
+      localStorage.removeItem(saveKey(slot));
+      const remaining = readSlots().filter(item => item !== slot);
+      writeSlots(remaining.length ? remaining : ["Default"]);
+      state.settings.saveSlot = readSlots()[0];
+      loadSlot(state.settings.saveSlot);
+      renderSlotSelect();
+      renderAll();
+    }
 
-      wireTitleUI();
-      wireGameUI();
+    function wireHost() {
+      $("#saveSlotSelect").addEventListener("change", () => {
+        loadSlot($("#saveSlotSelect").value);
+        renderAll();
+      });
+      $("#manageSlotsBtn").addEventListener("click", () => $("#slotModal").classList.add("show"));
+      $("#closeSlotBtn").addEventListener("click", () => $("#slotModal").classList.remove("show"));
+      $("#createSlotBtn").addEventListener("click", createSlot);
+      $("#renameSlotBtn").addEventListener("click", renameSlot);
+      $("#duplicateSlotBtn").addEventListener("click", duplicateSlot);
+      $("#deleteSlotBtn").addEventListener("click", deleteSlot);
+      $("#copyTemplateBtn").addEventListener("click", async () => {
+        await copyToClipboard(jsonTemplate());
+        alert("Template copied.");
+      });
+      $("#openBuilderFromTitle").addEventListener("click", openBuilder);
+      $("#openBuilderBtn").addEventListener("click", openBuilder);
+      $("#closeBuilderBtn").addEventListener("click", closeBuilder);
+      $("#addRoundBtn").addEventListener("click", addRound);
+      $("#addCategoryBtn").addEventListener("click", addCategory);
+      $("#builderCopyJsonBtn").addEventListener("click", async () => {
+        await copyToClipboard(exportQuestionsJson());
+        alert("JSON copied.");
+      });
+      $("#copyJsonBtn").addEventListener("click", async () => {
+        await copyToClipboard(exportQuestionsJson());
+        alert("JSON copied.");
+      });
+      $("#exportSaveBtn").addEventListener("click", exportSave);
+      $("#importSaveBtn").addEventListener("click", () => $("#importFileInput").click());
+      $("#importFileInput").addEventListener("change", (event) => {
+        const file = event.target.files?.[0];
+        if (file) importSave(file);
+        event.target.value = "";
+      });
+      $("#clearSaveBtn").addEventListener("click", () => {
+        if (!confirm(`Clear save for "${currentSlot()}"?`)) return;
+        localStorage.removeItem(saveKey(currentSlot()));
+        renderSlotSelect();
+      });
+      $("#startGameBtn").addEventListener("click", () => {
+        state.settings.autosave = $("#autosaveToggle").checked;
+        state.settings.projectorEnabled = $("#projectorToggle").checked;
+        state.settings.safeMode = $("#safeModeToggle").checked;
+        setTeamCount($("#teamCount").value);
+        state.settings.timerDefault = clampInt($("#timerDefault").value, 20, 1, 240);
+        applyMode($("#gameMode").value);
+        const raw = $("#jsonInput").value.trim();
+        if (raw) {
+          try {
+            const parsed = parseQuestionJson(raw);
+            state.rounds = parsed.rounds;
+            if (parsed.teams) {
+              state.teams = parsed.teams;
+              state.settings.teamCount = state.teams.length;
+            }
+            state.currentRoundIndex = 0;
+            state.currentPick = null;
+            undoStack = [];
+          } catch {
+            alert("That JSON did not load. Check the format and try again.");
+            return;
+          }
+        }
+        state.timer.timeLeft = state.settings.timerDefault;
+        showGame();
+        saveState();
+      });
+      $("#openProjectorBtn").addEventListener("click", openProjector);
+      $("#toggleDoubleBtn").addEventListener("click", () => {
+        pushUndo();
+        state.isDouble = !state.isDouble;
+        renderAll();
+        saveState();
+      });
+      $("#nextRoundBtn").addEventListener("click", nextRound);
+      $("#undoBtn").addEventListener("click", undo);
+      $("#titleBtn").addEventListener("click", showTitle);
+      $("#revealClassBtn").addEventListener("click", revealClass);
+      $("#hideClassBtn").addEventListener("click", hideClassAnswer);
+      $("#noTeamBtn").addEventListener("click", noTeam);
+      $("#pauseBtn").addEventListener("click", pauseTimer);
+      $("#closeQuestionBtn").addEventListener("click", closeQuestion);
+      document.addEventListener("keydown", (event) => {
+        const editing = document.activeElement && (document.activeElement.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName));
+        if (editing && event.key !== "Escape") return;
+        if (event.key === "Escape") {
+          if ($("#builder").classList.contains("show")) closeBuilder();
+          else if ($("#slotModal").classList.contains("show")) $("#slotModal").classList.remove("show");
+          else closeQuestion();
+        }
+        if (event.key === " ") {
+          event.preventDefault();
+          pauseTimer();
+        }
+        if (event.key.toLowerCase() === "u") undo();
+        const n = clampInt(event.key, -1);
+        if (n >= 1 && n <= state.teams.length && state.currentPick) award(n - 1);
+      });
+    }
 
-      onProjectorMessage(handleIncoming);
-
-      // If slot loaded successfully, keep it on title but ready to resume
-      if (loaded){
-        // nothing else needed; Start resumes
+    function initStars() {
+      const canvas = $("#stars");
+      const ctx = canvas.getContext("2d");
+      let width = 0;
+      let height = 0;
+      let dpr = 1;
+      let stars = [];
+      function resize() {
+        dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        width = Math.floor(window.innerWidth * dpr);
+        height = Math.floor(window.innerHeight * dpr);
+        canvas.width = width;
+        canvas.height = height;
+        stars = Array.from({ length: 180 }, () => ({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          speed: .25 + Math.random() * 1.1,
+          size: .7 + Math.random() * 1.7,
+          tone: Math.random()
+        }));
       }
+      window.addEventListener("resize", resize);
+      resize();
+      function frame() {
+        ctx.clearRect(0, 0, width, height);
+        for (const star of stars) {
+          star.y += star.speed * dpr;
+          if (star.y > height) {
+            star.y = -8;
+            star.x = Math.random() * width;
+          }
+          ctx.globalAlpha = .35 + star.tone * .45;
+          ctx.fillStyle = star.tone > .8 ? "#ffd84d" : "#ffffff";
+          ctx.fillRect(star.x, star.y, star.size * dpr, star.size * dpr);
+        }
+        requestAnimationFrame(frame);
+      }
+      frame();
+    }
 
-      showTitle();
+    function boot() {
+      initStars();
+      if (isHost) {
+        ensureSlot("Default");
+        state.settings.saveSlot = readSlots()[0] || "Default";
+        loadSlot(state.settings.saveSlot);
+        renderSlotSelect();
+        $("#teamCount").value = String(state.settings.teamCount);
+        $("#gameMode").value = state.settings.mode;
+        $("#timerDefault").value = String(state.settings.timerDefault);
+        $("#autosaveToggle").checked = state.settings.autosave;
+        $("#projectorToggle").checked = state.settings.projectorEnabled;
+        $("#safeModeToggle").checked = state.settings.safeMode;
+        wireHost();
+        showTitle();
+      } else {
+        $("#titleScreen").classList.add("hidden");
+        $("#gameScreen").classList.remove("hidden");
+        $("#fullscreenBtn").classList.remove("hidden");
+        $("#fullscreenBtn").addEventListener("click", () => document.documentElement.requestFullscreen?.());
+        renderAll();
+        setTimeout(() => send({ type: "PING" }), 250);
+      }
     }
 
     boot();
